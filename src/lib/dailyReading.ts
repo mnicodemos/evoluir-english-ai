@@ -305,7 +305,9 @@ export function readingOptionOrders(
   }
   return questions.map((question, questionIndex) => {
     const correctPosition = positions[questionIndex]!;
-    const distractors = question.options.map((_, index) => index).filter((index) => index !== question.answer);
+    const distractors = question.options
+      .map((_, index) => index)
+      .filter((index) => index !== question.answer);
     for (let index = distractors.length - 1; index > 0; index -= 1) {
       const swap = Math.floor(random() * (index + 1));
       [distractors[index], distractors[swap]] = [distractors[swap]!, distractors[index]!];
