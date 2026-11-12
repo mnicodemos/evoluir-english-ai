@@ -297,6 +297,12 @@ export const APP_GUIDE: GuideSection[] = [
       "Choose 1 to 7 study weekdays (Monday to Sunday) and set your daily minutes.",
       "Follow the activity of each day; done days are ticked.",
       "A new plan starts every Monday, and its order stays the same all week.",
+    steps: [
+      "Choose 1 to 7 study weekdays (Monday to Sunday) and set your daily minutes.",
+      "Follow the activity of each day; done days are ticked.",
+      "A new plan starts every Monday, and its order stays the same all week.",
+    ],
+    more: [
       "Your weekly frequency is the number of distinct valid study days divided by your weekly target, capped at 100%. Valid study days outside your selected weekdays still count toward the weekly target; days above the target stay in your history but do not raise the percentage.",
       "The week runs from Monday to Sunday in America/Sao_Paulo time. Days outside your selected plan are shown as inactive in the plan strip, but a valid study day on one of those dates can still count toward weekly frequency.",
       "Your streak is a separate measure: it counts consecutive credited study days.",
@@ -335,9 +341,13 @@ export const APP_GUIDE: GuideSection[] = [
     what: "Jewels mark streak milestones. Once earned, they remain yours permanently, even if your streak later resets.",
     steps: [
       "Close your study day with any one of the activities in What counts as a study day.",
+    steps: [
+      "Close your study day with any one of the activities in What counts as a study day.",
       "The milestones are 1, 7, 14, 21, 28, 35, 42, 49, 56 and 63 credited study days: Bronze first, then the next jewel at each milestone, up to Diamond.",
       "After Diamond, each additional 63-day cycle grants another Diamond at 126, 189, 252 days and so on.",
       "Freeze can protect at most one missed day in each Monday–Sunday week (Brasília time). It protects your streak but does not create a study-day record.",
+    ],
+    more: [
       "A jewel you earn is permanent; resetting or rebuilding a streak never removes or duplicates an award.",
       "The Dashboard shows your highest jewel and how many days are left for the next one.",
     ],
@@ -350,10 +360,13 @@ export const APP_GUIDE: GuideSection[] = [
     title: "Weekly league",
     what: "A friendly ranking with students of your level, reset every Monday.",
     steps: [
+    steps: [
       "Weekly XP shows your XP this week against last week and your best week, so you always have someone to beat: yourself.",
       "Join the league; other students only see your first name and initial.",
       "Earn XP through eligible learning activities; minutes alone and a study day do not grant an XP bonus.",
       "Weekly League XP, study frequency, streaks, Freeze and permanent jewels are separate systems. XP does not grant jewels, and jewels do not multiply XP.",
+    ],
+    more: [
       "The ranking opens once your level's league has 5 students taking part; then your medal shows your place: gold, silver or bronze for the top three.",
     ],
     to: "/league",
