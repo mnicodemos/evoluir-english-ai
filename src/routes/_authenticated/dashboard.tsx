@@ -347,7 +347,7 @@ function DashboardNotifications({
     {
       id: "review",
       to: wordReview.to,
-      label: `${translate("Words to review")}: ${wordReview.total}`,
+      label: `${translate("Cards&Words to review")}: ${wordReview.total}`,
       icon: RotateCcw,
       visible: wordReview.total > 0,
     },
