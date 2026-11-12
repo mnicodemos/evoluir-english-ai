@@ -191,8 +191,7 @@ export function WeeklyFrequency({
               <span
                 className={cn(
                   "text-[9px] text-muted-foreground",
-                  isToday && isPlanned && "font-semibold text-brand-green",
-                  studied && !isPlanned && "font-semibold text-amber-400",
+                  isToday && (isPlanned || studied) && "font-semibold text-brand-green",
                   !isPlanned && !studied && "opacity-35",
                 )}
               >
@@ -411,8 +410,7 @@ export function WeeklyFrequency({
                 <span
                   className={cn(
                     "text-[9px] text-muted-foreground",
-                    isToday && isPlanned && "font-semibold text-brand-green",
-                    studied && !isPlanned && "font-semibold text-amber-400",
+                    isToday && (isPlanned || studied) && "font-semibold text-brand-green",
                     !isPlanned && !studied && "opacity-35",
                   )}
                 >
