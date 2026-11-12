@@ -123,7 +123,7 @@ function VocabularyOnline() {
   const { data: profile } = useProfile();
   // The lessons' flashcards due: the second part of the one word review
   // (owner request, 2026-10-30), right under the words.
-  const { data: cardsDue = 0 } = useFlashcardsDue(profile?.id);
+  const { data: cardsDue = 0 } = useFlashcardsDue(profile?.id, { reviewedOnly: true });
   const loadDailyWords = useServerFn(dailyWords);
   const savePronunciation = useServerFn(persistPronunciationLegacy);
   const logTelemetry = useServerFn(logPracticeTelemetry);
