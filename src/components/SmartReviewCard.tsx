@@ -160,7 +160,9 @@ export function SmartReviewCard({
   // lessons' cards share this row, its count and its door (wordReviewTarget).
   const wordReview = wordReviewTarget(reviewCount, cardsFailed ? 0 : cardsDue);
   const showWordReviews = compact && wordReview.total > 0;
-  const items = showWordReviews ? allItems.filter((item) => item.skill !== "vocabulary") : allItems;
+  const items = showWordReviews
+    ? allItems.filter((item) => item.skill !== "vocabulary")
+    : allItems;
   const showMistakes = compact && mistakesDue > 0;
   // Up to three rows: due words and cards, due mistakes, then the server's suggestions.
   const suggestionSlots = 3 - Number(showWordReviews) - Number(showMistakes);
