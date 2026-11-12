@@ -1316,7 +1316,6 @@ const baseUiPt: Record<string, string> = {
   "This video is unavailable right now. Read the summary below and continue the lesson.":
     "Este vídeo está indisponível agora. Leia o resumo abaixo e continue a aula.",
   Watched: "Assistido",
-  Flashcards: "Flashcards",
   Quiz: "Quiz",
   "This lesson has no quiz yet.": "Esta lição ainda não tem quiz.",
   "This lesson was not found.": "Esta lição não foi encontrada.",
