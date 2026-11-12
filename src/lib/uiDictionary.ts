@@ -675,7 +675,8 @@ const baseUiPt: Record<string, string> = {
   "Their review date has arrived: a quick review keeps them in memory.":
     "Chegou a data de revisão: uma revisão rápida mantém essas palavras na memória.",
   "You are offline.": "Você está offline.",
-  "These are the words saved on this device": "Estas são as palavras salvas neste aparelho",
+  "These are the words saved on this device":
+    "Estas são as palavras salvas neste aparelho",
   "Marking words and checking pronunciation come back with the connection.":
     "Marcar palavras e testar a pronúncia voltam quando a conexão voltar.",
   "No new activities right now": "Nenhuma atividade nova no momento",
