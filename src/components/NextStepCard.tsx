@@ -942,7 +942,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     {t("Two activities for your development.")}
                   </p>
                   {/* Stacked, one full-width option per row, each with its description. */}
-                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:border-border [&>*]:bg-secondary/30 sm:[&>*]:px-3 sm:[&>*]:py-2.5 xl:flex-1 xl:auto-rows-fr xl:[&>*]:items-center">
+                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:!border-amber-400/35 [&>*]:!bg-amber-400/[0.045] sm:[&>*]:px-3 sm:[&>*]:py-2.5 xl:flex-1 xl:auto-rows-fr xl:[&>*]:items-center">
                     {quickWinSlot}
                     {challengeButton}
                     {!(quickWinSlot && challengeButton) && (
