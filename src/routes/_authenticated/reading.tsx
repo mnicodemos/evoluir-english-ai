@@ -665,7 +665,10 @@ function ReadingPage() {
       .getElementById(`reading-paragraph-${paragraph}`)
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
-  const optionOrders = useMemo(() => reading ? readingOptionOrders(reading.questions) : [], [reading]);
+  const optionOrders = useMemo(
+    () => (reading ? readingOptionOrders(reading.questions) : []),
+    [reading],
+  );
   const [chosen, setChosen] = useState<(number | null)[]>([]);
   const [checked, setChecked] = useState(false);
   // The question on screen: the five questions sit behind numbered tabs.
