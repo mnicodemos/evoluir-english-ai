@@ -61,9 +61,7 @@ describe("daily reading rules", () => {
     ).toBe(true);
     const correctPositions = orders.map((order, index) => order.indexOf(questions[index]!.answer));
     expect(
-      [0, 1, 2, 3].map((position) =>
-        correctPositions.filter((value) => value === position).length,
-      ),
+      [0, 1, 2, 3].map((position) => correctPositions.filter((value) => value === position).length),
     ).toEqual([2, 2, 2, 2]);
     expect(orders.every((order) => new Set(order).size === 4)).toBe(true);
   });
