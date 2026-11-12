@@ -1124,17 +1124,15 @@ function ReadingPage() {
                         {qIndex + 1}. {question.question}
                       </p>
                       <div className="mt-2 grid gap-1.5">
-                        {(
-                          optionOrders[qIndex] ??
-                          question.options.map((_, index) => index)
-                        ).map((originalIndex) => {
-                          const option = question.options[originalIndex]!;
-                          const picked = chosen[qIndex] === originalIndex;
-                          const right = checked && originalIndex === question.answer;
-                          const wrong = checked && picked && originalIndex !== question.answer;
-                          return (
-                            <button
-                              key={originalIndex}
+                        {(optionOrders[qIndex] ?? question.options.map((_, index) => index)).map(
+                          (originalIndex) => {
+                            const option = question.options[originalIndex]!;
+                            const picked = chosen[qIndex] === originalIndex;
+                            const right = checked && originalIndex === question.answer;
+                            const wrong = checked && picked && originalIndex !== question.answer;
+                            return (
+                              <button
+                                key={originalIndex}
                               type="button"
                               disabled={checked}
                               aria-pressed={picked}
