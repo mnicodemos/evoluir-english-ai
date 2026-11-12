@@ -297,10 +297,6 @@ export const APP_GUIDE: GuideSection[] = [
       "Choose 1 to 7 study weekdays (Monday to Sunday) and set your daily minutes.",
       "Follow the activity of each day; done days are ticked.",
       "A new plan starts every Monday, and its order stays the same all week.",
-    steps: [
-      "Choose 1 to 7 study weekdays (Monday to Sunday) and set your daily minutes.",
-      "Follow the activity of each day; done days are ticked.",
-      "A new plan starts every Monday, and its order stays the same all week.",
     ],
     more: [
       "Your weekly frequency is the number of distinct valid study days divided by your weekly target, capped at 100%. Valid study days outside your selected weekdays still count toward the weekly target; days above the target stay in your history but do not raise the percentage.",
