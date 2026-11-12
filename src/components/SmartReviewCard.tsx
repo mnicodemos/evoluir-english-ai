@@ -275,7 +275,7 @@ export function SmartReviewCard({
               <img src={reviewLesson} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Flashcards")} />
-                <p className="truncate text-sm font-semibold">{t("Review words")}</p>
+                <p className="truncate text-sm font-semibold">{t("Review flashcards")}</p>
               </div>
               <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
                 <Link to="/learning/review" aria-label={`${t("Review now")}: ${t("Flashcards")}`}>
@@ -289,7 +289,7 @@ export function SmartReviewCard({
               <img src={reviewWords} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
-                <p className="truncate text-sm font-semibold">{t("Review flashcards")}</p>
+                <p className="truncate text-sm font-semibold">{t("Review words")}</p>
               </div>
               <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
                 <Link to="/vocabulary" aria-label={`${t("Review now")}: ${t("Vocabulary")}`}>
