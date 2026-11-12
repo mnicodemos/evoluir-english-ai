@@ -115,6 +115,8 @@ export function WeeklyLeagueSummary({
         label={translate("Weekly league")}
         labelClassName="whitespace-nowrap text-[clamp(8px,2.4vw,10px)] tracking-[0.03em]"
         value={`${week.thisWeek} XP`}
+        detail={weekXpLine(week, translate, true)}
+        detailClassName="hidden sm:block"
         to="/league"
       />
     );
