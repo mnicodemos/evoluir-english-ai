@@ -321,21 +321,33 @@ export const appGuidePt: Record<string, string> = {
   "Ten reviewed words complete a study day; your lesson cards due show right under them, and the translator sits at the top.":
     "Dez palavras revisadas completam um dia de estudo; os cartões das lições a revisar aparecem logo abaixo, e o tradutor fica no topo.",
 
-
   "English Adventures A1–A2": "Aventuras em inglês A1–A2",
-  "Short interactive stories with EVO, designed for A1 and A2 learners.": "Histórias interativas curtas com a EVO, criadas para alunos dos níveis A1 e A2.",
-  "Open English Adventures and choose one of the four stories available at A1 or A2.": "Abra Aventuras em inglês e escolha uma das quatro histórias disponíveis nos níveis A1 ou A2.",
-  "Read each scene, choose your answer and follow how your decisions shape the story.": "Leia cada cena, escolha sua resposta e acompanhe como suas decisões influenciam a história.",
-  "Use EVO's hints and recovery feedback to learn from difficult choices; there is no pass/fail score.": "Use as dicas e o feedback de recuperação da EVO para aprender com escolhas difíceis; não há nota de aprovação ou reprovação.",
-  "Your completed activities and current checkpoint are saved, so you can continue later, including on another device.": "Suas atividades concluídas e o ponto atual da aventura ficam salvos para você continuar depois, inclusive em outro dispositivo.",
-  "A1 stories: Welcome Mix-up and Neighbourhood Mystery. A2 stories: Surprise Delivery and Community Festival.": "Histórias A1: Welcome Mix-up e Neighbourhood Mystery. Histórias A2: Surprise Delivery e Community Festival.",
-  "Each adventure has 10 activities. The Home progress card tracks completed activities across all four adventures.": "Cada aventura tem 10 atividades. O cartão de progresso da Home acompanha as atividades concluídas nas quatro aventuras.",
-  "Answer choices can appear in a different order; saved choices remain linked to the correct activity.": "As alternativas podem aparecer em ordens diferentes; as escolhas salvas continuam vinculadas à atividade correta.",
-  "Complete the 10-minute daily AI Teacher challenge to earn +5 XP once that day.": "Conclua o desafio diário de 10 minutos do AI Teacher para ganhar +5 XP uma única vez naquele dia.",
-  "A Coach session follows four stages: focus and first challenge, feedback and retry, correction and a final attempt, then a learning summary with the skill practised.": "Uma sessão Coach tem quatro etapas: foco e primeiro desafio, feedback e nova tentativa, correção e tentativa final, e depois um resumo da aprendizagem com a habilidade praticada.",
-  "Choose 1 to 7 study weekdays (Monday to Sunday) and set your daily minutes.": "Escolha de 1 a 7 dias de estudo (de segunda a domingo) e defina seus minutos diários.",
-  "Your weekly frequency is the number of distinct valid study days divided by your weekly target, capped at 100%. Valid study days outside your selected weekdays still count toward the weekly target; days above the target stay in your history but do not raise the percentage.": "Sua frequência semanal é o número de dias de estudo válidos e distintos dividido pela meta semanal, limitada a 100%. Dias válidos fora dos dias selecionados também contam para a meta semanal; dias acima da meta permanecem no histórico, mas não aumentam o percentual.",
-  "The week runs from Monday to Sunday in America/Sao_Paulo time. Days outside your selected plan are shown as inactive in the plan strip, but a valid study day on one of those dates can still count toward weekly frequency.": "A semana vai de segunda a domingo no fuso America/Sao_Paulo. Dias fora do plano selecionado aparecem inativos na faixa do plano, mas um dia de estudo válido nessas datas ainda pode contar para a frequência semanal.",
+  "Short interactive stories with EVO, designed for A1 and A2 learners.":
+    "Histórias interativas curtas com a EVO, criadas para alunos dos níveis A1 e A2.",
+  "Open English Adventures and choose one of the four stories available at A1 or A2.":
+    "Abra Aventuras em inglês e escolha uma das quatro histórias disponíveis nos níveis A1 ou A2.",
+  "Read each scene, choose your answer and follow how your decisions shape the story.":
+    "Leia cada cena, escolha sua resposta e acompanhe como suas decisões influenciam a história.",
+  "Use EVO's hints and recovery feedback to learn from difficult choices; there is no pass/fail score.":
+    "Use as dicas e o feedback de recuperação da EVO para aprender com escolhas difíceis; não há nota de aprovação ou reprovação.",
+  "Your completed activities and current checkpoint are saved, so you can continue later, including on another device.":
+    "Suas atividades concluídas e o ponto atual da aventura ficam salvos para você continuar depois, inclusive em outro dispositivo.",
+  "A1 stories: Welcome Mix-up and Neighbourhood Mystery. A2 stories: Surprise Delivery and Community Festival.":
+    "Histórias A1: Welcome Mix-up e Neighbourhood Mystery. Histórias A2: Surprise Delivery e Community Festival.",
+  "Each adventure has 10 activities. The Home progress card tracks completed activities across all four adventures.":
+    "Cada aventura tem 10 atividades. O cartão de progresso da Home acompanha as atividades concluídas nas quatro aventuras.",
+  "Answer choices can appear in a different order; saved choices remain linked to the correct activity.":
+    "As alternativas podem aparecer em ordens diferentes; as escolhas salvas continuam vinculadas à atividade correta.",
+  "Complete the 10-minute daily AI Teacher challenge to earn +5 XP once that day.":
+    "Conclua o desafio diário de 10 minutos do AI Teacher para ganhar +5 XP uma única vez naquele dia.",
+  "A Coach session follows four stages: focus and first challenge, feedback and retry, correction and a final attempt, then a learning summary with the skill practised.":
+    "Uma sessão Coach tem quatro etapas: foco e primeiro desafio, feedback e nova tentativa, correção e tentativa final, e depois um resumo da aprendizagem com a habilidade praticada.",
+  "Choose 1 to 7 study weekdays (Monday to Sunday) and set your daily minutes.":
+    "Escolha de 1 a 7 dias de estudo (de segunda a domingo) e defina seus minutos diários.",
+  "Your weekly frequency is the number of distinct valid study days divided by your weekly target, capped at 100%. Valid study days outside your selected weekdays still count toward the weekly target; days above the target stay in your history but do not raise the percentage.":
+    "Sua frequência semanal é o número de dias de estudo válidos e distintos dividido pela meta semanal, limitada a 100%. Dias válidos fora dos dias selecionados também contam para a meta semanal; dias acima da meta permanecem no histórico, mas não aumentam o percentual.",
+  "The week runs from Monday to Sunday in America/Sao_Paulo time. Days outside your selected plan are shown as inactive in the plan strip, but a valid study day on one of those dates can still count toward weekly frequency.":
+    "A semana vai de segunda a domingo no fuso America/Sao_Paulo. Dias fora do plano selecionado aparecem inativos na faixa do plano, mas um dia de estudo válido nessas datas ainda pode contar para a frequência semanal.",
   "Your weekly frequency is the number of distinct valid study days divided by your weekly target, capped at 100%. Extra study days remain in your history but do not increase the percentage.":
     "Sua frequência semanal é o número de dias de estudo válidos e distintos dividido pela meta semanal, limitada a 100%. Dias extras continuam no histórico, mas não aumentam o percentual.",
   "The frequency week runs from Monday to Sunday, in Brasília time. Your streak is a separate measure: it counts consecutive credited study days.":
