@@ -53,12 +53,18 @@ describe("daily reading rules", () => {
     }));
     const orders = readingOptionOrders(questions, () => 0.25);
     expect(orders).toHaveLength(8);
-    expect(orders.every((order, index) => order[orders[index]!.indexOf(questions[index]!.answer)] === questions[index]!.answer)).toBe(true);
+    expect(
+      orders.every(
+        (order, index) =>
+          order[orders[index]!.indexOf(questions[index]!.answer)] === questions[index]!.answer,
+      ),
+    ).toBe(true);
     const correctPositions = orders.map((order, index) => order.indexOf(questions[index]!.answer));
-    expect([0, 1, 2, 3].map((position) => correctPositions.filter((value) => value === position).length)).toEqual([2, 2, 2, 2]);
+    expect(
+      [0, 1, 2, 3].map((position) => correctPositions.filter((value) => value === position).length),
+    ).toEqual([2, 2, 2, 2]);
     expect(orders.every((order) => new Set(order).size === 4)).toBe(true);
   });
-
 
   it("grows in length and questions with the level", () => {
     expect(READING_SPECS.a1.maxWords).toBeLessThan(READING_SPECS.b1.minWords);
