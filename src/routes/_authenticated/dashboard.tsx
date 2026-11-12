@@ -652,7 +652,7 @@ function Dashboard() {
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const indicators = useActivityIndicators();
   const reviewCount = useDueReviewCount(profile?.id);
-  const { data: cardsDue = 0 } = useFlashcardsDue(profile?.id);
+  const { data: cardsDue = 0 } = useFlashcardsDue(profile?.id, { reviewedOnly: true });
   const {
     data: mistakesDue = 0,
     isSuccess: mistakesKnown,
