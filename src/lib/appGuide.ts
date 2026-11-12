@@ -337,8 +337,6 @@ export const APP_GUIDE: GuideSection[] = [
     what: "Jewels mark streak milestones. Once earned, they remain yours permanently, even if your streak later resets.",
     steps: [
       "Close your study day with any one of the activities in What counts as a study day.",
-    steps: [
-      "Close your study day with any one of the activities in What counts as a study day.",
       "The milestones are 1, 7, 14, 21, 28, 35, 42, 49, 56 and 63 credited study days: Bronze first, then the next jewel at each milestone, up to Diamond.",
       "After Diamond, each additional 63-day cycle grants another Diamond at 126, 189, 252 days and so on.",
       "Freeze can protect at most one missed day in each Monday–Sunday week (Brasília time). It protects your streak but does not create a study-day record.",
@@ -355,7 +353,6 @@ export const APP_GUIDE: GuideSection[] = [
     icon: "league",
     title: "Weekly league",
     what: "A friendly ranking with students of your level, reset every Monday.",
-    steps: [
     steps: [
       "Weekly XP shows your XP this week against last week and your best week, so you always have someone to beat: yourself.",
       "Join the league; other students only see your first name and initial.",
