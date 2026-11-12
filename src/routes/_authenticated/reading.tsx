@@ -1166,9 +1166,10 @@ function ReadingPage() {
                               <span translate="no" lang="en">
                                 {option}
                               </span>
-                            </button>
-                          );
-                        })}
+                              </button>
+                            );
+                          },
+                        )}
                       </div>
                       {checked && question.explanation_pt ? (
                         <p translate="no" className="mt-1.5 text-xs text-muted-foreground">
