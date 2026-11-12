@@ -66,3 +66,11 @@ export function lessonStarted(lesson: {
 }): boolean {
   return (lesson.video_progress ?? 0) > 0 || (lesson.progress ?? 0) > 0 || !!lesson.completed_at;
 }
+
+
+/** True only after the student has actually rated a flashcard at least once. */
+export function isFlashcardReviewed(
+  state: { times_reviewed?: number | null } | undefined,
+): boolean {
+  return (state?.times_reviewed ?? 0) > 0;
+}
