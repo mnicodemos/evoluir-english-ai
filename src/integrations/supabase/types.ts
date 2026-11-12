@@ -3013,6 +3013,22 @@ export type Database = {
           xp: number
         }[]
       }
+      weekly_league_xp_breakdown: {
+        Args: never
+        Returns: {
+          activity: string
+          occurred_at: string
+          xp: number
+        }[]
+      }
+      weekly_league_xp_entries: {
+        Args: { p_user_id: string; p_week_start: string }
+        Returns: {
+          activity: string
+          occurred_at: string
+          xp: number
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
