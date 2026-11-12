@@ -288,6 +288,37 @@ export function parseDailyReading(raw: string, level: ReadingLevel): DailyReadin
   };
 }
 
+/**
+ * Display option order for one reading attempt. Correct-answer positions are
+ * balanced across the four slots; distractors are shuffled independently.
+ * Each entry maps a displayed slot to the original option index, so grading
+ * and evidence continue to use the canonical answer index.
+ */
+export function readingOptionOrders(
+  questions: readonly Pick<DailyReadingQuestion, "options" | "answer">[],
+  random: () => number = Math.random,
+): number[][] {
+  const positions = Array.from({ length: questions.length }, (_, index) => index % 4);
+  for (let index = positions.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(random() * (index + 1));
+    [positions[index], positions[swap]] = [positions[swap]!, positions[index]!];
+  }
+  return questions.map((question, questionIndex) => {
+    const correctPosition = positions[questionIndex]!;
+    const distractors = question.options.map((_, index) => index).filter((index) => index !== question.answer);
+    for (let index = distractors.length - 1; index > 0; index -= 1) {
+      const swap = Math.floor(random() * (index + 1));
+      [distractors[index], distractors[swap]] = [distractors[swap]!, distractors[index]!];
+    }
+    const order: number[] = [];
+    let distractorIndex = 0;
+    for (let slot = 0; slot < question.options.length; slot += 1) {
+      order.push(slot === correctPosition ? question.answer : distractors[distractorIndex++]!);
+    }
+    return order;
+  });
+}
+
 /** Right answers out of the questions; unanswered ones count as wrong. */
 export function gradeReading(
   questions: readonly Pick<DailyReadingQuestion, "answer">[],
