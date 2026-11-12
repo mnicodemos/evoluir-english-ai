@@ -73,7 +73,7 @@ export function weekXpLine(
 ): string {
   if (week.record) return translate("Your best week so far");
   if (week.lastWeek <= 0) return translate(compact ? "Earns XP" : "Every activity earns XP");
-  if (week.delta >= 0) return `+${week.delta} XP ${translate("vs last week")}`;
+  if (week.delta >= 0) return "";
   if (compact) return `${translate("Beat")} ${week.lastWeek} XP`;
   return `${-week.delta} XP ${translate("to beat last week")}`;
 }
