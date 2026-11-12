@@ -673,10 +673,11 @@ const baseUiPt: Record<string, string> = {
   "Next in your plan": "Próximo no seu plano",
   "Review 1 word": "Revisar 1 palavra",
   "Review {n} words": "Revisar {n} palavras",
-  "Flashcards": "Flashcards",
+  Flashcards: "Flashcards",
   "Review 1 flashcard": "Revisar 1 flashcard",
   "Review {n} flashcards": "Revisar {n} flashcards",
-  "Revisit your lesson cards to strengthen what you have learned.": "Revise os cartões das suas aulas para fortalecer o que você aprendeu.",
+  "Revisit your lesson cards to strengthen what you have learned.":
+    "Revise os cartões das suas aulas para fortalecer o que você aprendeu.",
   "Their review date has arrived: a quick review keeps them in memory.":
     "Chegou a data de revisão: uma revisão rápida mantém essas palavras na memória.",
   "You are offline.": "Você está offline.",
