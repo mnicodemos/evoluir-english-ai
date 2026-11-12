@@ -92,9 +92,9 @@ jobs:
             # only from a malicious server's response, and the app calls trusted
             # APIs). Remove once bun.lock has undici >= 7.30.1.
             # Zod 4 is pinned to 4.6.7. The app still directly uses Zod 3.25.76;
-  # this advisory has no patched 3.x release, so ignore only this GHSA until
-  # the application can safely migrate its direct Zod 3 usage.
-  if bun audit --audit-level=high --ignore=GHSA-mrhx-c7xc-m3w5 --ignore=GHSA-xjj6-f33q-929c >"$audit_log" 2>&1; then
+            # this advisory has no patched 3.x release, so ignore only this GHSA until
+            # the application can safely migrate its direct Zod 3 usage.
+            if bun audit --audit-level=high --ignore=GHSA-mrhx-c7xc-m3w5 --ignore=GHSA-xjj6-f33q-929c >"$audit_log" 2>&1; then
               cat "$audit_log"
               audit_ok=true
               break
