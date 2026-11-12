@@ -153,7 +153,10 @@ export function DashboardHeaderStat({
         {detail &&
           (detailIcon ? (
             <span
-              className={cn("mt-0.5 flex min-w-0 items-center gap-1 text-xs leading-tight text-muted-foreground", detailClassName)}
+              className={cn(
+                "mt-0.5 flex min-w-0 items-center gap-1 text-xs leading-tight text-muted-foreground",
+                detailClassName,
+              )}
               style={detailStyle}
             >
               {detailIcon}
@@ -161,7 +164,10 @@ export function DashboardHeaderStat({
             </span>
           ) : (
             <span
-              className={cn("mt-0.5 block truncate text-xs leading-tight text-muted-foreground", detailClassName)}
+              className={cn(
+                "mt-0.5 block truncate text-xs leading-tight text-muted-foreground",
+                detailClassName,
+              )}
               style={detailStyle}
             >
               {detail}
