@@ -34,6 +34,7 @@ export function DashboardHeaderStat({
   value,
   detail,
   detailStyle,
+  detailClassName,
   detailIcon,
   valueStyle,
   iconColor,
@@ -49,6 +50,7 @@ export function DashboardHeaderStat({
   value: string;
   detail?: string | null;
   detailStyle?: CSSProperties | undefined;
+  detailClassName?: string;
   detailIcon?: ReactNode;
   valueStyle?: CSSProperties | undefined;
   iconColor?: string | undefined;
@@ -151,7 +153,10 @@ export function DashboardHeaderStat({
         {detail &&
           (detailIcon ? (
             <span
-              className="mt-0.5 flex min-w-0 items-center gap-1 text-xs leading-tight text-muted-foreground"
+              className={cn(
+                "mt-0.5 flex min-w-0 items-center gap-1 text-xs leading-tight text-muted-foreground",
+                detailClassName,
+              )}
               style={detailStyle}
             >
               {detailIcon}
@@ -159,7 +164,10 @@ export function DashboardHeaderStat({
             </span>
           ) : (
             <span
-              className="mt-0.5 block truncate text-xs leading-tight text-muted-foreground"
+              className={cn(
+                "mt-0.5 block truncate text-xs leading-tight text-muted-foreground",
+                detailClassName,
+              )}
               style={detailStyle}
             >
               {detail}
