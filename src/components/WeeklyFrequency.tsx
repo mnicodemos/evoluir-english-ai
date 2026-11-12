@@ -168,7 +168,7 @@ export function WeeklyFrequency({
           const isPlanned = selectedWeekdays.includes(
             ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!,
           );
-          const studied = isPlanned && (studyDays?.has(key) ?? false);
+          const studied = studyDays?.has(key) ?? false;
           const isToday = key === todayKey;
           return (
             <div
@@ -191,8 +191,8 @@ export function WeeklyFrequency({
               <span
                 className={cn(
                   "text-[9px] text-muted-foreground",
-                  isToday && isPlanned && "font-semibold text-brand-green",
-                  !isPlanned && "opacity-35",
+                  isToday && (isPlanned || studied) && "font-semibold text-brand-green",
+                  !isPlanned && !studied && "opacity-35",
                 )}
               >
                 {labels[i]}
@@ -202,8 +202,8 @@ export function WeeklyFrequency({
                   className={cn(
                     "grid size-5 place-items-center rounded-full",
                     isToday
-                      ? "bg-brand-green text-primary-foreground"
-                      : "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35",
+                      ? isPlanned ? "bg-brand-green text-primary-foreground" : "bg-amber-400 text-slate-950"
+                      : isPlanned ? "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35" : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/45",
                   )}
                 >
                   <Check className="size-3.5" strokeWidth={3} />
@@ -399,15 +399,15 @@ export function WeeklyFrequency({
             const isPlanned = selectedWeekdays.includes(
               ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!,
             );
-            const studied = isPlanned && (studyDays?.has(key) ?? false);
+            const studied = studyDays?.has(key) ?? false;
             const isToday = key === todayKey;
             return (
               <div key={key} className="grid justify-items-center gap-1">
                 <span
                   className={cn(
                     "text-[9px] text-muted-foreground",
-                    isToday && isPlanned && "font-semibold text-brand-green",
-                    !isPlanned && "opacity-35",
+                    isToday && (isPlanned || studied) && "font-semibold text-brand-green",
+                    !isPlanned && !studied && "opacity-35",
                   )}
                 >
                   {labels[i]}
@@ -417,8 +417,8 @@ export function WeeklyFrequency({
                     className={cn(
                       "grid size-5 place-items-center rounded-full",
                       isToday
-                        ? "bg-brand-green text-primary-foreground"
-                        : "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35",
+                        ? isPlanned ? "bg-brand-green text-primary-foreground" : "bg-amber-400 text-slate-950"
+                        : isPlanned ? "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35" : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/45",
                     )}
                   >
                     <Check className="size-3" strokeWidth={3} />
@@ -463,11 +463,11 @@ export function WeeklyFrequency({
               const isPlanned = selectedWeekdays.includes(
                 ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][i]!,
               );
-              const studied = isPlanned && (studyDays?.has(key) ?? false);
+              const studied = studyDays?.has(key) ?? false;
               return (
                 <div key={key} className="flex flex-col items-center gap-1">
                   {studied ? (
-                    <span className="grid size-6 place-items-center rounded-full bg-brand-green text-primary-foreground">
+                    <span className={cn("grid size-6 place-items-center rounded-full", isPlanned ? "bg-brand-green text-primary-foreground" : "bg-amber-400 text-slate-950")}>
                       <Check className="size-3.5" strokeWidth={3} />
                     </span>
                   ) : isPlanned ? (
