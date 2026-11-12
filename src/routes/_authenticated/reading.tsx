@@ -665,7 +665,10 @@ function ReadingPage() {
       .getElementById(`reading-paragraph-${paragraph}`)
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
-  const optionOrders = useMemo(() => reading ? readingOptionOrders(reading.questions) : [], [reading]);
+  const optionOrders = useMemo(
+    () => (reading ? readingOptionOrders(reading.questions) : []),
+    [reading],
+  );
   const [chosen, setChosen] = useState<(number | null)[]>([]);
   const [checked, setChecked] = useState(false);
   // The question on screen: the five questions sit behind numbered tabs.
@@ -1121,48 +1124,50 @@ function ReadingPage() {
                         {qIndex + 1}. {question.question}
                       </p>
                       <div className="mt-2 grid gap-1.5">
-                        {(optionOrders[qIndex] ?? question.options.map((_, index) => index)).map((originalIndex) => {
-                          const option = question.options[originalIndex]!;
-                          const picked = chosen[qIndex] === originalIndex;
-                          const right = checked && originalIndex === question.answer;
-                          const wrong = checked && picked && originalIndex !== question.answer;
-                          return (
-                            <button
-                              key={originalIndex}
-                              type="button"
-                              disabled={checked}
-                              aria-pressed={picked}
-                              onClick={() => {
-                                const next = chosen.map((value, index) =>
-                                  index === qIndex ? originalIndex : value,
-                                );
-                                setChosen(next);
-                                // On to the next open question, so answering flows.
-                                const open = next.findIndex(
-                                  (value, index) => index > qIndex && value === null,
-                                );
-                                if (open >= 0) window.setTimeout(() => setCurrent(open), 250);
-                              }}
-                              className={cn(
-                                "flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
-                                picked && !checked
-                                  ? "border-brand-green bg-brand-green/10"
-                                  : "border-border hover:bg-secondary/60",
-                                right && "border-brand-green bg-brand-green/10 text-brand-green",
-                                wrong && "border-destructive/60 bg-destructive/10",
-                              )}
-                            >
-                              {right ? (
-                                <Check className="size-4 shrink-0" aria-hidden="true" />
-                              ) : wrong ? (
-                                <X className="size-4 shrink-0" aria-hidden="true" />
-                              ) : null}
-                              <span translate="no" lang="en">
-                                {option}
-                              </span>
-                            </button>
-                          );
-                        })}
+                        {(optionOrders[qIndex] ?? question.options.map((_, index) => index)).map(
+                          (originalIndex) => {
+                            const option = question.options[originalIndex]!;
+                            const picked = chosen[qIndex] === originalIndex;
+                            const right = checked && originalIndex === question.answer;
+                            const wrong = checked && picked && originalIndex !== question.answer;
+                            return (
+                              <button
+                                key={originalIndex}
+                                type="button"
+                                disabled={checked}
+                                aria-pressed={picked}
+                                onClick={() => {
+                                  const next = chosen.map((value, index) =>
+                                    index === qIndex ? originalIndex : value,
+                                  );
+                                  setChosen(next);
+                                  // On to the next open question, so answering flows.
+                                  const open = next.findIndex(
+                                    (value, index) => index > qIndex && value === null,
+                                  );
+                                  if (open >= 0) window.setTimeout(() => setCurrent(open), 250);
+                                }}
+                                className={cn(
+                                  "flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
+                                  picked && !checked
+                                    ? "border-brand-green bg-brand-green/10"
+                                    : "border-border hover:bg-secondary/60",
+                                  right && "border-brand-green bg-brand-green/10 text-brand-green",
+                                  wrong && "border-destructive/60 bg-destructive/10",
+                                )}
+                              >
+                                {right ? (
+                                  <Check className="size-4 shrink-0" aria-hidden="true" />
+                                ) : wrong ? (
+                                  <X className="size-4 shrink-0" aria-hidden="true" />
+                                ) : null}
+                                <span translate="no" lang="en">
+                                  {option}
+                                </span>
+                              </button>
+                            );
+                          },
+                        )}
                       </div>
                       {checked && question.explanation_pt ? (
                         <p translate="no" className="mt-1.5 text-xs text-muted-foreground">

@@ -158,10 +158,13 @@ export function SmartReviewCard({
   // not labelled as reviews until they have been reviewed once.
   const showVocabularyReviews = compact && reviewCount > 0;
   const showFlashcardReviews = compact && !cardsFailed && cardsDue > 0;
-  const items = showVocabularyReviews ? allItems.filter((item) => item.skill !== "vocabulary") : allItems;
+  const items = showVocabularyReviews
+    ? allItems.filter((item) => item.skill !== "vocabulary")
+    : allItems;
   const showMistakes = compact && mistakesDue > 0;
   // Up to three rows: due words and cards, due mistakes, then the server's suggestions.
-  const suggestionSlots = 3 - Number(showVocabularyReviews) - Number(showFlashcardReviews) - Number(showMistakes);
+  const suggestionSlots =
+    3 - Number(showVocabularyReviews) - Number(showFlashcardReviews) - Number(showMistakes);
   const shownItems = items.slice(0, Math.max(suggestionSlots, 0));
   // Rows still free take today's new activities, the ones the bell lists, so
   // the card never says "all done" while there is something new to do (user
@@ -271,7 +274,10 @@ export function SmartReviewCard({
           }`}
         >
           {showFlashcardReviews && (
-            <li className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`} style={rowTint("learning")}>
+            <li
+              className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`}
+              style={rowTint("learning")}
+            >
               <img src={reviewLesson} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Flashcards")} />
@@ -285,7 +291,10 @@ export function SmartReviewCard({
             </li>
           )}
           {showVocabularyReviews && (
-            <li className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`} style={rowTint("vocabulary")}>
+            <li
+              className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`}
+              style={rowTint("vocabulary")}
+            >
               <img src={reviewWords} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
