@@ -640,9 +640,6 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                 aria-hidden="true"
               />
               {`${leagueShown?.xp ?? 0} XP`}
-              {(leagueShown?.lastWeek ?? 0) > 0 && (leagueShown?.delta ?? 0) > 0
-                ? ` · +${leagueShown!.delta}`
-                : ""}
             </>
           )}
         </span>
