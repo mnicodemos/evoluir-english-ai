@@ -10,9 +10,9 @@ import { studyToday } from "@/lib/today";
  * never came back). Under the ["user-flashcards"] key, which the review page
  * refreshes after each rating, so the bell and Keep improving follow it.
  */
-export function useFlashcardsDue(userId?: string) {
+export function useFlashcardsDue(userId?: string, options: { reviewedOnly?: boolean } = {}) {
   return useQuery({
-    queryKey: ["user-flashcards", "due", userId],
+    queryKey: ["user-flashcards", "due", userId, options.reviewedOnly ? "reviewed-only" : "all"],
     enabled: !!userId,
     staleTime: 60 * 1000,
     queryFn: async () => {
@@ -39,9 +39,11 @@ export function useFlashcardsDue(userId?: string) {
         (lessons.data ?? []).filter(lessonStarted).map((lesson) => lesson.lesson_id),
       );
       const today = studyToday();
-      return (cards.data ?? []).filter((card) =>
-        isFlashcardDue(card, byCard.get(card.id), started, today),
-      ).length;
+      return (cards.data ?? []).filter((card) => {
+        const state = byCard.get(card.id);
+        if (options.reviewedOnly && !state) return false;
+        return isFlashcardDue(card, state, started, today);
+      }).length;
     },
   });
 }

@@ -301,6 +301,7 @@ const baseUiPt: Record<string, string> = {
   "Did you finish this task?": "Você terminou esta tarefa?",
   "Two minutes of English in your break": "Dois minutos de inglês na sua pausa",
   "Review words": "Revisar palavras",
+  "Review flashcards": "Revisar flashcards",
   "Good to have you back": "Que bom ter você de volta",
   "Continue with Google": "Continuar com Google",
   "or with your email": "ou com seu e-mail",
