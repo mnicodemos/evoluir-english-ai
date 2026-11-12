@@ -1164,7 +1164,7 @@ function ReadingPage() {
                                 <span translate="no" lang="en">
                                   {option}
                                 </span>
-                                </button>
+                              </button>
                             );
                           },
                         )}
