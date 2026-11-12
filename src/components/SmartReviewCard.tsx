@@ -73,12 +73,12 @@ export function SmartReviewCard({
   const { data, isLoading, isError } = useNextStep();
   // Vocabulary words whose spaced review date has arrived (same count as the bell).
   const { count: reviewCount, ready: reviewsReady } = useDueReviewState(profile?.id);
-  // Lesson flashcards whose review date has arrived, counted with the words.
+  // Previously reviewed lesson flashcards whose review date has arrived.
   const {
     data: cardsDue = 0,
     isSuccess: cardsKnown,
     isError: cardsFailed,
-  } = useFlashcardsDue(profile?.id);
+  } = useFlashcardsDue(profile?.id, { reviewedOnly: true });
   // Today's reading, for the "New today" rows (same query as the bell).
   const { data: readingDone } = useDailyReadingDone(profile?.id);
   // Today's minutes against the goal: until it is met, free rows keep a next
@@ -154,16 +154,15 @@ export function SmartReviewCard({
   const allItems = (data.reviews ?? []).filter((item) =>
     dashboardActionAvailable(item.resource.to, indicators),
   );
-  // Due word reviews take the first row on the compact card and replace the
-  // generic Vocabulary suggestion, so the same skill never shows twice.
-  // One word review (owner request, 2026-10-30): Vocabulary's words and the
-  // lessons' cards share this row, its count and its door (wordReviewTarget).
-  const wordReview = wordReviewTarget(reviewCount, cardsFailed ? 0 : cardsDue);
-  const showWordReviews = compact && wordReview.total > 0;
-  const items = showWordReviews ? allItems.filter((item) => item.skill !== "vocabulary") : allItems;
+  // Keep Vocabulary words and lesson Flashcards as distinct review queues,
+  // each with its own destination and count. Newly unlocked lesson cards are
+  // not labelled as reviews until they have been reviewed once.
+  const showVocabularyReviews = compact && reviewCount > 0;
+  const showFlashcardReviews = compact && !cardsFailed && cardsDue > 0;
+  const items = showVocabularyReviews ? allItems.filter((item) => item.skill !== "vocabulary") : allItems;
   const showMistakes = compact && mistakesDue > 0;
   // Up to three rows: due words and cards, due mistakes, then the server's suggestions.
-  const suggestionSlots = 3 - Number(showWordReviews) - Number(showMistakes);
+  const suggestionSlots = 3 - Number(showVocabularyReviews) - Number(showFlashcardReviews) - Number(showMistakes);
   const shownItems = items.slice(0, Math.max(suggestionSlots, 0));
   // Rows still free take today's new activities, the ones the bell lists, so
   // the card never says "all done" while there is something new to do (user
@@ -173,7 +172,8 @@ export function SmartReviewCard({
     data.quickWin?.activity.to ?? "",
     data.quest?.resource.to ?? "",
     ...shownItems.map((item) => item.resource.to),
-    ...(showWordReviews ? ["/vocabulary", "/learning/review"] : []),
+    ...(showVocabularyReviews ? ["/vocabulary"] : []),
+    ...(showFlashcardReviews ? ["/learning/review"] : []),
   ];
   const newRows = compact
     ? newTodayRows({ readingDone, indicators, taken, slots: suggestionSlots - shownItems.length })
@@ -190,7 +190,8 @@ export function SmartReviewCard({
       })
     : [];
   const rows =
-    Number(showWordReviews) +
+    Number(showVocabularyReviews) +
+    Number(showFlashcardReviews) +
     Number(showMistakes) +
     shownItems.length +
     newRows.length +
@@ -270,27 +271,29 @@ export function SmartReviewCard({
             rows >= 3 ? "grid-rows-3" : "grid-rows-2"
           }`}
         >
-          {showWordReviews && (
-            <li
-              className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`}
-              style={rowTint("vocabulary")}
-            >
-              <img src={reviewWords} alt="" className={ROW_PHOTO} />
+          {showFlashcardReviews && (
+            <li className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`} style={rowTint("learning")}>
+              <img src={reviewLesson} alt="" className={ROW_PHOTO} />
               <div className="min-w-0">
                 <RowTag kind="review" label={t("To review")} detail={t("Flashcards")} />
-                <p className="truncate text-sm font-semibold">
-                  {wordReview.total === 1
-                    ? t("Review 1 flashcard")
-                    : t("Review {n} flashcards").replace("{n}", String(wordReview.total))}
-                </p>
-                <p
-                  className={`text-[10px] leading-tight text-muted-foreground ${rows >= 3 ? ROW_NOTE_TIGHT : "line-clamp-2"}`}
-                >
-                  {t("Revisit your lesson cards to strengthen what you have learned.")}
-                </p>
+                <p className="truncate text-sm font-semibold">{t("Review words")}</p>
               </div>
               <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
-                <Link to={wordReview.to} aria-label={`${t("Review now")}: ${t("Flashcards")}`}>
+                <Link to="/learning/review" aria-label={`${t("Review now")}: ${t("Flashcards")}`}>
+                  <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
+                </Link>
+              </Button>
+            </li>
+          )}
+          {showVocabularyReviews && (
+            <li className={`group relative grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)_auto] items-center gap-2 overflow-hidden rounded-lg ${ROW_TINT} p-1 pr-2`} style={rowTint("vocabulary")}>
+              <img src={reviewWords} alt="" className={ROW_PHOTO} />
+              <div className="min-w-0">
+                <RowTag kind="review" label={t("To review")} detail={t("Vocabulary")} />
+                <p className="truncate text-sm font-semibold">{t("Review flashcards")}</p>
+              </div>
+              <Button asChild variant="ghost" size="icon" className={ROW_ACTION}>
+                <Link to="/vocabulary" aria-label={`${t("Review now")}: ${t("Vocabulary")}`}>
                   <RefreshCw className="size-5" strokeWidth={2.25} aria-hidden="true" />
                 </Link>
               </Button>
