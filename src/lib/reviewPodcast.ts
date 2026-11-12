@@ -298,9 +298,10 @@ export function diagnoseReviewPodcast(raw: string, level = "b1"): PodcastValidat
   const validationIssues = parsed.error.issues.map((issue) => ({
     path: issue.path.length ? issue.path.join(".") : "(root)",
     // Keep diagnostics stable across Zod v3/v4 enum issue naming.
-    code: issue.code === "invalid_value" && issue.path[issue.path.length - 1] === "speaker"
-      ? "invalid_enum_value"
-      : issue.code,
+    code:
+      issue.code === "invalid_value" && issue.path[issue.path.length - 1] === "speaker"
+        ? "invalid_enum_value"
+        : issue.code,
   }));
   const insufficientWords =
     lineCount !== null &&
