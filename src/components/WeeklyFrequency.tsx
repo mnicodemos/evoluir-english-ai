@@ -421,8 +421,12 @@ export function WeeklyFrequency({
                     className={cn(
                       "grid size-5 place-items-center rounded-full",
                       isToday
-                        ? isPlanned ? "bg-brand-green text-primary-foreground" : "bg-amber-400 text-slate-950"
-                        : isPlanned ? "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35" : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/45",
+                        ? isPlanned
+                          ? "bg-brand-green text-primary-foreground"
+                          : "bg-amber-400 text-slate-950"
+                        : isPlanned
+                          ? "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35"
+                          : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/45",
                     )}
                   >
                     <Check className="size-3" strokeWidth={3} />
@@ -471,12 +475,14 @@ export function WeeklyFrequency({
               return (
                 <div key={key} className="flex flex-col items-center gap-1">
                   {studied ? (
-                    <span className={cn(
+                    <span
+                      className={cn(
                         "grid size-6 place-items-center rounded-full",
                         isPlanned
                           ? "bg-brand-green text-primary-foreground"
                           : "bg-amber-400 text-slate-950",
-                      )}>
+                      )}
+                    >
                       <Check className="size-3.5" strokeWidth={3} />
                     </span>
                   ) : isPlanned ? (
