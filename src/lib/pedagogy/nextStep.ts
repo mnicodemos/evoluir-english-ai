@@ -288,7 +288,7 @@ function quickWinActivity(
   if (skill === "vocabulary") activity = SMART_REVIEW;
   else if (skill === "speaking" || skill === "pronunciation") activity = PRONUNCIATION_DRILL;
   else if (skill === "writing") activity = MISTAKES_PRACTICE;
-  else if (skill === "listening") activity = FALLBACK_BY_SKILL["listening"]?.activity ?? null;
+  else if (skill === "listening") activity = null;
   else if (skill === "grammar")
     activity = selectedActivity.type === "lesson" ? TEACHER_FALLBACK.activity : MISTAKES_PRACTICE;
   else if (skill === "reading") activity = LEARNING_CENTER;
