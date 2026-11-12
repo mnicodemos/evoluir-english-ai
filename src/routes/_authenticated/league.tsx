@@ -303,7 +303,7 @@ function YourWeek({ week }: { week: WeekXpSummary }) {
         <span className="font-display text-4xl font-bold tabular-nums">{week.thisWeek}</span>
         <span className="text-sm text-muted-foreground">{t("XP this week")}</span>
       </p>
-      <p className={cn("text-sm font-medium", rising ? "text-brand-green" : "")}>
+      <p className={cn("hidden text-sm font-medium sm:block", rising ? "text-brand-green" : "")}>
         {weekXpLine(week, t)}
       </p>
       <dl className="grid grid-cols-2 gap-2 text-sm">
