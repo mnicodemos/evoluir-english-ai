@@ -192,7 +192,7 @@ export function WeeklyFrequency({
                 className={cn(
                   "text-[9px] text-muted-foreground",
                   isToday && isPlanned && "font-semibold text-brand-green",
-                    studied && !isPlanned && "font-semibold text-amber-400",
+                  studied && !isPlanned && "font-semibold text-amber-400",
                   !isPlanned && !studied && "opacity-35",
                 )}
               >
@@ -208,7 +208,7 @@ export function WeeklyFrequency({
                         : "bg-amber-400 text-slate-950"
                       : isPlanned
                         ? "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35"
-                        : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/45",
+                        : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/35",
                   )}
                 >
                   <Check className="size-3.5" strokeWidth={3} />
@@ -411,7 +411,8 @@ export function WeeklyFrequency({
                 <span
                   className={cn(
                     "text-[9px] text-muted-foreground",
-                    isToday && (isPlanned || studied) && "font-semibold text-brand-green",
+                    isToday && isPlanned && "font-semibold text-brand-green",
+                    studied && !isPlanned && "font-semibold text-amber-400",
                     !isPlanned && !studied && "opacity-35",
                   )}
                 >
