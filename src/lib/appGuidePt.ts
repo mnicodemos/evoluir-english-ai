@@ -358,6 +358,7 @@ export const appGuidePt: Record<string, string> = {
     "O dia de estudo depende da conclusão de uma atividade válida, não apenas dos minutos. Os minutos ainda podem contribuir para a meta diária de tempo.",
   "Jewels mark streak milestones. Once earned, they remain yours permanently, even if your streak later resets.":
     "As joias marcam etapas da sequência de estudos. Depois de conquistadas, continuam sendo suas permanentemente, mesmo que sua sequência seja reiniciada.",
+  "Your streak is a separate measure: it counts consecutive credited study days.": "Sua sequência é uma medida separada: conta os dias de estudo creditados consecutivos.",
   "The milestones are 1, 7, 14, 21, 28, 35, 42, 49, 56 and 63 credited study days: Bronze first, then the next jewel at each milestone, up to Diamond.":
     "As etapas são 1, 7, 14, 21, 28, 35, 42, 49, 56 e 63 dias de estudo contabilizados: primeiro Bronze e depois uma nova joia em cada etapa, até o Diamante.",
   "After Diamond, each additional 63-day cycle grants another Diamond at 126, 189, 252 days and so on.":
