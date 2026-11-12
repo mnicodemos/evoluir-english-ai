@@ -1128,13 +1128,13 @@ function ReadingPage() {
                           const wrong = checked && picked && originalIndex !== question.answer;
                           return (
                             <button
-                              key={oIndex}
+                              key={originalIndex}
                               type="button"
                               disabled={checked}
                               aria-pressed={picked}
                               onClick={() => {
                                 const next = chosen.map((value, index) =>
-                                  index === qIndex ? oIndex : value,
+                                  index === qIndex ? originalIndex : value,
                                 );
                                 setChosen(next);
                                 // On to the next open question, so answering flows.
