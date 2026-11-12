@@ -361,6 +361,7 @@ function ExtraVideosPage() {
                         type="button"
                         className="absolute inset-0 grid place-items-center bg-black text-white transition hover:bg-black/80"
                         onClick={() => {
+                          completionInFlight.current = false;
                           setLoadedPlayer(null);
                           setPlaying(video.id);
                         }}
