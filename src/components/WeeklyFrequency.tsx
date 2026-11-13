@@ -158,7 +158,7 @@ export function WeeklyFrequency({
               </span>
               {/* A yellow trophy as tall as the text marks the all-time count (owner request, 2026-10-30). */}
               <span className="inline-flex items-center gap-1">
-                <Trophy className="size-[1em] shrink-0 text-amber-400" aria-hidden="true" />
+                <Trophy className="size-[1em] shrink-0 text-amber-500" aria-hidden="true" />
                 <span>
                   {totalStudyDays}{" "}
                   {lang === "pt" ? "dias de estudo no total" : "study days in total"}
@@ -195,7 +195,7 @@ export function WeeklyFrequency({
                 className={cn(
                   "text-[9px] text-muted-foreground",
                   isToday && isPlanned && "font-semibold text-brand-green",
-                  isToday && studied && !isPlanned && "font-semibold text-amber-400",
+                  isToday && studied && !isPlanned && "font-semibold text-amber-500",
                   !isPlanned && !studied && "opacity-35",
                 )}
               >
@@ -208,10 +208,10 @@ export function WeeklyFrequency({
                     isToday
                       ? isPlanned
                         ? "bg-brand-green text-primary-foreground"
-                        : "bg-amber-400 text-slate-950"
+                        : "bg-amber-500 text-slate-950"
                       : isPlanned
                         ? "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35"
-                        : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/35",
+                        : "bg-amber-500/15 text-amber-500 ring-1 ring-inset ring-amber-500/35",
                   )}
                 >
                   <Check className="size-3.5" strokeWidth={3} />
@@ -392,7 +392,7 @@ export function WeeklyFrequency({
             {totalStudyDays != null && (
               <p className="mt-0.5 flex items-start gap-1 text-[11px] leading-tight text-muted-foreground">
                 <Trophy
-                  className="mt-[0.125em] size-[1em] shrink-0 text-amber-400"
+                  className="mt-[0.125em] size-[1em] shrink-0 text-amber-500"
                   aria-hidden="true"
                 />
                 <span>
@@ -415,7 +415,7 @@ export function WeeklyFrequency({
                   className={cn(
                     "text-[9px] text-muted-foreground",
                     isToday && isPlanned && "font-semibold text-brand-green",
-                    isToday && studied && !isPlanned && "font-semibold text-amber-400",
+                    isToday && studied && !isPlanned && "font-semibold text-amber-500",
                     !isPlanned && !studied && "opacity-35",
                   )}
                 >
@@ -430,8 +430,8 @@ export function WeeklyFrequency({
                           ? "bg-brand-green text-primary-foreground"
                           : "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35"
                         : isToday
-                          ? "bg-amber-400 text-slate-950"
-                          : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/35",
+                          ? "bg-amber-500 text-slate-950"
+                          : "bg-amber-500/15 text-amber-500 ring-1 ring-inset ring-amber-500/35",
                     )}
                   >
                     <Check className="size-3" strokeWidth={3} />
@@ -485,7 +485,7 @@ export function WeeklyFrequency({
                         "grid size-6 place-items-center rounded-full",
                         isPlanned
                           ? "bg-brand-green text-primary-foreground"
-                          : "bg-amber-400 text-slate-950",
+                          : "bg-amber-500 text-slate-950",
                       )}
                     >
                       <Check className="size-3.5" strokeWidth={3} />
