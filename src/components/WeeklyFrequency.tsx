@@ -99,6 +99,9 @@ export function WeeklyFrequency({
       window.matchMedia("(min-width: 1024px)").matches,
   );
   const studiedCount = weeklyProgress?.creditedStudyDays ?? 0;
+  // The dashboard rhythm shows every qualified day, including extra days
+  // outside the plan. Only the progress arc is capped at the weekly goal.
+  const rhythmStudyDayCount = weeklyProgress?.validStudyDays ?? 0;
   const weekReady = studyDays !== undefined && totalStudyDays !== undefined;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
@@ -155,7 +158,7 @@ export function WeeklyFrequency({
               </span>
               {/* A yellow trophy as tall as the text marks the all-time count (owner request, 2026-10-30). */}
               <span className="inline-flex items-center gap-1">
-                <Trophy className="size-[1em] shrink-0 text-amber-400" aria-hidden="true" />
+                <Trophy className="size-[1em] shrink-0 text-amber-500" aria-hidden="true" />
                 <span>
                   {totalStudyDays}{" "}
                   {lang === "pt" ? "dias de estudo no total" : "study days in total"}
@@ -192,7 +195,7 @@ export function WeeklyFrequency({
                 className={cn(
                   "text-[9px] text-muted-foreground",
                   isToday && isPlanned && "font-semibold text-brand-green",
-                  isToday && studied && !isPlanned && "font-semibold text-amber-400",
+                  isToday && studied && !isPlanned && "font-semibold text-amber-500",
                   !isPlanned && !studied && "opacity-35",
                 )}
               >
@@ -205,10 +208,10 @@ export function WeeklyFrequency({
                     isToday
                       ? isPlanned
                         ? "bg-brand-green text-primary-foreground"
-                        : "bg-amber-400 text-slate-950"
+                        : "bg-amber-500 text-slate-950"
                       : isPlanned
                         ? "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35"
-                        : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/35",
+                        : "bg-amber-500/15 text-amber-500 ring-1 ring-inset ring-amber-500/35",
                   )}
                 >
                   <Check className="size-3.5" strokeWidth={3} />
@@ -323,7 +326,7 @@ export function WeeklyFrequency({
   }
 
   if (presentation === "dashboard-panel") {
-    const progress = weeklyGoal > 0 ? Math.min(1, studiedCount / weeklyGoal) : 0;
+    const progress = weeklyGoal > 0 ? Math.min(1, rhythmStudyDayCount / weeklyGoal) : 0;
     return (
       <section
         className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4"
@@ -356,12 +359,17 @@ export function WeeklyFrequency({
             <CelebrationBurst active={celebrateWeek} />
             {/* The same open-bottom gauge as Today's Progress (user request,
                 2026-10-24): the days in its gap, the check or the share inside. */}
-            <GaugeRing progress={progress} value={studiedCount} goal={weeklyGoal} unit={daysLabel}>
+            <GaugeRing
+              progress={progress}
+              value={rhythmStudyDayCount}
+              goal={weeklyGoal}
+              unit={daysLabel}
+            >
               {allStudied ? (
                 <Check
                   className="size-8 text-brand-green 2xl:size-9"
                   strokeWidth={3.25}
-                  aria-label={`${studiedCount} of ${weeklyGoal} days, goal reached`}
+                  aria-label={`${rhythmStudyDayCount} of ${weeklyGoal} days, goal reached`}
                 />
               ) : (
                 <span className="font-display text-xl font-bold leading-none text-foreground">
@@ -377,19 +385,19 @@ export function WeeklyFrequency({
               {lang === "pt" ? "Continue aprendendo" : "Keep learning"}
             </p>
             <p className="mt-0.5 min-w-0 whitespace-nowrap text-[13px] font-semibold 2xl:text-sm">
-              {studiedCount}{" "}
+              {rhythmStudyDayCount}{" "}
               {lang === "pt"
-                ? studiedCount === 1
+                ? rhythmStudyDayCount === 1
                   ? "dia esta semana"
                   : "dias esta semana"
-                : studiedCount === 1
+                : rhythmStudyDayCount === 1
                   ? "day this week"
                   : "days this week"}
             </p>
             {totalStudyDays != null && (
               <p className="mt-0.5 flex items-start gap-1 text-[11px] leading-tight text-muted-foreground">
                 <Trophy
-                  className="mt-[0.125em] size-[1em] shrink-0 text-amber-400"
+                  className="mt-[0.125em] size-[1em] shrink-0 text-amber-500"
                   aria-hidden="true"
                 />
                 <span>
@@ -412,7 +420,7 @@ export function WeeklyFrequency({
                   className={cn(
                     "text-[9px] text-muted-foreground",
                     isToday && isPlanned && "font-semibold text-brand-green",
-                    isToday && studied && !isPlanned && "font-semibold text-amber-400",
+                    isToday && studied && !isPlanned && "font-semibold text-amber-500",
                     !isPlanned && !studied && "opacity-35",
                   )}
                 >
@@ -427,8 +435,8 @@ export function WeeklyFrequency({
                           ? "bg-brand-green text-primary-foreground"
                           : "bg-brand-green/15 text-brand-green ring-1 ring-inset ring-brand-green/35"
                         : isToday
-                          ? "bg-amber-400 text-slate-950"
-                          : "bg-amber-400/15 text-amber-400 ring-1 ring-inset ring-amber-400/35",
+                          ? "bg-amber-500 text-slate-950"
+                          : "bg-amber-500/15 text-amber-500 ring-1 ring-inset ring-amber-500/35",
                     )}
                   >
                     <Check className="size-3" strokeWidth={3} />
@@ -482,7 +490,7 @@ export function WeeklyFrequency({
                         "grid size-6 place-items-center rounded-full",
                         isPlanned
                           ? "bg-brand-green text-primary-foreground"
-                          : "bg-amber-400 text-slate-950",
+                          : "bg-amber-500 text-slate-950",
                       )}
                     >
                       <Check className="size-3.5" strokeWidth={3} />
