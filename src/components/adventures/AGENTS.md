@@ -1,1 +1,2 @@
 - Adventure soundtrack uses a lazily created native element volume (no Web Audio graph); if the soundtrack is blocked when EVO ends, it continues on her gesture-unlocked element; this preserves mobile volume control and the welcome-to-music transition.
+- Checkpoint loading renders AdventureLoading inside the shared shell; never return an empty page while saved story progress resolves.

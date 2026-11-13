@@ -191,7 +191,10 @@ function RootComponent() {
     // does not notify other tabs/devices or refresh their derived queries.
     let profileChannel: ReturnType<typeof supabase.channel> | null = null;
     let subscribedUserId: string | null = null;
+    let active = true;
+    const subscriptionId = crypto.randomUUID();
     const syncProfileSubscription = (userId: string | null) => {
+      if (!active) return;
       if (subscribedUserId === userId) return;
       if (profileChannel) {
         void supabase.removeChannel(profileChannel);
@@ -201,7 +204,7 @@ function RootComponent() {
       if (!userId) return;
 
       profileChannel = supabase
-        .channel(`profile-sync-${userId}`)
+        .channel(`profile-sync-${userId}-${subscriptionId}`)
         .on(
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${userId}` },
@@ -241,6 +244,7 @@ function RootComponent() {
     };
 
     supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
       const userId = data.session?.user.id ?? null;
       setSentryUser(userId);
       syncProfileSubscription(userId);
@@ -260,6 +264,7 @@ function RootComponent() {
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
     return () => {
+      active = false;
       data.subscription.unsubscribe();
       if (profileChannel) void supabase.removeChannel(profileChannel);
     };

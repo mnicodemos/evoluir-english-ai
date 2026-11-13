@@ -702,7 +702,6 @@ function AppShellContent({
         <main
           onTouchStart={handleMainTouchStart}
           onTouchEnd={handleMainTouchEnd}
-          key={bare ? "bare" : location.pathname}
           className={cn(
             bare && "contents",
             "animate-page-in w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",

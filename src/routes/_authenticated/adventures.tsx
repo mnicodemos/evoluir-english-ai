@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, Compass, Lock, RotateCcw, Sparkles } from "lucid
 import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { AdventureLoading } from "@/components/adventures/AdventureLoading";
 import { A1WelcomeMixUp } from "@/components/adventures/A1WelcomeMixUp";
 import { A1NeighbourhoodMystery } from "@/components/adventures/A1NeighbourhoodMystery";
 import { A2SurpriseDelivery } from "@/components/adventures/A2SurpriseDelivery";
@@ -237,7 +238,7 @@ function EnglishAdventuresPage() {
     // Do not briefly render A1.1 while the cloud checkpoint is loading.
     // Once A1.1 is complete, resume directly at A1.2, including its saved
     // completion screen when the student has already finished both adventures.
-    if (!welcomeCheckpoint.ready) return null;
+    if (!welcomeCheckpoint.ready) return <AdventureLoading />;
     return welcomeCheckpoint.completed ? <A1NeighbourhoodMystery /> : <A1WelcomeMixUp />;
   }
 

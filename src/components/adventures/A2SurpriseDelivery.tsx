@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-reac
 import { Link } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
+import { AdventureLoading } from "@/components/adventures/AdventureLoading";
 import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdventureJourneyMap";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
@@ -218,7 +219,7 @@ export function A2SurpriseDelivery() {
   const scene = scenes[Math.min(index, scenes.length - 1)];
   if (!scene) return null;
   const choice = selected === null ? null : scene.choices[selected];
-  if (!progress.ready) return null;
+  if (!progress.ready) return <AdventureLoading />;
 
   function continueStory() {
     if (!choice) return;

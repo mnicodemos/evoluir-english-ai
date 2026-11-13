@@ -2,6 +2,7 @@ import { ArrowLeft, ArrowRight, Compass, RotateCcw, Sparkles } from "lucide-reac
 import { Link } from "@tanstack/react-router";
 
 import { AppShell } from "@/components/AppShell";
+import { AdventureLoading } from "@/components/adventures/AdventureLoading";
 import { EnglishAdventureJourneyMap } from "@/components/adventures/EnglishAdventureJourneyMap";
 import { AdventureMusicControl } from "@/components/adventures/AdventureMusicControl";
 import { EnglishAdventuresAvatar } from "@/components/EnglishAdventuresAvatar";
@@ -309,7 +310,7 @@ export function A1WelcomeMixUp() {
   if (!scene) return null;
   const choice = selected === null ? null : scene.choices[selected];
   const canContinue = choice?.correct === true;
-  if (!progress.ready) return null;
+  if (!progress.ready) return <AdventureLoading />;
 
   function continueStory() {
     if (!canContinue) return;

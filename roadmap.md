@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Corrigir o carregamento de Adventures: abertura autenticada, navegação interna e recarregamento mobile verificados; progresso preservado e testes de checkpoint aprovados.
+
 - [x] Otimizar Continue evoluindo: histórico por nível separado, cache compartilhado por aluno; 44 testes e validação autenticada do card e Meu progresso passaram (recarregamento com cache: 2,64 s no ambiente local).
 
 - [x] Stabilize Today's Progress daily reads and fit its three labels; authenticated slow-network and 360/390/411/1368/1920 px checks passed, card height and gauge preserved.

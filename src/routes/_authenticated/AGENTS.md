@@ -1,1 +1,2 @@
 - Signed-in pages share one shell: AppShellHost in src/routes/_authenticated/route.tsx renders the menu, bars and footer once around <Outlet />, and a page's <AppShell> only registers its layout options; this keeps the chrome still across page changes.
+- Keep AppShellContent's main unkeyed by route or shell registration state; changing that key remounts the registering children and causes a registration/loading loop.
