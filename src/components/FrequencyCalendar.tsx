@@ -21,7 +21,7 @@ const WEEKDAYS_PT = ["S", "T", "Q", "Q", "S", "S", "D"];
 export function FrequencyCalendar({ userId }: Props) {
   const { lang } = useUiLang();
   const todayKey = dayFmt.format(new Date());
-  const { data: plannedDays = [] } = useStudyWeekdays(userId);
+  const { data: plannedDays, isFetched: plannedDaysFetched } = useStudyWeekdays(userId);
   const [monthOffset, setMonthOffset] = useState(0);
 
   const baseYear = Number(todayKey.slice(0, 4));
@@ -37,13 +37,14 @@ export function FrequencyCalendar({ userId }: Props) {
   const monthEndLocal = new Date(
     `${nextMonth.getFullYear()}-${String(nextMonth.getMonth() + 1).padStart(2, "0")}-01T00:00:00-03:00`,
   );
-  const { data: studyDays } = useQualifiedStudyDays({
+  const { data: studyDays, isFetched: studyDaysFetched } = useQualifiedStudyDays({
     userId,
     start: monthStartLocal,
     end: monthEndLocal,
     queryKey: `month:${monthKey}`,
   });
 
+  const calendarDataReady = plannedDaysFetched && studyDaysFetched;
   const daysInMonth = new Date(year, month, 0).getDate();
   // Blank cells before the 1st, counted from Monday.
   const firstWeekday = (new Date(year, month - 1, 1).getDay() + 6) % 7;
@@ -83,7 +84,7 @@ export function FrequencyCalendar({ userId }: Props) {
         </Button>
       </div>
       <p className="mt-0.5 text-center text-[11px] text-muted-foreground sm:mt-1 sm:text-xs">
-        {studiedCount} {studiedCount === 1 ? "day studied" : "days studied"}
+        {calendarDataReady ? `${studiedCount} ${studiedCount === 1 ? "day studied" : "days studied"}` : " "}
       </p>
       <div className="mt-2 grid grid-cols-7 gap-0.5 text-center sm:mt-3 sm:gap-1">
         {(lang === "pt" ? WEEKDAYS_PT : WEEKDAYS_EN).map((w, i) => (
@@ -94,7 +95,7 @@ export function FrequencyCalendar({ userId }: Props) {
         {cells.map((day, i) => {
           if (day === null) return <span key={`e-${i}`} />;
           const key = `${monthKey}-${String(day).padStart(2, "0")}`;
-          const studied = studyDays?.has(key);
+          const studied = calendarDataReady ? studyDays?.has(key) : undefined;
           const isToday = key === todayKey;
           const weekday = new Date(`${key}T12:00:00Z`).getUTCDay();
           const weekdayName = [
@@ -106,7 +107,7 @@ export function FrequencyCalendar({ userId }: Props) {
             "Friday",
             "Saturday",
           ][weekday]!;
-          const isPlanned = plannedDays?.includes(weekdayName) ?? false;
+          const isPlanned = calendarDataReady && (plannedDays?.includes(weekdayName) ?? false);
           return (
             <span
               key={key}
