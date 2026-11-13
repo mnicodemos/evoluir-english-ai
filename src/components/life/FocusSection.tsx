@@ -328,12 +328,18 @@ export function FocusSection() {
                         : "bg-white/[0.08]",
                   )}
                   style={{ height: `${Math.max(3, (row.minutes / weekMax) * 28)}px` }}
-                  title={`🍅 ${row.count} · ${row.minutes} min · ${row.planned ? t("Planned day") : t("Extra study day")}`}
+                  title={`🍅 ${row.count} · ${row.minutes} min · ${
+                    row.planned ? t("Planned day") : t("Extra study day")
+                  }`}
                 />
                 <span
                   className={cn(
                     "text-[10px] uppercase",
-                    row.planned ? "text-muted-foreground" : row.minutes ? "text-amber-400" : "text-muted-foreground/60",
+                    row.planned
+                      ? "text-muted-foreground"
+                      : row.minutes
+                        ? "text-amber-400"
+                        : "text-muted-foreground/60",
                   )}
                 >
                   {weekday(row.day)}
