@@ -29,7 +29,7 @@ export function useWeeklyLeagueStanding(profile: LeagueProfile | null | undefine
     staleTime: 5 * 60 * 1000,
   });
   // The student's own weeks (weekly_league_history, migration 0078), for Your week.
-  const { data: weeks } = useQuery({
+  const { data: weeks, isSuccess: weeksLoaded } = useQuery({
     queryKey: ["week-xp-history", profile?.id],
     enabled: !!profile?.id,
     staleTime: 30 * 1000,
@@ -53,6 +53,7 @@ export function useWeeklyLeagueStanding(profile: LeagueProfile | null | undefine
   const joined = !!me?.joined;
   return {
     loaded: !!rows,
+    weeksLoaded,
     joined,
     rank: me?.rank_position ?? null,
     xp,
@@ -105,7 +106,7 @@ export function WeeklyLeagueSummary({
   profile: LeagueProfile;
   translate: (label: string) => string;
 }) {
-  const { total, rank, xp, joined, ranked, week } = useWeeklyLeagueStanding(profile);
+  const { total, rank, xp, joined, ranked, week, weeksLoaded } = useWeeklyLeagueStanding(profile);
 
   if (!ranked) {
     return (
@@ -115,7 +116,7 @@ export function WeeklyLeagueSummary({
         label={translate("Weekly league")}
         labelClassName="whitespace-nowrap text-[clamp(8px,2.4vw,10px)] tracking-[0.03em]"
         value={`${week.thisWeek} XP`}
-        detail={weekXpLine(week, translate, true)}
+        detail={weeksLoaded ? weekXpLine(week, translate, true) : ""}
         detailClassName="hidden sm:block"
         to="/league"
       />
