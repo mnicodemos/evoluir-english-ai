@@ -84,7 +84,9 @@ export function FrequencyCalendar({ userId }: Props) {
         </Button>
       </div>
       <p className="mt-0.5 text-center text-[11px] text-muted-foreground sm:mt-1 sm:text-xs">
-        {calendarDataReady ? `${studiedCount} ${studiedCount === 1 ? "day studied" : "days studied"}` : " "}
+        {calendarDataReady
+          ? `${studiedCount} ${studiedCount === 1 ? "day studied" : "days studied"}`
+          : " "}
       </p>
       <div className="mt-2 grid grid-cols-7 gap-0.5 text-center sm:mt-3 sm:gap-1">
         {(lang === "pt" ? WEEKDAYS_PT : WEEKDAYS_EN).map((w, i) => (
