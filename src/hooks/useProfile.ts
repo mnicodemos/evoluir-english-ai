@@ -70,5 +70,6 @@ export function useProfile() {
       if (insertError) throw insertError;
       return created as Profile;
     },
+    staleTime: 60 * 1000,
   });
 }

@@ -42,6 +42,7 @@ import { FocusHeaderButton } from "@/components/focus/FocusHeaderButton";
 import { ShortsHeaderButton } from "@/components/shorts/ShortsHeaderButton";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
+import { AppLoadingScreen } from "@/components/AppLoadingScreen";
 import { studyDayStartIso, studyToday } from "@/lib/today";
 import { habitsDueToday } from "@/lib/life";
 import { getLevelState } from "@/lib/level";
@@ -834,7 +835,7 @@ function Dashboard() {
   return (
     <AppShell dashboardLayout desktopOneScreen>
       {isLoading || !profile ? (
-        <DashboardSkeleton />
+        <AppLoadingScreen />
       ) : (
         <>
           <DiamondCelebration
@@ -1267,42 +1268,3 @@ function Dashboard() {
   );
 }
 
-/**
- * The Dashboard while the profile loads, in the page's own shapes and grid
- * (user report, 2026-10-23: three loose bars with the footer under them
- * flashed on every load): it fills the screen like the real page, so the
- * footer stays below and nothing jumps when the cards arrive.
- */
-function DashboardSkeleton() {
-  return (
-    <div
-      className="dashboard-one-screen flex h-full flex-col gap-[7px] lg:h-auto lg:grid lg:gap-[7px] xl:grid-rows-[4rem_7.59rem_minmax(min-content,1.2fr)_minmax(min-content,1fr)_minmax(6.5rem,auto)] xl:gap-5 xl:pb-3"
-      aria-busy="true"
-    >
-      <div className="flex min-w-0 items-center justify-between gap-3 xl:h-16">
-        <div className="min-w-0 space-y-2">
-          <Skeleton className="h-6 w-40 sm:w-56" />
-          <Skeleton className="hidden h-4 w-72 lg:block" />
-        </div>
-        <Skeleton className="h-10 w-32 rounded-full lg:h-11 lg:w-72" />
-      </div>
-      <div className="hidden min-w-0 gap-3 lg:grid lg:grid-cols-12 xl:h-[7.59rem]">
-        <Skeleton className="h-full min-h-[7.59rem] rounded-xl lg:col-span-4" />
-        <Skeleton className="h-full min-h-[7.59rem] rounded-xl lg:col-span-8" />
-      </div>
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[7px] lg:grid lg:grid-cols-12 lg:gap-3">
-        <Skeleton className="min-h-[13rem] flex-1 rounded-xl lg:col-span-9 lg:min-h-[16.45rem]" />
-        <Skeleton className="min-h-[9rem] rounded-xl lg:col-span-3 lg:min-h-[16.45rem]" />
-      </div>
-      <div className="grid min-w-0 gap-[7px] lg:grid-cols-12 lg:gap-3">
-        <Skeleton className="min-h-[12rem] rounded-xl lg:col-span-5 xl:h-full" />
-        <Skeleton className="hidden min-h-[12rem] rounded-xl lg:col-span-4 lg:block xl:h-full" />
-        <Skeleton className="hidden min-h-[12rem] rounded-xl lg:col-span-3 lg:block xl:h-full" />
-      </div>
-      <div className="hidden min-w-0 gap-3 lg:grid lg:grid-cols-12">
-        <Skeleton className="min-h-[6.5rem] rounded-xl lg:col-span-8" />
-        <Skeleton className="min-h-[6.5rem] rounded-xl lg:col-span-4" />
-      </div>
-    </div>
-  );
-}
