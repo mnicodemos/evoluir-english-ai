@@ -27,8 +27,12 @@ const { historyReads, client } = vi.hoisted(() => {
 
 vi.mock("@tanstack/react-start", () => ({
   createServerFn: () => ({
-    middleware() { return this; },
-    inputValidator() { return this; },
+    middleware() {
+      return this;
+    },
+    inputValidator() {
+      return this;
+    },
     handler: (handler: (args: unknown) => unknown) => handler,
   }),
 }));
@@ -46,10 +50,15 @@ const run = loadNextStep as unknown as (args: {
 }) => Promise<{ skillsByLevel?: unknown[]; activity: { to: string } }>;
 
 describe("next-step history loading", () => {
-  beforeEach(() => { historyReads.length = 0; });
+  beforeEach(() => {
+    historyReads.length = 0;
+  });
 
   it("Dashboard reads its 400 review evidence rows without the 3000-row history", async () => {
-    const result = await run({ context: { userId: "student" }, data: { includeLevelHistory: false } });
+    const result = await run({
+      context: { userId: "student" },
+      data: { includeLevelHistory: false },
+    });
     expect(historyReads).toEqual([400]);
     expect(result.skillsByLevel).toEqual([]);
     expect(result.activity.to).toBe("/coach");
