@@ -113,7 +113,9 @@ export function FrequencyCalendar({ userId }: Props) {
               className={
                 "mx-auto flex size-6 items-center justify-center rounded-full text-[11px] sm:size-7 sm:text-xs " +
                 (studied
-                  ? "bg-brand-green font-semibold text-primary-foreground"
+                  ? isPlanned
+                    ? "bg-brand-green font-semibold text-primary-foreground"
+                    : "border border-amber-500/70 bg-amber-500/15 font-semibold text-amber-400"
                   : isPlanned
                     ? "border border-primary/60 font-medium text-foreground"
                     : "text-muted-foreground") +
