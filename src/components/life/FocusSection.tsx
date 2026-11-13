@@ -307,7 +307,7 @@ export function FocusSection() {
         </div>
       ) : null}
 
-      {/* Only the student's selected My Study Plan days, in Monday-first order. */}
+      {/* Always show all seven days; planned and extra study days remain distinct. */}
       <div className="mt-3 border-t border-white/10 pt-2.5 xl:mt-2 xl:pt-2">
         <div className="flex items-end justify-between gap-3">
           <ol
@@ -319,12 +319,23 @@ export function FocusSection() {
                 <span
                   className={cn(
                     "w-full max-w-6 rounded-sm",
-                    row.minutes ? "bg-pink-400/70" : "bg-white/[0.08]",
+                    row.planned
+                      ? row.minutes
+                        ? "bg-pink-400/80"
+                        : "bg-pink-400/20"
+                      : row.minutes
+                        ? "bg-amber-400/80"
+                        : "bg-white/[0.08]",
                   )}
                   style={{ height: `${Math.max(3, (row.minutes / weekMax) * 28)}px` }}
-                  title={`🍅 ${row.count} · ${row.minutes} min`}
+                  title={`🍅 ${row.count} · ${row.minutes} min · ${row.planned ? t("Planned day") : t("Extra study day")}`}
                 />
-                <span className="text-[10px] uppercase text-muted-foreground">
+                <span
+                  className={cn(
+                    "text-[10px] uppercase",
+                    row.planned ? "text-muted-foreground" : row.minutes ? "text-amber-400" : "text-muted-foreground/60",
+                  )}
+                >
                   {weekday(row.day)}
                 </span>
               </li>
