@@ -9,11 +9,18 @@ export const Route = createFileRoute("/_authenticated")({
   pendingMs: 0,
   pendingMinMs: 250,
   pendingComponent: () => (
-    <div className="dashboard-shell dark flex min-h-[100dvh] bg-background text-foreground" aria-busy="true" aria-label="Loading page" role="status">
+    <div
+      className="dashboard-shell dark flex min-h-[100dvh] bg-background text-foreground"
+      aria-busy="true"
+      aria-label="Loading page"
+      role="status"
+    >
       <aside className="hidden w-48 shrink-0 border-r border-white/10 p-3 lg:flex lg:flex-col lg:gap-5">
         <Skeleton className="mb-2 h-9 w-full rounded-xl" />
         <div className="space-y-3">
-          {Array.from({ length: 12 }, (_, index) => <Skeleton key={index} className="h-8 w-full rounded-lg" />)}
+          {Array.from({ length: 12 }, (_, index) => (
+            <Skeleton key={index} className="h-8 w-full rounded-lg" />
+          ))}
         </div>
         <Skeleton className="mt-auto h-20 w-full rounded-xl" />
       </aside>
@@ -40,7 +47,9 @@ export const Route = createFileRoute("/_authenticated")({
         </footer>
       </main>
       <nav className="fixed inset-x-0 bottom-0 flex h-14 items-center justify-around border-t border-white/10 bg-background px-4 lg:hidden">
-        {Array.from({ length: 5 }, (_, index) => <Skeleton key={index} className="size-7 rounded-lg" />)}
+        {Array.from({ length: 5 }, (_, index) => (
+          <Skeleton key={index} className="size-7 rounded-lg" />
+        ))}
       </nav>
     </div>
   ),
