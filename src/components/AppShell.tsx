@@ -24,7 +24,17 @@ import {
   Trophy,
   Video,
 } from "lucide-react";
-import { Fragment, useEffect, useRef, type ReactNode, type TouchEvent } from "react";
+import {
+  Fragment,
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+  type TouchEvent,
+} from "react";
 
 import { FocusController } from "@/components/focus/FocusWidget";
 import { Button } from "@/components/ui/button";
@@ -343,6 +353,46 @@ export function MobileNavigationMenu({
   );
 }
 
+type ShellOptions = {
+  dashboardLayout: boolean;
+  mobileOneScreen: boolean;
+  desktopOneScreen: boolean;
+};
+type ShellHost = { register: (options: ShellOptions) => () => void };
+const ShellHostContext = createContext<ShellHost | null>(null);
+
+/**
+ * One shell for every signed-in page (product review, 2026-11-13: each page
+ * used to mount its own menu, bars and footer, so they were redrawn on every
+ * page change). The authenticated layout renders this once around <Outlet />;
+ * a page's <AppShell> only tells it which layout options to use. Pages with
+ * no <AppShell> (onboarding, redirects) get no menu or bars.
+ */
+export function AppShellHost({ children }: { children: ReactNode }) {
+  const [entries, setEntries] = useState<Array<{ id: number; options: ShellOptions }>>([]);
+  const nextId = useRef(0);
+  const host = useRef<ShellHost>({
+    register: (options) => {
+      const id = ++nextId.current;
+      setEntries((list) => [...list, { id, options }]);
+      return () => setEntries((list) => list.filter((entry) => entry.id !== id));
+    },
+  }).current;
+  const active = entries[entries.length - 1]?.options;
+  return (
+    <ShellHostContext.Provider value={host}>
+      <AppShellContent
+        bare={!active}
+        dashboardLayout={active?.dashboardLayout ?? false}
+        mobileOneScreen={active?.mobileOneScreen ?? false}
+        desktopOneScreen={active?.desktopOneScreen ?? false}
+      >
+        {children}
+      </AppShellContent>
+    </ShellHostContext.Provider>
+  );
+}
+
 export function AppShell({
   children,
   dashboardLayout = false,
@@ -357,8 +407,15 @@ export function AppShell({
    *  hands its height to the page, which fills it (xl:flex-1 xl:min-h-0). */
   desktopOneScreen?: boolean;
 }) {
+  const host = useContext(ShellHostContext);
+  useLayoutEffect(() => {
+    if (!host) return;
+    return host.register({ dashboardLayout, mobileOneScreen, desktopOneScreen });
+  }, [host, dashboardLayout, mobileOneScreen, desktopOneScreen]);
+  if (host) return <>{children}</>;
   return (
     <AppShellContent
+      bare={false}
       dashboardLayout={dashboardLayout}
       mobileOneScreen={mobileOneScreen}
       desktopOneScreen={desktopOneScreen}
@@ -370,11 +427,13 @@ export function AppShell({
 
 function AppShellContent({
   children,
+  bare,
   dashboardLayout,
   mobileOneScreen,
   desktopOneScreen,
 }: {
   children: ReactNode;
+  bare: boolean;
   dashboardLayout: boolean;
   mobileOneScreen: boolean;
   desktopOneScreen: boolean;
@@ -543,6 +602,7 @@ function AppShellContent({
       <div
         className={cn(
           "dashboard-shell dark relative flex min-h-screen flex-col overflow-x-clip bg-background",
+          bare && "contents",
           desktopOneScreen && "desktop-one-screen",
           dashboardLayout
             ? "h-dvh overflow-hidden lg:h-auto lg:overflow-visible lg:pb-0"
@@ -551,93 +611,100 @@ function AppShellContent({
           desktopOneScreen && "xl:h-dvh xl:min-h-[48rem]",
         )}
       >
-        <aside className="fixed inset-y-0 left-0 z-30 hidden h-dvh w-[13.2rem] flex-col items-stretch overflow-hidden border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
-          <Link
-            to="/dashboard"
-            aria-label={translate("Home")}
-            className="flex h-14 min-w-0 items-center gap-2 rounded-lg px-1 hover:bg-sidebar-accent"
-          >
-            {/* One line, the same lockup as the public home header. */}
-            <Logo className="size-[3.32rem] shrink-0" />
-            <BrandName className="min-w-0 whitespace-nowrap text-base" />
-          </Link>
+        {bare ? null : (
+          <aside className="fixed inset-y-0 left-0 z-30 hidden h-dvh w-[13.2rem] flex-col items-stretch overflow-hidden border-r border-sidebar-border bg-sidebar px-3 pt-3 pb-4 text-sidebar-foreground lg:flex">
+            <Link
+              to="/dashboard"
+              aria-label={translate("Home")}
+              className="flex h-14 min-w-0 items-center gap-2 rounded-lg px-1 hover:bg-sidebar-accent"
+            >
+              {/* One line, the same lockup as the public home header. */}
+              <Logo className="size-[3.32rem] shrink-0" />
+              <BrandName className="min-w-0 whitespace-nowrap text-base" />
+            </Link>
 
-          <nav className="mt-3 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain">
-            {dashboardSidebarNav.map((item) => (
-              <Fragment key={item.to}>
-                {"group" in item ? (
-                  item.group ? (
-                    <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/45">
-                      {translate(item.group)}
-                    </p>
-                  ) : (
-                    <span className="mx-2 my-2 border-t border-sidebar-border" aria-hidden="true" />
-                  )
-                ) : null}
+            <nav className="mt-3 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overscroll-contain">
+              {dashboardSidebarNav.map((item) => (
+                <Fragment key={item.to}>
+                  {"group" in item ? (
+                    item.group ? (
+                      <p className="px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/45">
+                        {translate(item.group)}
+                      </p>
+                    ) : (
+                      <span
+                        className="mx-2 my-2 border-t border-sidebar-border"
+                        aria-hidden="true"
+                      />
+                    )
+                  ) : null}
+                  <Link
+                    to={item.to}
+                    aria-label={translate(item.label)}
+                    className="grid h-10 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                    // Just a soft background and green text: no border or side bar.
+                    activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
+                    inactiveProps={{
+                      className: lifeTabOpen(location.pathname, item.to)
+                        ? "bg-sidebar-accent text-brand-green"
+                        : "text-sidebar-foreground/70",
+                    }}
+                  >
+                    <item.icon className="size-5" />
+                    <span className="truncate text-left">{translate(item.label)}</span>
+                  </Link>
+                </Fragment>
+              ))}
+            </nav>
+
+            <div className="flex shrink-0 flex-col items-stretch gap-1">
+              <div className="flex flex-col items-stretch gap-0.5 border-t border-sidebar-border pb-1 pt-2">
+                {/* The app guide ("Diário de bordo", user request). */}
                 <Link
-                  to={item.to}
-                  aria-label={translate(item.label)}
-                  className="grid h-10 grid-cols-[2.4rem_minmax(0,1fr)] items-center rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                  // Just a soft background and green text: no border or side bar.
-                  activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
-                  inactiveProps={{
-                    className: lifeTabOpen(location.pathname, item.to)
-                      ? "bg-sidebar-accent text-brand-green"
-                      : "text-sidebar-foreground/70",
-                  }}
+                  to="/guide"
+                  className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  activeProps={{ className: "text-brand-green" }}
+                  inactiveProps={{ className: "text-sidebar-foreground/70" }}
                 >
-                  <item.icon className="size-5" />
-                  <span className="truncate text-left">{translate(item.label)}</span>
+                  <BookMarked className="size-5 shrink-0 text-sky-400" />
+                  <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
                 </Link>
-              </Fragment>
-            ))}
-          </nav>
-
-          <div className="flex shrink-0 flex-col items-stretch gap-1">
-            <div className="flex flex-col items-stretch gap-0.5 border-t border-sidebar-border pb-1 pt-2">
-              {/* The app guide ("Diário de bordo", user request). */}
-              <Link
-                to="/guide"
-                className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                activeProps={{ className: "text-brand-green" }}
-                inactiveProps={{ className: "text-sidebar-foreground/70" }}
-              >
-                <BookMarked className="size-5 shrink-0 text-sky-400" />
-                <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
-              </Link>
-              <Link
-                to="/premium"
-                className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                activeProps={{ className: "text-brand-green" }}
-                inactiveProps={{ className: "text-sidebar-foreground/70" }}
-              >
-                <Crown className="size-5 shrink-0 text-amber-400" />
-                <span className="min-w-0 truncate text-left">{translate("My Subscription")}</span>
-              </Link>
-              <Button
-                variant="ghost"
-                aria-label={translate("Sign out")}
-                className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                onClick={signOut}
-              >
-                <LogOut className="size-5 shrink-0 text-rose-400" />
-                <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
-              </Button>
-            </div>
-            {/* The profile: icons on top (gear, language, notifications), the
+                <Link
+                  to="/premium"
+                  className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  activeProps={{ className: "text-brand-green" }}
+                  inactiveProps={{ className: "text-sidebar-foreground/70" }}
+                >
+                  <Crown className="size-5 shrink-0 text-amber-400" />
+                  <span className="min-w-0 truncate text-left">{translate("My Subscription")}</span>
+                </Link>
+                <Button
+                  variant="ghost"
+                  aria-label={translate("Sign out")}
+                  className="h-11 min-w-0 justify-start gap-2 rounded-lg px-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  onClick={signOut}
+                >
+                  <LogOut className="size-5 shrink-0 text-rose-400" />
+                  <span className="min-w-0 truncate text-left">{translate("Sign out")}</span>
+                </Button>
+              </div>
+              {/* The profile: icons on top (gear, language, notifications), the
                 photo, name and plan below (user request). */}
-            <ProfileMenu
-              presentation="dashboard-sidebar"
-              className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              toolbar={<UtilityButtons />}
-            />
-          </div>
-        </aside>
+              <ProfileMenu
+                presentation="dashboard-sidebar"
+                className="hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                toolbar={<UtilityButtons />}
+              />
+            </div>
+          </aside>
+        )}
 
         <main
           onTouchStart={handleMainTouchStart}
           onTouchEnd={handleMainTouchEnd}
+          key={bare ? "bare" : location.pathname}
           className={cn(
+            bare && "contents",
             "animate-page-in w-full max-w-none px-4 py-6 sm:px-6 lg:px-8 lg:py-6 xl:px-10",
             !dashboardLayout && "flex-1",
             desktopOneScreen && "xl:flex xl:min-h-0 xl:flex-col",
@@ -649,61 +716,65 @@ function AppShellContent({
         </main>
 
         {/* The Focus timer ends its phases and floats over every page. */}
-        <FocusController />
+        {bare ? null : <FocusController />}
 
-        <nav
-          className={cn(
-            "fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-white/10 bg-sidebar/80 px-0.5 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur-xl lg:hidden",
-            // Keep the tab bar anchored to the viewport on every route.
-            // The shell's bottom padding already reserves its height and the
-            // safe-area inset; lifting Life+ separately left a floating gap.
-          )}
-          aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
-        >
-          {dashboardMobileNav.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              className="group flex min-w-0 flex-col items-center pt-1.5 transition-colors"
-              activeProps={{ className: "text-brand-green" }}
-              inactiveProps={{ className: "text-muted-foreground" }}
-            >
-              <span className="grid justify-items-center gap-0.5">
-                {/* The active tab sits in a soft pill (user request: a
+        {bare ? null : (
+          <nav
+            className={cn(
+              "fixed inset-x-0 bottom-0 z-40 grid h-[4.275rem] grid-cols-5 border-t border-white/10 bg-sidebar/80 px-0.5 pb-[calc(env(safe-area-inset-bottom)_+_2px)] text-sidebar-foreground shadow-[0_-10px_28px_oklch(0.04_0.02_240/0.42)] backdrop-blur-xl lg:hidden",
+              // Keep the tab bar anchored to the viewport on every route.
+              // The shell's bottom padding already reserves its height and the
+              // safe-area inset; lifting Life+ separately left a floating gap.
+            )}
+            aria-label={lang === "pt" ? "Navegação principal" : "Main navigation"}
+          >
+            {dashboardMobileNav.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="group flex min-w-0 flex-col items-center pt-1.5 transition-colors"
+                activeProps={{ className: "text-brand-green" }}
+                inactiveProps={{ className: "text-muted-foreground" }}
+              >
+                <span className="grid justify-items-center gap-0.5">
+                  {/* The active tab sits in a soft pill (user request: a
                     sophisticated app), like native tab bars. */}
-                <span className="grid h-7 w-14 place-items-center rounded-full transition-colors group-data-[status=active]:bg-brand-green/15">
-                  <item.icon className="size-6" />
-                </span>
-                {/* Two short lines instead of a cut label on 360 px phones
+                  <span className="grid h-7 w-14 place-items-center rounded-full transition-colors group-data-[status=active]:bg-brand-green/15">
+                    <item.icon className="size-6" />
+                  </span>
+                  {/* Two short lines instead of a cut label on 360 px phones
                     ("Professor de IA", "Videochamada"). */}
-                <span className="line-clamp-2 max-w-full pb-0.5 text-center text-[10px] font-medium leading-[1.1] tracking-tight">
-                  {item.label}
+                  <span className="line-clamp-2 max-w-full pb-0.5 text-center text-[10px] font-medium leading-[1.1] tracking-tight">
+                    {item.label}
+                  </span>
                 </span>
-              </span>
-            </Link>
-          ))}
-          <MobileNavigationMenu
-            translate={translate}
-            studentLevel={profile?.level ?? profile?.max_level}
-            presentation="bottom-tab"
-            bottomLabel={lang === "pt" ? "Mais" : "More"}
-            className="w-full hover:bg-transparent hover:text-brand-green"
-          />
-        </nav>
+              </Link>
+            ))}
+            <MobileNavigationMenu
+              translate={translate}
+              studentLevel={profile?.level ?? profile?.max_level}
+              presentation="bottom-tab"
+              bottomLabel={lang === "pt" ? "Mais" : "More"}
+              className="w-full hover:bg-transparent hover:text-brand-green"
+            />
+          </nav>
+        )}
 
-        <div
-          className={cn(
-            "mb-0",
-            dashboardLayout && "hidden lg:block",
-            mobileOneScreen && "hidden sm:block",
-          )}
-        >
-          <Footer
-            minimal
-            lang={lang}
-            containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10"
-          />
-        </div>
+        {bare ? null : (
+          <div
+            className={cn(
+              "mb-0",
+              dashboardLayout && "hidden lg:block",
+              mobileOneScreen && "hidden sm:block",
+            )}
+          >
+            <Footer
+              minimal
+              lang={lang}
+              containerClassName="w-full max-w-none px-4 sm:px-6 lg:px-8 xl:px-10"
+            />
+          </div>
+        )}
       </div>
     </TooltipProvider>
   );
