@@ -198,7 +198,13 @@ describe("focus", () => {
       "2026-10-18",
     ]);
     expect(summary.week.map((row) => row.planned)).toEqual([
-      true, false, true, false, true, false, false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
     ]);
     expect(summary.weekMinutes).toBe(110);
     expect(summary.extraWeekMinutes).toBe(40);
@@ -227,7 +233,13 @@ describe("focus", () => {
       "2026-10-18",
     ]);
     expect(summary.week.map((row) => row.planned)).toEqual([
-      true, true, false, false, false, false, false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
     ]);
     expect(summary.todayCount).toBe(1);
     expect(summary.todayMinutes).toBe(40);
