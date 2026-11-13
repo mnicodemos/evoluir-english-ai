@@ -259,7 +259,15 @@ export const loadReadingWeek = createServerFn({ method: "GET" })
     const level = readingLevel(profile?.level);
     const studyDays = (profile?.study_days as string[] | null) ?? null;
     const plannedDays = new Set(readingPlanDays(today, studyDays));
-    const days = readingPlanDays(today, ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]);
+    const days = readingPlanDays(today, [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ]);
     const byDay = new Map<string, { score: number | null; choice: ReadingChoice | null }>();
     for (const row of rows ?? []) {
       const result = (row.result ?? {}) as { day?: unknown; choice?: unknown };
@@ -274,7 +282,14 @@ export const loadReadingWeek = createServerFn({ method: "GET" })
         const choice = read?.choice ?? null;
         const available =
           day !== today && !!(await readStored(day, level, choice).catch(() => null))?.content;
-        return { day, done: !!read, score: read?.score ?? null, choice, available, planned: plannedDays.has(day) };
+        return {
+          day,
+          done: !!read,
+          score: read?.score ?? null,
+          choice,
+          available,
+          planned: plannedDays.has(day),
+        };
       }),
     );
   });
