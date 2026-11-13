@@ -172,8 +172,8 @@ describe("focus", () => {
     expect(summary.todayCount).toBe(2);
     expect(summary.todayMinutes).toBe(62);
     expect(summary.week[0]).toEqual({ day: "2026-10-12", count: 0, minutes: 0, planned: true });
-    expect(summary.week[5]).toEqual({ day: "2026-10-17", count: 2, minutes: 62 });
-    expect(summary.week[6]).toEqual({ day: "2026-10-18", count: 1, minutes: 20 });
+    expect(summary.week[5]).toEqual({ day: "2026-10-17", count: 2, minutes: 62, planned: true });
+    expect(summary.week[6]).toEqual({ day: "2026-10-18", count: 1, minutes: 20, planned: true });
     expect(summary.weekMinutes).toBe(82);
   });
 
