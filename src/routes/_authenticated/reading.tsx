@@ -433,6 +433,7 @@ function ReadingWeek({
   t: (label: string) => string;
 }) {
   const doneCount = week.filter((entry) => entry.done).length;
+  const plannedCount = week.filter((entry) => entry.planned).length;
   // The final item is not necessarily today: the week can include upcoming
   // scheduled study days. Highlight only the actual São Paulo study date.
   const today = studyToday();
@@ -440,7 +441,8 @@ function ReadingWeek({
     <section className="card-soft p-3 sm:p-4" aria-labelledby="reading-week-title">
       <h2 id="reading-week-title" className="text-xs font-semibold text-muted-foreground">
         <span>{t("Your reading week")}</span> <span>·</span>{" "}
-        <span className="text-foreground">{doneCount}</span> <span>{t("of")}</span> <span>7</span>{" "}
+        <span className="text-foreground">{doneCount}</span> <span>{t("of")}</span>{" "}
+        <span>{plannedCount}</span>
         <span>{t("days")}</span>
       </h2>
       <ol className="mt-2 grid max-w-xl grid-cols-7 gap-1.5">
@@ -473,9 +475,11 @@ function ReadingWeek({
                 <span
                   className={cn(
                     "grid size-7 place-items-center rounded-full text-[10px] font-semibold tabular-nums",
-                    entry.done
-                      ? "bg-brand-green/15 text-brand-green ring-1 ring-brand-green/50"
-                      : "bg-white/[0.04] text-muted-foreground",
+                    entry.done && !entry.planned
+                      ? "bg-amber-400/15 text-amber-400 ring-1 ring-amber-400/60"
+                      : entry.done
+                        ? "bg-brand-green/15 text-brand-green ring-1 ring-brand-green/50"
+                        : "bg-white/[0.04] text-muted-foreground",
                     isToday && !entry.done && "ring-1 ring-brand-green/60",
                   )}
                 >
