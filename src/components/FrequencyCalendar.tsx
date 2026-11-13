@@ -112,7 +112,7 @@ export function FrequencyCalendar({ userId }: Props) {
               key={key}
               className={
                 "mx-auto flex size-6 items-center justify-center rounded-full text-[11px] sm:size-7 sm:text-xs " +
-                (isToday || key > todayKey
+                (isToday || key > todayKey || !studied
                   ? studied
                     ? isPlanned
                       ? "bg-brand-green font-semibold text-primary-foreground"
