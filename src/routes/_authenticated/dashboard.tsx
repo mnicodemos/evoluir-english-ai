@@ -1280,4 +1280,3 @@ function Dashboard() {
     </AppShell>
   );
 }
-
