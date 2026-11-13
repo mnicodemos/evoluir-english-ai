@@ -110,24 +110,32 @@ export function FrequencyCalendar({ userId }: Props) {
             "Saturday",
           ][weekday]!;
           const isPlanned = calendarDataReady && (plannedDays?.includes(weekdayName) ?? false);
+
+          let dayStateClass = "text-muted-foreground";
+          if (calendarDataReady) {
+            if (isToday || key > todayKey || !studied) {
+              if (studied) {
+                dayStateClass = isPlanned
+                  ? "bg-brand-green font-semibold text-primary-foreground"
+                  : "border border-amber-500/70 bg-amber-500/15 font-semibold text-amber-400";
+              } else {
+                dayStateClass = isPlanned
+                  ? "border border-primary/60 font-medium text-foreground"
+                  : "text-muted-foreground";
+              }
+            } else {
+              dayStateClass = isPlanned
+                ? "border border-cyan-400/25 bg-cyan-400/10 font-medium text-cyan-200"
+                : "border border-amber-400/25 bg-amber-400/10 font-medium text-amber-200";
+            }
+          }
+
           return (
             <span
               key={key}
               className={
                 "mx-auto flex size-6 items-center justify-center rounded-full text-[11px] sm:size-7 sm:text-xs " +
-                (!calendarDataReady
-                  ? "text-muted-foreground"
-                  : isToday || key > todayKey || !studied
-                    ? studied
-                    ? isPlanned
-                      ? "bg-brand-green font-semibold text-primary-foreground"
-                      : "border border-amber-500/70 bg-amber-500/15 font-semibold text-amber-400"
-                    : isPlanned
-                      ? "border border-primary/60 font-medium text-foreground"
-                      : "text-muted-foreground"
-                  : isPlanned
-                    ? "border border-cyan-400/25 bg-cyan-400/10 font-medium text-cyan-200"
-                    : "border border-amber-400/25 bg-amber-400/10 font-medium text-amber-200") +
+                dayStateClass +
                 (isToday ? " ring-1 ring-foreground/50" : "")
               }
             >
