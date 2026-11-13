@@ -832,9 +832,22 @@ function Dashboard() {
     !!profile && profile.daily_minutes > 0 && minutesToday >= profile.daily_minutes,
   );
 
+  // Keep the logo screen until Today's Progress and Keep improving have their
+  // answers, so every block appears together (owner request, 2026-11-12),
+  // never longer than 2.5 s after the profile arrives.
+  const [splashWaited, setSplashWaited] = useState(false);
+  const profileReady = !!profile;
+  useEffect(() => {
+    if (!profileReady) return;
+    const timer = window.setTimeout(() => setSplashWaited(true), 2500);
+    return () => window.clearTimeout(timer);
+  }, [profileReady]);
+  const blocksReady = !!progress && indicators.ready && (mistakesKnown || mistakesFailed);
+  const showSplash = isLoading || !profile || (!splashWaited && !blocksReady);
+
   return (
     <AppShell dashboardLayout desktopOneScreen>
-      {isLoading || !profile ? (
+      {showSplash || !profile ? (
         <AppLoadingScreen />
       ) : (
         <>

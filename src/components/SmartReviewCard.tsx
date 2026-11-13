@@ -92,7 +92,7 @@ export function SmartReviewCard({
   // written can keep "today's practice" loading for a minute).
   const [waited, setWaited] = useState(false);
   useEffect(() => {
-    const timer = window.setTimeout(() => setWaited(true), 4000);
+    const timer = window.setTimeout(() => setWaited(true), 2500);
     return () => window.clearTimeout(timer);
   }, []);
 
