@@ -42,7 +42,7 @@ import { FocusHeaderButton } from "@/components/focus/FocusHeaderButton";
 import { ShortsHeaderButton } from "@/components/shorts/ShortsHeaderButton";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
-import { AppLoadingScreen } from "@/components/AppLoadingScreen";
+import { AppLoadingScreen, isAppBooted } from "@/components/AppLoadingScreen";
 import { studyDayStartIso, studyToday } from "@/lib/today";
 import { habitsDueToday } from "@/lib/life";
 import { getLevelState } from "@/lib/level";
@@ -835,7 +835,7 @@ function Dashboard() {
   // Keep the logo screen until Today's Progress and Keep improving have their
   // answers, so every block appears together (owner request, 2026-11-12),
   // never longer than 2.5 s after the profile arrives.
-  const [splashWaited, setSplashWaited] = useState(false);
+  const [splashWaited, setSplashWaited] = useState(() => isAppBooted());
   const profileReady = !!profile;
   useEffect(() => {
     if (!profileReady) return;

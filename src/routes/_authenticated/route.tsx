@@ -6,8 +6,10 @@ import { AppLoadingScreen } from "@/components/AppLoadingScreen";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
-  pendingMs: 0,
-  pendingMinMs: 250,
+  // Splash only on the first load; later page changes wait quietly (500 ms)
+  // with the current page still on screen.
+  pendingMs: 500,
+  pendingMinMs: 0,
   pendingComponent: () => <AppLoadingScreen />,
   head: () => ({
     meta: [{ name: "robots", content: "noindex, nofollow" }],
