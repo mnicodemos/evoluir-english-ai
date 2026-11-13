@@ -99,6 +99,9 @@ export function WeeklyFrequency({
       window.matchMedia("(min-width: 1024px)").matches,
   );
   const studiedCount = weeklyProgress?.creditedStudyDays ?? 0;
+  // The dashboard rhythm shows every qualified day, including extra days
+  // outside the plan. Only the progress arc is capped at the weekly goal.
+  const rhythmStudyDayCount = weeklyProgress?.validStudyDays ?? 0;
   const weekReady = studyDays !== undefined && totalStudyDays !== undefined;
   const goalLabel = lang === "pt" ? "Meu objetivo:" : "My goal:";
   const daysLabel = lang === "pt" ? "dias" : "days";
@@ -323,7 +326,7 @@ export function WeeklyFrequency({
   }
 
   if (presentation === "dashboard-panel") {
-    const progress = weeklyGoal > 0 ? Math.min(1, studiedCount / weeklyGoal) : 0;
+    const progress = weeklyGoal > 0 ? Math.min(1, rhythmStudyDayCount / weeklyGoal) : 0;
     return (
       <section
         className="card-soft flex h-full min-w-0 flex-col p-3 xl:p-4"
@@ -356,12 +359,12 @@ export function WeeklyFrequency({
             <CelebrationBurst active={celebrateWeek} />
             {/* The same open-bottom gauge as Today's Progress (user request,
                 2026-10-24): the days in its gap, the check or the share inside. */}
-            <GaugeRing progress={progress} value={studiedCount} goal={weeklyGoal} unit={daysLabel}>
+            <GaugeRing progress={progress} value={rhythmStudyDayCount} goal={weeklyGoal} unit={daysLabel}>
               {allStudied ? (
                 <Check
                   className="size-8 text-brand-green 2xl:size-9"
                   strokeWidth={3.25}
-                  aria-label={`${studiedCount} of ${weeklyGoal} days, goal reached`}
+                  aria-label={`${rhythmStudyDayCount} of ${weeklyGoal} days, goal reached`}
                 />
               ) : (
                 <span className="font-display text-xl font-bold leading-none text-foreground">
@@ -377,12 +380,12 @@ export function WeeklyFrequency({
               {lang === "pt" ? "Continue aprendendo" : "Keep learning"}
             </p>
             <p className="mt-0.5 min-w-0 whitespace-nowrap text-[13px] font-semibold 2xl:text-sm">
-              {studiedCount}{" "}
+              {rhythmStudyDayCount}{" "}
               {lang === "pt"
-                ? studiedCount === 1
+                ? rhythmStudyDayCount === 1
                   ? "dia esta semana"
                   : "dias esta semana"
-                : studiedCount === 1
+                : rhythmStudyDayCount === 1
                   ? "day this week"
                   : "days this week"}
             </p>
