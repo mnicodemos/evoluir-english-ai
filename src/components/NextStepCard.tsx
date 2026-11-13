@@ -218,7 +218,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   // today), then follows the fresh data quietly; a pill seen for the first
   // time keeps its placeholder. Your week has a fixed label and shows at once.
   const firstPillKey = profile?.id ? `evoluir-first-pill:${profile.id}:${studyToday()}` : null;
-  const leaguePillKey = profile?.id ? `evoluir-league-pill:${profile.id}` : null;
+  const leaguePillKey = profile?.id ? `evoluir-league-pill:v2:${profile.id}` : null;
   const [cachedFirstPill, setCachedFirstPill] = useState<MobilePill | null>(null);
   const [cachedLeague, setCachedLeague] = useState<LeagueSummary | null>(null);
   useEffect(() => {
@@ -240,7 +240,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     writeStorage(firstPillKey, JSON.stringify(freshFirstPill.current));
   });
   useEffect(() => {
-    if (!leaguePillKey || !league.loaded) return;
+    if (!leaguePillKey || !league.loaded || !league.weeksLoaded) return;
     const summary: LeagueSummary = {
       joined: league.joined,
       rank: league.rank,
@@ -254,6 +254,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
   }, [
     leaguePillKey,
     league.loaded,
+    league.weeksLoaded,
     league.joined,
     league.rank,
     league.xp,
@@ -262,10 +263,11 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
     league.week.delta,
     league.week.lastWeek,
   ]);
-  const leagueShown: LeagueSummary | null = league.loaded
-    ? { ...league, delta: league.week.delta, lastWeek: league.week.lastWeek }
-    : cachedLeague;
-  const leaguePillReady = pillWaitOver || !!leagueShown;
+  const leagueShown: LeagueSummary | null =
+    league.loaded && league.weeksLoaded
+      ? { ...league, delta: league.week.delta, lastWeek: league.week.lastWeek }
+      : cachedLeague;
+  const leaguePillReady = !!leagueShown;
 
   if (isLoading) {
     return (
