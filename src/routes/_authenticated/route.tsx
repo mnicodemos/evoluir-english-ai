@@ -12,7 +12,6 @@ export const Route = createFileRoute("/_authenticated")({
     <div
       className="dashboard-shell dark flex min-h-[100dvh] bg-background text-foreground"
       aria-busy="true"
-      aria-label="Loading page"
       role="status"
     >
       <aside className="hidden w-48 shrink-0 border-r border-white/10 p-3 lg:flex lg:flex-col lg:gap-5">
