@@ -171,13 +171,13 @@ describe("focus", () => {
     );
     expect(summary.todayCount).toBe(2);
     expect(summary.todayMinutes).toBe(62);
-    expect(summary.week[0]).toEqual({ day: "2026-10-12", count: 0, minutes: 0 });
-    expect(summary.week[5]).toEqual({ day: "2026-10-17", count: 2, minutes: 62 });
-    expect(summary.week[6]).toEqual({ day: "2026-10-18", count: 1, minutes: 20 });
+    expect(summary.week[0]).toEqual({ day: "2026-10-12", count: 0, minutes: 0, planned: true });
+    expect(summary.week[5]).toEqual({ day: "2026-10-17", count: 2, minutes: 62, planned: true });
+    expect(summary.week[6]).toEqual({ day: "2026-10-18", count: 1, minutes: 20, planned: true });
     expect(summary.weekMinutes).toBe(82);
   });
 
-  it("shows only the selected My Study Plan days in Monday-first order", () => {
+  it("shows all seven days and marks selected My Study Plan days", () => {
     const summary = focusSummary(
       [
         { day: "2026-10-12", minutes: 25 },
@@ -188,14 +188,31 @@ describe("focus", () => {
       "2026-10-17",
       ["Monday", "Wednesday", "Friday"],
     );
-    expect(summary.week.map((row) => row.day)).toEqual(["2026-10-12", "2026-10-14", "2026-10-16"]);
+    expect(summary.week.map((row) => row.day)).toEqual([
+      "2026-10-12",
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-17",
+      "2026-10-18",
+    ]);
+    expect(summary.week.map((row) => row.planned)).toEqual([
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+    ]);
     expect(summary.weekMinutes).toBe(110);
     expect(summary.extraWeekMinutes).toBe(40);
     expect(summary.todayCount).toBe(0);
     expect(summary.todayMinutes).toBe(0);
   });
 
-  it("counts real study on unplanned days without marking those days as planned", () => {
+  it("counts real study on unplanned days and keeps their status distinct", () => {
     const summary = focusSummary(
       [
         { day: "2026-10-12", minutes: 25 },
@@ -206,7 +223,24 @@ describe("focus", () => {
       "2026-10-14",
       ["Monday", "Tuesday"],
     );
-    expect(summary.week.map((row) => row.day)).toEqual(["2026-10-12", "2026-10-13"]);
+    expect(summary.week.map((row) => row.day)).toEqual([
+      "2026-10-12",
+      "2026-10-13",
+      "2026-10-14",
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-17",
+      "2026-10-18",
+    ]);
+    expect(summary.week.map((row) => row.planned)).toEqual([
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+    ]);
     expect(summary.todayCount).toBe(1);
     expect(summary.todayMinutes).toBe(40);
     expect(summary.weekMinutes).toBe(105);
