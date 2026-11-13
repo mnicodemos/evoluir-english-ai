@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
 import { useProfile } from "@/hooks/useProfile";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
@@ -22,17 +22,24 @@ export type NextStepData = Awaited<ReturnType<typeof loadNextStep>>;
  */
 export function useNextStep(options: { enabled?: boolean } = {}) {
   const { data: profile } = useProfile();
+  const queryClient = useQueryClient();
   const storeKey = profile?.id ? `evoluir-next-step:${profile.id}:${profile.level ?? ""}` : null;
-  const [stored, setStored] = useState<NextStepData | undefined>(undefined);
   useEffect(() => {
-    if (!storeKey) return;
+    if (!storeKey || !profile?.id) return;
+    const queryKey = ["next-step", profile.level ?? null, profile.id];
+    if (queryClient.getQueryData(queryKey)) return;
     try {
       const raw = window.localStorage.getItem(storeKey);
-      setStored(raw ? (JSON.parse(raw) as NextStepData) : undefined);
+      if (!raw) return;
+      const cached = JSON.parse(raw) as NextStepData;
+      if (!cached?.activity?.to || !Array.isArray(cached.reviews)) return;
+      // Seed the shared query after hydration, not just one observer's placeholder.
+      // Keep it stale so the current student's fresh result still replaces it.
+      queryClient.setQueryData(queryKey, cached, { updatedAt: 1 });
     } catch {
-      setStored(undefined);
+      // Invalid or unavailable storage never prevents the fresh read.
     }
-  }, [storeKey]);
+  }, [storeKey, profile?.id, profile?.level, queryClient]);
   // "Watch an extra video" in the Quick Win's rotation (owner request,
   // 2026-10-31): on its days, for Premium students whose level has videos and
   // whose regular-video completion is confirmed by the server (extraVideoQuickWin.ts).
@@ -78,7 +85,7 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
 
   const nextStepQuery = useQuery({
     select,
-    queryKey: ["next-step", profile?.level ?? null],
+    queryKey: ["next-step", profile?.level ?? null, profile?.id],
     queryFn: async () => {
       const result = await loadNextStep({ data: undefined });
       if (storeKey) {
@@ -91,8 +98,7 @@ export function useNextStep(options: { enabled?: boolean } = {}) {
       return result;
     },
     staleTime: 60 * 1000,
-    placeholderData: () => stored,
-    ...(options.enabled === undefined ? {} : { enabled: options.enabled }),
+    enabled: !!profile?.id && options.enabled !== false,
   });
   // The extra-video Quick Win of today is confirmed done by the server: the card
   // shows it as completed instead of letting it silently vanish.

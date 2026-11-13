@@ -61,8 +61,8 @@ function ProgressPage() {
   const [viewLevel, setViewLevel] = useState<string | null>(null);
 
   const { data: nextStep, isLoading } = useQuery({
-    queryKey: ["next-step", profile?.level ?? null],
-    queryFn: () => loadNextStep({ data: undefined }),
+    queryKey: ["next-step", profile?.level ?? null, profile?.id, "history"],
+    queryFn: () => loadNextStep({ data: { includeLevelHistory: true } }),
     staleTime: 60 * 1000,
     enabled: !!profile,
   });

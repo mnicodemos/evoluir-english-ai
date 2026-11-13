@@ -1,1 +1,2 @@
 - Dashboard daily progress reads daily evidence through `useTodayStudyMetrics` and reuses `todayStudyMetrics`; keep cumulative AI context separate to avoid catalogue reads delaying daily indicators.
+- Keep the next-step query scoped to student and level; hydrate its shared cache after mount, and request per-level evidence history only from My Progress so Dashboard review suggestions avoid that expensive read.

@@ -69,7 +69,7 @@ export function SmartReviewCard({
   const indicators = useActivityIndicators();
   // The EVO card's query (shared cache, and the answer kept from the last
   // visit), so the rows no longer wait for the server's next step.
-  const { data, isLoading, isError } = useNextStep();
+  const { data, isLoading } = useNextStep();
   // Vocabulary words whose spaced review date has arrived (same count as the bell).
   const { count: reviewCount, ready: reviewsReady } = useDueReviewState(profile?.id);
   // Previously reviewed lesson flashcards whose review date has arrived.
@@ -101,7 +101,7 @@ export function SmartReviewCard({
   // rows appear and vanish on load, so it waits, keeping the card's shape.
   if (
     compact &&
-    (isLoading ||
+    ((!data && isLoading) ||
       (!waited &&
         (!indicators.ready ||
           !reviewsReady ||
@@ -134,7 +134,7 @@ export function SmartReviewCard({
     );
   }
 
-  if (isLoading) {
+  if (!data && isLoading) {
     return (
       <section
         className={compact ? "card-soft h-full p-4" : "card-soft p-5"}
@@ -148,7 +148,7 @@ export function SmartReviewCard({
   }
 
   // An error here must never break the dashboard: the section simply steps out.
-  if (isError || !data) return null;
+  if (!data) return null;
 
   const allItems = (data.reviews ?? []).filter((item) =>
     dashboardActionAvailable(item.resource.to, indicators),
