@@ -55,15 +55,17 @@ export const loadNextStep = createServerFn({ method: "POST" })
       // Per-level history for My Progress: every evidence row keeps the level
       // of the content it came from (item_cefr), so each level's measurement
       // is rebuilt from what was practised at that level.
-      data.includeLevelHistory ? supabaseAdmin
-        .from("assessment_evidence")
-        .select(
-          "skill, source_type, item_cefr, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, rubric_version, created_at",
-        )
-        .eq("user_id", userId)
-        .not("item_cefr", "is", null)
-        .order("created_at", { ascending: false })
-        .limit(LEVEL_HISTORY_LIMIT) : Promise.resolve({ data: [] }),
+      data.includeLevelHistory
+        ? supabaseAdmin
+            .from("assessment_evidence")
+            .select(
+              "skill, source_type, item_cefr, raw_score, source_reliability, evidence_quality, sample_weight, evaluated_by, rubric_version, created_at",
+            )
+            .eq("user_id", userId)
+            .not("item_cefr", "is", null)
+            .order("created_at", { ascending: false })
+            .limit(LEVEL_HISTORY_LIMIT)
+        : Promise.resolve({ data: [] }),
       supabaseAdmin
         .from("learning_profile")
         .select("common_errors")
