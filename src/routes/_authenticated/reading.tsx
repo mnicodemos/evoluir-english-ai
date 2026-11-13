@@ -442,7 +442,7 @@ function ReadingWeek({
       <h2 id="reading-week-title" className="text-xs font-semibold text-muted-foreground">
         <span>{t("Your reading week")}</span> <span>·</span>{" "}
         <span className="text-foreground">{doneCount}</span> <span>{t("of")}</span>{" "}
-        <span>{plannedCount}</span>{" "}
+        <span>{plannedCount}</span>
         <span>{t("days")}</span>
       </h2>
       <ol className="mt-2 grid max-w-xl grid-cols-7 gap-1.5">
