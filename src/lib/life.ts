@@ -443,16 +443,16 @@ export function focusSummary(
     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][
       weekdayOf(day)
     ]!;
-    if (!selected.has(weekday)) return null;
     const ofDay = weekSessions.filter((session) => session.day === day);
     return {
       day,
+      planned: selected.has(weekday),
       count: ofDay.filter((session) => !session.partial).length,
       minutes: ofDay.reduce((sum, session) => sum + session.minutes, 0),
     };
-  }).filter((row): row is { day: string; count: number; minutes: number } => row !== null);
+  });
   const todaySessions = sessions.filter((session) => session.day === today);
-  const plannedWeekMinutes = week.reduce((sum, row) => sum + row.minutes, 0);
+  const plannedWeekMinutes = week.reduce((sum, row) => sum + (row.planned ? row.minutes : 0), 0);
   const weekMinutes = weekSessions.reduce((sum, session) => sum + session.minutes, 0);
   const completedCount = sessions.filter((session) => !session.partial).length;
   const partialCount = sessions.filter((session) => session.partial).length;
