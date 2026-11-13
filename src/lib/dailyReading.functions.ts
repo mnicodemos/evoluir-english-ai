@@ -229,6 +229,7 @@ export type ReadingWeekDay = {
   choice: ReadingChoice | null;
   /** A stored text the student can open again (never today, which is the page itself). */
   available: boolean;
+  planned: boolean;
 };
 
 /**
@@ -256,7 +257,9 @@ export const loadReadingWeek = createServerFn({ method: "GET" })
         .limit(20),
     ]);
     const level = readingLevel(profile?.level);
-    const days = readingPlanDays(today, profile?.study_days as string[] | null);
+    const studyDays = (profile?.study_days as string[] | null) ?? null;
+    const plannedDays = new Set(readingPlanDays(today, studyDays));
+    const days = readingPlanDays(today, ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]);
     const byDay = new Map<string, { score: number | null; choice: ReadingChoice | null }>();
     for (const row of rows ?? []) {
       const result = (row.result ?? {}) as { day?: unknown; choice?: unknown };
@@ -271,7 +274,7 @@ export const loadReadingWeek = createServerFn({ method: "GET" })
         const choice = read?.choice ?? null;
         const available =
           day !== today && !!(await readStored(day, level, choice).catch(() => null))?.content;
-        return { day, done: !!read, score: read?.score ?? null, choice, available };
+        return { day, done: !!read, score: read?.score ?? null, choice, available, planned: plannedDays.has(day) };
       }),
     );
   });
