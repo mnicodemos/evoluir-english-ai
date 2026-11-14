@@ -946,7 +946,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                     {challengeButton}
                     {!(quickWinSlot && challengeButton) && (
                       // One option left: the other row says it is done.
-                      <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !bg-transparent text-xs text-muted-foreground">
+                      <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !border-brand-green/35 !bg-brand-green/[0.045] text-xs text-muted-foreground">
                         <DoneSeal size="sm" />
                         {t("Nothing else pending right now.")}
                       </p>
