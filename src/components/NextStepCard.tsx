@@ -952,7 +952,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   </p>
                   {/* Each activity owns its own state: available stays amber;
                       unavailable gets its own green completion row. */}
-                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:!border-amber-400/35 [&>*]:!bg-amber-400/[0.045] [&>p]:!border-solid [&>p]:!border-brand-green/35 [&>p]:!bg-brand-green/[0.045] sm:[&>*]:px-3 sm:[&>*]:py-2.5 xl:flex-1 xl:auto-rows-fr xl:[&>*]:items-center>
+                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:!border-amber-400/35 [&>*]:!bg-amber-400/[0.045] [&>p]:!border-solid [&>p]:!border-brand-green/35 [&>p]:!bg-brand-green/[0.045] sm:[&>*]:px-3 sm:[&>*]:py-2.5 xl:flex-1 xl:auto-rows-fr xl:[&>*]:items-center">
                     {quickWinSlot ?? (
                       <p className="flex min-h-12 items-center justify-center gap-2 text-xs text-muted-foreground">
                         <DoneSeal size="sm" />
@@ -960,7 +960,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                       </p>
                     )}
                     {challengeButton ?? (
-                      <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !border-brand-green/35 !bg-brand-green/[0.045] text-xs text-muted-foreground">
+                      <p className="flex min-h-12 items-center justify-center gap-2 text-xs text-muted-foreground">
                         <DoneSeal size="sm" />
                         {t("Nothing else pending right now.")}
                       </p>
