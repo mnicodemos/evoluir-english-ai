@@ -1,0 +1,1 @@
+- Send app emails through the managed server-only helper; reject promotional templates because the managed service is transactional only.

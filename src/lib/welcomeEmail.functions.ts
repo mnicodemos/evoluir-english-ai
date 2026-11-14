@@ -74,10 +74,6 @@ export const sendStudentWelcomeEmail = createServerFn({ method: "POST" })
 
     const result = await sendAndRecord("welcome");
     if (!result.sent) return { sent: false as const, reason: result.reason };
-    const { hasPremium } = await import("@/lib/premium.server");
-    const alreadyPremium = await hasPremium(context.userId);
-    const premiumResult = alreadyPremium
-      ? { sent: false as const, reason: "already_premium" as const }
-      : await sendAndRecord("premium-benefits");
-    return { sent: true as const, premiumSent: premiumResult.sent };
+    // The managed app-email service cannot send promotional Premium upsells.
+    return { sent: true as const, premiumSent: false };
   });
