@@ -29,8 +29,12 @@ export function AdminEmailCampaigns() {
       suppressed: pt ? "Suprimido" : "Suppressed",
       failed: pt ? "Falhou" : "Failed",
     };
-    const date = status.sent_at ? new Date(status.sent_at).toLocaleString(pt ? "pt-BR" : "en-US") : "";
-    return date ? `${labels[status.status] ?? status.status} · ${date}` : labels[status.status] ?? status.status;
+    const date = status.sent_at
+      ? new Date(status.sent_at).toLocaleString(pt ? "pt-BR" : "en-US")
+      : "";
+    return date
+      ? `${labels[status.status] ?? status.status} · ${date}`
+      : (labels[status.status] ?? status.status);
   };
   const filtered = (recipients.data ?? []).filter((user) =>
     `${user.name} ${user.email}`.toLowerCase().includes(search.toLowerCase()),
@@ -42,7 +46,12 @@ export function AdminEmailCampaigns() {
     try {
       const result = await send({ data: { userId, campaign, lang } });
       if (result.sent) toast.success(pt ? "E-mail enviado." : "Email sent.");
-      else toast.info(pt ? "Destinatário suprimido pelo serviço de e-mail." : "Recipient suppressed by email service.");
+      else
+        toast.info(
+          pt
+            ? "Destinatário suprimido pelo serviço de e-mail."
+            : "Recipient suppressed by email service.",
+        );
     } catch (error) {
       toast.error(pt ? "Não foi possível enviar o e-mail." : "Could not send the email.", {
         description: error instanceof Error ? error.message : undefined,
@@ -60,7 +69,9 @@ export function AdminEmailCampaigns() {
         <div>
           <h2 className="font-semibold">{pt ? "Campanhas por e-mail" : "Email campaigns"}</h2>
           <p className="text-sm text-muted-foreground">
-            {pt ? "Envie boas-vindas ou apresente os benefícios do Premium individualmente." : "Send a welcome or Premium benefits email to an individual student."}
+            {pt
+              ? "Envie boas-vindas ou apresente os benefícios do Premium individualmente."
+              : "Send a welcome or Premium benefits email to an individual student."}
           </p>
         </div>
       </div>
@@ -70,9 +81,14 @@ export function AdminEmailCampaigns() {
         placeholder={pt ? "Buscar aluno por nome ou e-mail" : "Search student by name or email"}
       />
       {recipients.isPending ? (
-        <div className="flex items-center gap-2 py-5 text-sm text-muted-foreground"><Loader2 className="size-4 animate-spin" />{pt ? "Carregando alunos..." : "Loading students..."}</div>
+        <div className="flex items-center gap-2 py-5 text-sm text-muted-foreground">
+          <Loader2 className="size-4 animate-spin" />
+          {pt ? "Carregando alunos..." : "Loading students..."}
+        </div>
       ) : recipients.isError ? (
-        <p className="text-sm text-destructive">{pt ? "Não foi possível carregar os alunos." : "Could not load students."}</p>
+        <p className="text-sm text-destructive">
+          {pt ? "Não foi possível carregar os alunos." : "Could not load students."}
+        </p>
       ) : (
         <div className="max-h-[60vh] overflow-y-auto">
           <table className="w-full text-left text-sm">
@@ -90,22 +106,48 @@ export function AdminEmailCampaigns() {
                     <p className="font-medium">{user.name}</p>
                     <p className="text-xs text-muted-foreground">{user.email}</p>
                   </td>
-                  <td className="py-2 pr-2 text-xs">{user.plan === "premium" ? "Premium" : "Free"}</td>
+                  <td className="py-2 pr-2 text-xs">
+                    {user.plan === "premium" ? "Premium" : "Free"}
+                  </td>
                   <td className="py-2">
                     <div className="flex flex-wrap gap-1.5">
-                      <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => void sendEmail(user.id, "welcome")}>
-                        {sending === `${user.id}:welcome` ? <Loader2 className="size-3 animate-spin" /> : <Send className="size-3" />}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={sending !== null}
+                        onClick={() => void sendEmail(user.id, "welcome")}
+                      >
+                        {sending === `${user.id}:welcome` ? (
+                          <Loader2 className="size-3 animate-spin" />
+                        ) : (
+                          <Send className="size-3" />
+                        )}
                         <span>{pt ? "Boas-vindas" : "Welcome"}</span>
                       </Button>
-                      <Button size="sm" variant="outline" disabled={sending !== null || user.plan === "premium"} onClick={() => void sendEmail(user.id, "premium-benefits")}>
-                        {sending === `${user.id}:premium-benefits` ? <Loader2 className="size-3 animate-spin" /> : <Mail className="size-3" />}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        disabled={sending !== null || user.plan === "premium"}
+                        onClick={() => void sendEmail(user.id, "premium-benefits")}
+                      >
+                        {sending === `${user.id}:premium-benefits` ? (
+                          <Loader2 className="size-3 animate-spin" />
+                        ) : (
+                          <Mail className="size-3" />
+                        )}
                         <span>{pt ? "Premium" : "Premium"}</span>
                       </Button>
                     </div>
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 ? <tr><td colSpan={4} className="py-6 text-center text-sm text-muted-foreground">{pt ? "Nenhum aluno encontrado." : "No students found."}</td></tr> : null}
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-6 text-center text-sm text-muted-foreground">
+                    {pt ? "Nenhum aluno encontrado." : "No students found."}
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>

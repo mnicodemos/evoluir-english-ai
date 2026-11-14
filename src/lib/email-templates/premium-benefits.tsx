@@ -1,5 +1,13 @@
 import {
-  Body, Button, Container, Head, Heading, Hr, Html, Preview, Text,
+  Body,
+  Button,
+  Container,
+  Head,
+  Heading,
+  Hr,
+  Html,
+  Preview,
+  Text,
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 
@@ -15,7 +23,8 @@ const COPY = {
     preview: "Descubra tudo o que o Evoluir+ Premium pode oferecer.",
     heading: "Leve seu inglês mais longe com o Premium",
     greeting: (name: string) => `Olá, ${name}!`,
-    intro: "Você já começou sua jornada no Evoluir+ English AI. Com o Premium, pode ampliar suas oportunidades de prática e desenvolvimento.",
+    intro:
+      "Você já começou sua jornada no Evoluir+ English AI. Com o Premium, pode ampliar suas oportunidades de prática e desenvolvimento.",
     benefits: [
       "Até 5x mais uso diário dos recursos de IA: conversação, videochamadas e correções.",
       "Business English a partir do B1: 36 aulas para reuniões, e-mails e entrevistas.",
@@ -32,7 +41,8 @@ const COPY = {
     preview: "Discover what Evoluir+ Premium can offer.",
     heading: "Take your English further with Premium",
     greeting: (name: string) => `Hello, ${name}!`,
-    intro: "You have started your Evoluir+ English AI journey. Premium gives you more ways to practice and grow.",
+    intro:
+      "You have started your Evoluir+ English AI journey. Premium gives you more ways to practice and grow.",
     benefits: [
       "Up to 5x the daily AI usage: speaking, video calls and corrections.",
       "Business English from B1: 36 lessons for meetings, emails and interviews.",
@@ -55,21 +65,49 @@ export function PremiumBenefitsEmail({ lang = "pt", studentName = "" }: PremiumB
       <Head />
       <Preview>{t.preview}</Preview>
       <Body style={{ backgroundColor: "#f5f7f6", fontFamily: "Arial, sans-serif", margin: 0 }}>
-        <Container style={{ backgroundColor: "#ffffff", borderRadius: 12, margin: "24px auto", maxWidth: 600, padding: 32 }}>
+        <Container
+          style={{
+            backgroundColor: "#ffffff",
+            borderRadius: 12,
+            margin: "24px auto",
+            maxWidth: 600,
+            padding: 32,
+          }}
+        >
           <Heading style={{ color: "#111827", fontSize: 24 }}>{t.heading}</Heading>
           <Text style={{ color: "#111827", fontSize: 16 }}>{t.greeting(name)}</Text>
           <Text style={{ color: "#4b5563", fontSize: 15, lineHeight: "24px" }}>{t.intro}</Text>
           {t.benefits.map((benefit) => (
-            <Text key={benefit} style={{ color: "#4b5563", fontSize: 14, lineHeight: "22px", margin: "0 0 10px" }}>
+            <Text
+              key={benefit}
+              style={{ color: "#4b5563", fontSize: 14, lineHeight: "22px", margin: "0 0 10px" }}
+            >
               ✓ {benefit}
             </Text>
           ))}
-          <Button href={SITE} style={{ backgroundColor: "#00cdb3", borderRadius: 8, color: "#062b29", display: "inline-block", fontSize: 15, fontWeight: "bold", marginTop: 18, padding: "13px 22px", textDecoration: "none" }}>
+          <Button
+            href={SITE}
+            style={{
+              backgroundColor: "#00cdb3",
+              borderRadius: 8,
+              color: "#062b29",
+              display: "inline-block",
+              fontSize: 15,
+              fontWeight: "bold",
+              marginTop: 18,
+              padding: "13px 22px",
+              textDecoration: "none",
+            }}
+          >
             {t.cta}
           </Button>
           <Hr style={{ borderColor: "#e5e7eb", margin: "28px 0 18px" }} />
           <Text style={{ color: "#6b7280", fontSize: 13, lineHeight: "21px" }}>{t.note}</Text>
-          <Text style={{ color: "#6b7280", fontSize: 13, lineHeight: "21px", whiteSpace: "pre-line" }}>{t.sign}</Text>
+          <Text
+            style={{ color: "#6b7280", fontSize: 13, lineHeight: "21px", whiteSpace: "pre-line" }}
+          >
+            {t.sign}
+          </Text>
         </Container>
       </Body>
     </Html>
@@ -80,6 +118,8 @@ export const template = {
   component: PremiumBenefitsEmail,
   displayName: "Premium benefits",
   subject: (data: Record<string, unknown>) =>
-    data["lang"] === "en" ? "Discover Evoluir+ Premium" : "Conheça os benefícios do Evoluir+ Premium",
+    data["lang"] === "en"
+      ? "Discover Evoluir+ Premium"
+      : "Conheça os benefícios do Evoluir+ Premium",
   previewData: { lang: "pt", studentName: "Ana" },
 } satisfies TemplateEntry;

@@ -2204,7 +2204,6 @@ export const getAiCostByStudent = createServerFn({ method: "GET" })
     };
   });
 
-
 /** Admin-only recipient lookup for transactional email campaigns. */
 export const listEmailCampaignRecipients = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -2227,16 +2226,13 @@ export const listEmailCampaignRecipients = createServerFn({ method: "GET" })
       : { data: [], error: null };
     if (deliveryError) throw deliveryError;
     const deliveryByKey = new Map(
-      (deliveries ?? []).map((delivery) => [
-        `${delivery.user_id}:${delivery.campaign}`,
-        delivery,
-      ]),
+      (deliveries ?? []).map((delivery) => [`${delivery.user_id}:${delivery.campaign}`, delivery]),
     );
     return (data ?? []).map((row) => ({
       id: row.id,
       name: row.name || "Student",
       email: row.email || "",
-      plan: row.plan === "premium" ? "premium" as const : "free" as const,
+      plan: row.plan === "premium" ? ("premium" as const) : ("free" as const),
       welcomeStatus: deliveryByKey.get(`${row.id}:welcome`) ?? null,
       premiumStatus: deliveryByKey.get(`${row.id}:premium-benefits`) ?? null,
     }));
@@ -2246,11 +2242,13 @@ export const listEmailCampaignRecipients = createServerFn({ method: "GET" })
 export const sendAdminStudentEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      userId: z.string().uuid(),
-      campaign: z.enum(["welcome", "premium-benefits"]),
-      lang: z.enum(["pt", "en"]),
-    }).parse(input),
+    z
+      .object({
+        userId: z.string().uuid(),
+        campaign: z.enum(["welcome", "premium-benefits"]),
+        lang: z.enum(["pt", "en"]),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
@@ -2265,9 +2263,8 @@ export const sendAdminStudentEmail = createServerFn({ method: "POST" })
     if (!recipient) throw new Error("This student has no email address.");
     const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
     const idempotencyKey = `admin-${data.campaign}:${data.userId}:${Date.now()}`;
-    const { error: pendingError } = await supabaseAdmin
-      .from("email_campaign_deliveries")
-      .upsert({
+    const { error: pendingError } = await supabaseAdmin.from("email_campaign_deliveries").upsert(
+      {
         user_id: data.userId,
         campaign: data.campaign,
         status: "pending",
@@ -2275,7 +2272,9 @@ export const sendAdminStudentEmail = createServerFn({ method: "POST" })
         idempotency_key: idempotencyKey,
         last_error: null,
         updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id,campaign" });
+      },
+      { onConflict: "user_id,campaign" },
+    );
     if (pendingError) throw pendingError;
     try {
       const result = await sendTemplateEmail(data.campaign, recipient, {
@@ -2300,7 +2299,8 @@ export const sendAdminStudentEmail = createServerFn({ method: "POST" })
         .from("email_campaign_deliveries")
         .update({
           status: "failed",
-          last_error: sendError instanceof Error ? sendError.message.slice(0, 500) : "Unknown email error",
+          last_error:
+            sendError instanceof Error ? sendError.message.slice(0, 500) : "Unknown email error",
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", data.userId)

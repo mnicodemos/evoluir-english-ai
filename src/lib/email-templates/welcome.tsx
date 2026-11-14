@@ -106,7 +106,9 @@ export function WelcomeEmail({ lang = "pt", studentName = "" }: WelcomeEmailProp
           </Button>
           <Hr style={{ borderColor: "#e5e7eb", margin: "28px 0 18px" }} />
           <Text style={{ color: "#6b7280", fontSize: 13, lineHeight: "21px" }}>{t.help}</Text>
-          <Text style={{ color: "#6b7280", fontSize: 13, lineHeight: "21px", whiteSpace: "pre-line" }}>
+          <Text
+            style={{ color: "#6b7280", fontSize: 13, lineHeight: "21px", whiteSpace: "pre-line" }}
+          >
             {t.sign}
           </Text>
         </Container>

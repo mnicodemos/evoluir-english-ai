@@ -280,7 +280,12 @@ function AdminPage() {
             </TabsContent>
 
             <TabsContent value="communication" className="mt-4">
-              <FolderTabs tabs={[{ value: "push", label: t("Push") }, { value: "emails", label: t("Email campaigns") }]}>
+              <FolderTabs
+                tabs={[
+                  { value: "push", label: t("Push") },
+                  { value: "emails", label: t("Email campaigns") },
+                ]}
+              >
                 <TabsContent value="push">
                   <AdminPushTest />
                 </TabsContent>

@@ -26,9 +26,8 @@ export const sendStudentWelcomeEmail = createServerFn({ method: "POST" })
     const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
     const sendAndRecord = async (campaign: "welcome" | "premium-benefits") => {
       const idempotencyKey = `student-${campaign}:${context.userId}`;
-      const { error: pendingError } = await supabaseAdmin
-        .from("email_campaign_deliveries")
-        .upsert({
+      const { error: pendingError } = await supabaseAdmin.from("email_campaign_deliveries").upsert(
+        {
           user_id: context.userId,
           campaign,
           status: "pending",
@@ -36,7 +35,9 @@ export const sendStudentWelcomeEmail = createServerFn({ method: "POST" })
           idempotency_key: idempotencyKey,
           last_error: null,
           updated_at: new Date().toISOString(),
-        }, { onConflict: "user_id,campaign" });
+        },
+        { onConflict: "user_id,campaign" },
+      );
       if (pendingError) throw pendingError;
       try {
         const result = await sendTemplateEmail(campaign, recipient, {
@@ -61,7 +62,8 @@ export const sendStudentWelcomeEmail = createServerFn({ method: "POST" })
           .from("email_campaign_deliveries")
           .update({
             status: "failed",
-            last_error: sendError instanceof Error ? sendError.message.slice(0, 500) : "Unknown email error",
+            last_error:
+              sendError instanceof Error ? sendError.message.slice(0, 500) : "Unknown email error",
             updated_at: new Date().toISOString(),
           })
           .eq("user_id", context.userId)
@@ -74,6 +76,8 @@ export const sendStudentWelcomeEmail = createServerFn({ method: "POST" })
     if (!result.sent) return { sent: false as const, reason: result.reason };
     const { hasPremium } = await import("@/lib/premium.server");
     const alreadyPremium = await hasPremium(context.userId);
-    const premiumResult = alreadyPremium ? { sent: false as const, reason: "already_premium" as const } : await sendAndRecord("premium-benefits");
+    const premiumResult = alreadyPremium
+      ? { sent: false as const, reason: "already_premium" as const }
+      : await sendAndRecord("premium-benefits");
     return { sent: true as const, premiumSent: premiumResult.sent };
   });
