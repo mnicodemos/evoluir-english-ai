@@ -6,9 +6,7 @@ import { TEMPLATES } from "./registry";
 const SITE_NAME = "Evoluir English AI";
 const DEFAULT_FROM_EMAIL = "noreply@notify.evoluirmaisenglishai.com";
 
-export type SendTemplateEmailResult =
-  | { sent: true; providerMessageId: string }
-  | { sent: false; reason: "recipient_suppressed" };
+export type SendTemplateEmailResult = { sent: true; providerMessageId: string } | { sent: false; reason: "recipient_suppressed" };
 
 export interface SendTemplateEmailOptions {
   templateData?: Record<string, unknown>;
