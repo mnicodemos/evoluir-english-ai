@@ -111,7 +111,7 @@ export function LevelCard({
                 chip,
                 active &&
                   "border-transparent bg-brand-green text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklab,var(--brand-green)_22%,transparent)]",
-                locked && "border-border/50 text-muted-foreground/45",
+                locked && "border-dashed border-muted-foreground text-muted-foreground/45",
               )}
             >
               {code}
