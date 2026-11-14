@@ -932,28 +932,7 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   {t("Extra practice")}
                 </h3>
               </div>
-              {quickWinSlot || challengeButton ? (
-                <>
-                  <p
-                    className="mt-0.5 hidden w-full min-w-0 truncate whitespace-nowrap text-xs text-sidebar-foreground/70 sm:block xl:hidden"
-                    title={t("Two activities for your development.")}
-                  >
-                    {t("Two activities for your development.")}
-                  </p>
-                  {/* Stacked, one full-width option per row, each with its description. */}
-                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:!border-amber-400/35 [&>*]:!bg-amber-400/[0.045] sm:[&>*]:px-3 sm:[&>*]:py-2.5 xl:flex-1 xl:auto-rows-fr xl:[&>*]:items-center">
-                    {quickWinSlot}
-                    {challengeButton}
-                    {!(quickWinSlot && challengeButton) && (
-                      // One option left: the other row says it is done.
-                      <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !border-brand-green/35 !bg-brand-green/[0.045] text-xs text-muted-foreground">
-                        <DoneSeal size="sm" />
-                        {t("Nothing else pending right now.")}
-                      </p>
-                    )}
-                  </div>
-                </>
-              ) : !videoQuickWinStatusReady ? (
+              {!videoQuickWinStatusReady ? (
                 <div
                   className="mt-2 flex min-h-[7.5rem] flex-col justify-center gap-2 rounded-lg border border-dashed border-border px-3 xl:flex-1"
                   aria-label={t("Loading extra practice")}
@@ -964,13 +943,30 @@ export function NextStepCard({ compact = false }: { compact?: boolean }) {
                   <Skeleton className="h-3 w-4/5" />
                 </div>
               ) : (
-                <div className="mt-2 flex min-h-[7.5rem] flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border px-3 text-center xl:flex-1">
-                  <DoneSeal />
-                  <p className="text-sm font-semibold">{t("Extra practice done for today")}</p>
-                  <p className="text-[11px] text-muted-foreground">
-                    {t("New options appear tomorrow.")}
+                <>
+                  <p
+                    className="mt-0.5 hidden w-full min-w-0 truncate whitespace-nowrap text-xs text-sidebar-foreground/70 sm:block xl:hidden"
+                    title={t("Two activities for your development.")}
+                  >
+                    {t("Two activities for your development.")}
                   </p>
-                </div>
+                  {/* Each activity owns its own state: available stays amber;
+                      unavailable gets its own green completion row. */}
+                  <div className="mt-2 grid gap-2 [&>*]:justify-start [&>*]:rounded-lg [&>*]:border [&>*]:!border-amber-400/35 [&>*]:!bg-amber-400/[0.045] sm:[&>*]:px-3 sm:[&>*]:py-2.5 xl:flex-1 xl:auto-rows-fr xl:[&>*]:items-center">
+                    {quickWinSlot ?? (
+                      <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !border-brand-green/35 !bg-brand-green/[0.045] text-xs text-muted-foreground">
+                        <DoneSeal size="sm" />
+                        {t("Nothing else pending right now.")}
+                      </p>
+                    )}
+                    {challengeButton ?? (
+                      <p className="flex min-h-12 items-center justify-center gap-2 !border-dashed !border-brand-green/35 !bg-brand-green/[0.045] text-xs text-muted-foreground">
+                        <DoneSeal size="sm" />
+                        {t("Nothing else pending right now.")}
+                      </p>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           </aside>
