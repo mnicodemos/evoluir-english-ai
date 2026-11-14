@@ -284,6 +284,9 @@ function AdminPage() {
                 <TabsContent value="push">
                   <AdminPushTest />
                 </TabsContent>
+                <TabsContent value="emails">
+                  <AdminEmailCampaigns />
+                </TabsContent>
               </FolderTabs>
             </TabsContent>
 
