@@ -1,44 +1,34 @@
 import * as React from "react";
 import { render } from "@react-email/render";
-import { EmailAPIError, sendLovableEmail } from "@lovable.dev/email-js";
 import { TEMPLATES } from "./registry";
 
-// Server-only: reads LOVABLE_API_KEY. Never import from client components.
-
-// Configuration baked in at scaffold time
+// Server-only: reads RESEND_API_KEY. Never import from client components.
 const SITE_NAME = "Evoluir English AI";
-// SENDER_DOMAIN is the verified sender subdomain FQDN (e.g., "notify.example.com").
-// It MUST match the subdomain delegated to Lovable's nameservers. NEVER use the root domain.
-const SENDER_DOMAIN = "notify.evoluirmaisenglishai.com";
-// FROM_DOMAIN is the domain shown in the From: header (e.g., "example.com").
-// Can be the root domain when display_from_root is enabled — this is cosmetic only.
-const FROM_DOMAIN = "notify.evoluirmaisenglishai.com";
+const DEFAULT_FROM_EMAIL = "noreply@notify.evoluirmaisenglishai.com";
 
 export type SendTemplateEmailResult =
-  { sent: true } | { sent: false; reason: "recipient_suppressed" };
+  | { sent: true; providerMessageId: string }
+  | { sent: false; reason: "recipient_suppressed" };
 
 export interface SendTemplateEmailOptions {
   templateData?: Record<string, unknown>;
-  /** Dedupes retries of the same logical send; defaults to a random UUID (no dedupe). */
+  /** Stable key prevents duplicate sends when the provider receives a retry. */
   idempotencyKey?: string;
   replyTo?: string;
 }
 
 /**
- * Renders a registered template and sends it through Lovable's managed email
- * API. Suppression, retries, and rate limits are enforced by Lovable
- * server-side. A suppressed recipient is an expected outcome
- * ({ sent: false }); any other failure throws — EmailAPIError exposes
- * .code and .status for branching.
+ * Renders a registered React Email template and sends it through Resend.
+ * The domain must be verified in Resend before production delivery.
  */
 export async function sendTemplateEmail(
   templateName: string,
   to: string,
   options: SendTemplateEmailOptions = {},
 ): Promise<SendTemplateEmailResult> {
-  const apiKey = process.env["LOVABLE_API_KEY"];
+  const apiKey = process.env["RESEND_API_KEY"];
   if (!apiKey) {
-    throw new Error("LOVABLE_API_KEY is not configured");
+    throw new Error("RESEND_API_KEY is not configured");
   }
 
   const template = TEMPLATES[templateName];
@@ -62,28 +52,41 @@ export async function sendTemplateEmail(
   const subject =
     typeof template.subject === "function" ? template.subject(templateData) : template.subject;
 
-  try {
-    await sendLovableEmail(
-      {
-        to: recipient,
-        from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
-        sender_domain: SENDER_DOMAIN,
-        subject,
-        html,
-        text,
-        purpose: "transactional",
-        label: templateName,
-        idempotency_key: options.idempotencyKey || crypto.randomUUID(),
-        ...(options.replyTo ? { reply_to: options.replyTo } : {}),
-      },
-      { apiKey, sendUrl: process.env["LOVABLE_SEND_URL"] },
-    );
-  } catch (error) {
-    if (error instanceof EmailAPIError && error.code === "recipient_suppressed") {
-      return { sent: false, reason: "recipient_suppressed" };
-    }
-    throw error;
+  const fromEmail = process.env["RESEND_FROM_EMAIL"] || DEFAULT_FROM_EMAIL;
+  const replyTo = options.replyTo || process.env["RESEND_REPLY_TO"];
+  const idempotencyKey = options.idempotencyKey || crypto.randomUUID();
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "Idempotency-Key": idempotencyKey,
+    },
+    body: JSON.stringify({
+      from: `${SITE_NAME} <${fromEmail}>`,
+      to: [recipient],
+      subject,
+      html,
+      text,
+      ...(replyTo ? { reply_to: replyTo } : {}),
+    }),
+  });
+
+  const payload: unknown = await response.json().catch(() => null);
+  if (!response.ok) {
+    const details =
+      payload && typeof payload === "object" && "message" in payload
+        ? String(payload.message)
+        : `Resend API returned HTTP ${response.status}`;
+    throw new Error(`Resend email failed (${response.status}): ${details}`);
   }
 
-  return { sent: true };
+  const providerMessageId =
+    payload && typeof payload === "object" && "id" in payload ? String(payload.id) : "";
+  if (!providerMessageId) {
+    throw new Error("Resend accepted the request but returned no email ID");
+  }
+
+  return { sent: true, providerMessageId };
 }
