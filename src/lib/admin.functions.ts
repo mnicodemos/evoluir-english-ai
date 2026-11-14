@@ -2203,3 +2203,108 @@ export const getAiCostByStudent = createServerFn({ method: "GET" })
       truncated: (events ?? []).length >= 10000,
     };
   });
+
+/** Admin-only recipient lookup for transactional email campaigns. */
+export const listEmailCampaignRecipients = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("profiles")
+      .select("id, name, email, created_at, plan")
+      .not("email", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw error;
+    const userIds = (data ?? []).map((row) => row.id);
+    const { data: deliveries, error: deliveryError } = userIds.length
+      ? await supabaseAdmin
+          .from("email_campaign_deliveries")
+          .select("user_id, campaign, status, sent_at, updated_at, last_error")
+          .in("user_id", userIds)
+      : { data: [], error: null };
+    if (deliveryError) throw deliveryError;
+    const deliveryByKey = new Map(
+      (deliveries ?? []).map((delivery) => [`${delivery.user_id}:${delivery.campaign}`, delivery]),
+    );
+    return (data ?? []).map((row) => ({
+      id: row.id,
+      name: row.name || "Student",
+      email: row.email || "",
+      plan: row.plan === "premium" ? ("premium" as const) : ("free" as const),
+      welcomeStatus: deliveryByKey.get(`${row.id}:welcome`) ?? null,
+      premiumStatus: deliveryByKey.get(`${row.id}:premium-benefits`) ?? null,
+    }));
+  });
+
+/** Admin-triggered, one-recipient send; recipients are always resolved server-side. */
+export const sendAdminStudentEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        userId: z.string().uuid(),
+        campaign: z.enum(["welcome", "premium-benefits"]),
+        lang: z.enum(["pt", "en"]),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) throw new Error("Forbidden");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profile, error } = await supabaseAdmin
+      .from("profiles")
+      .select("name, email")
+      .eq("id", data.userId)
+      .maybeSingle();
+    if (error) throw error;
+    const recipient = profile?.email?.trim();
+    if (!recipient) throw new Error("This student has no email address.");
+    const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+    const idempotencyKey = `admin-${data.campaign}:${data.userId}:${Date.now()}`;
+    const { error: pendingError } = await supabaseAdmin.from("email_campaign_deliveries").upsert(
+      {
+        user_id: data.userId,
+        campaign: data.campaign,
+        status: "pending",
+        recipient_email: recipient,
+        idempotency_key: idempotencyKey,
+        last_error: null,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,campaign" },
+    );
+    if (pendingError) throw pendingError;
+    try {
+      const result = await sendTemplateEmail(data.campaign, recipient, {
+        templateData: { lang: data.lang, studentName: profile?.name?.trim() || "" },
+        idempotencyKey,
+      });
+      const status = result.sent ? "sent" : "suppressed";
+      const { error: updateError } = await supabaseAdmin
+        .from("email_campaign_deliveries")
+        .update({
+          status,
+          sent_at: result.sent ? new Date().toISOString() : null,
+          updated_at: new Date().toISOString(),
+          last_error: result.sent ? null : "Recipient suppressed by email provider",
+        })
+        .eq("user_id", data.userId)
+        .eq("campaign", data.campaign);
+      if (updateError) throw updateError;
+      return { ...result, status };
+    } catch (sendError) {
+      await supabaseAdmin
+        .from("email_campaign_deliveries")
+        .update({
+          status: "failed",
+          last_error:
+            sendError instanceof Error ? sendError.message.slice(0, 500) : "Unknown email error",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", data.userId)
+        .eq("campaign", data.campaign);
+      throw sendError;
+    }
+  });

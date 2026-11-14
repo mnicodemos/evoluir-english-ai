@@ -1,6 +1,8 @@
 import type { ComponentType } from "react";
 
 import { template as courseGuideTemplate } from "./course-guide";
+import { template as welcomeTemplate } from "./welcome";
+import { template as premiumBenefitsTemplate } from "./premium-benefits";
 
 export interface TemplateEntry {
   // Props vary per template; createElement accepts the caller's data object.
@@ -23,4 +25,6 @@ export interface TemplateEntry {
  */
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "course-guide": courseGuideTemplate,
+  welcome: welcomeTemplate,
+  "premium-benefits": premiumBenefitsTemplate,
 };
