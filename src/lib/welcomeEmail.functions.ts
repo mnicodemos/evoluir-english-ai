@@ -32,7 +32,17 @@ export const sendStudentWelcomeEmail = createServerFn({ method: "POST" })
       idempotencyKey: `student-welcome:${context.userId}`,
     });
 
-    return result.sent
-      ? { sent: true as const }
-      : { sent: false as const, reason: result.reason };
+    if (!result.sent) return { sent: false as const, reason: result.reason };
+
+    // Send the Premium overview immediately after the transactional welcome.
+    // Each message has its own idempotency key, so retries never duplicate either email.
+    const premiumResult = await sendTemplateEmail("premium-benefits", recipient, {
+      templateData: {
+        lang: data.lang,
+        studentName: profile?.name?.trim() || "",
+      },
+      idempotencyKey: `student-premium-benefits:${context.userId}`,
+    });
+
+    return { sent: true as const, premiumSent: premiumResult.sent };
   });
