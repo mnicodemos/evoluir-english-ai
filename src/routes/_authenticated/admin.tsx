@@ -19,6 +19,7 @@ import { AdminCostPerformance } from "@/components/AdminCostPerformance";
 import { AdminAiCostByActivity } from "@/components/AdminAiCostByActivity";
 import { AdminFinancialProjection } from "@/components/AdminFinancialProjection";
 import { AdminPushTest } from "@/components/AdminPushTest";
+import { AdminEmailCampaigns } from "@/components/AdminEmailCampaigns";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
 import { AdminLevelIntroVideos } from "@/components/AdminLevelIntroVideos";
 import { AdminLessonAudioPrep } from "@/components/AdminLessonAudioPrep";
@@ -279,7 +280,7 @@ function AdminPage() {
             </TabsContent>
 
             <TabsContent value="communication" className="mt-4">
-              <FolderTabs tabs={[{ value: "push", label: t("Push") }]}>
+              <FolderTabs tabs={[{ value: "push", label: t("Push") }, { value: "emails", label: t("Email campaigns") }]}>
                 <TabsContent value="push">
                   <AdminPushTest />
                 </TabsContent>
