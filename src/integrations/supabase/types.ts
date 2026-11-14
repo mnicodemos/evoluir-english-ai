@@ -14,45 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      email_campaign_deliveries: {
-        Row: {
-          campaign: string
-          created_at: string
-          id: string
-          idempotency_key: string
-          last_error: string | null
-          recipient_email: string
-          sent_at: string | null
-          status: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          campaign: string
-          created_at?: string
-          id?: string
-          idempotency_key: string
-          last_error?: string | null
-          recipient_email: string
-          sent_at?: string | null
-          status?: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          campaign?: string
-          created_at?: string
-          id?: string
-          idempotency_key?: string
-          last_error?: string | null
-          recipient_email?: string
-          sent_at?: string | null
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       activities: {
         Row: {
           activity_type: string
@@ -626,6 +587,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_campaign_deliveries: {
+        Row: {
+          campaign: string
+          created_at: string
+          id: string
+          idempotency_key: string
+          last_error: string | null
+          recipient_email: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign: string
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          last_error?: string | null
+          recipient_email: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign?: string
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          last_error?: string | null
+          recipient_email?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       english_adventure_checkpoints: {
         Row: {
