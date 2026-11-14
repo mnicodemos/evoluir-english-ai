@@ -19,6 +19,7 @@ import { recordPlacementEvidence } from "@/lib/placementEvidence.functions";
 import { placementComplete, scorePlacement } from "@/lib/placementTest";
 import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
+import { sendStudentWelcomeEmail } from "@/lib/welcomeEmail.functions";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -93,6 +94,11 @@ function Onboarding() {
         await recordPlacement({ data: { answers } }).catch(() => undefined);
       }
       await queryClient.invalidateQueries({ queryKey: ["profile"] });
+      // Email delivery must never prevent a student from entering the course.
+      // The server uses the authenticated profile address and a stable idempotency key.
+      await sendStudentWelcomeEmail({ data: { lang } }).catch((emailError) => {
+        console.warn("Student welcome email could not be sent", emailError);
+      });
       navigate({ to, replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not save your plan");
