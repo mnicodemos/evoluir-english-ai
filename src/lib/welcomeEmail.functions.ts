@@ -24,25 +24,54 @@ export const sendStudentWelcomeEmail = createServerFn({ method: "POST" })
     if (!recipient) return { sent: false as const, reason: "missing_email" as const };
 
     const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
-    const result = await sendTemplateEmail("welcome", recipient, {
-      templateData: {
-        lang: data.lang,
-        studentName: profile?.name?.trim() || "",
-      },
-      idempotencyKey: `student-welcome:${context.userId}`,
-    });
+    const sendAndRecord = async (campaign: "welcome" | "premium-benefits") => {
+      const idempotencyKey = `student-${campaign}:${context.userId}`;
+      const { error: pendingError } = await supabaseAdmin
+        .from("email_campaign_deliveries")
+        .upsert({
+          user_id: context.userId,
+          campaign,
+          status: "pending",
+          recipient_email: recipient,
+          idempotency_key: idempotencyKey,
+          last_error: null,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: "user_id,campaign" });
+      if (pendingError) throw pendingError;
+      try {
+        const result = await sendTemplateEmail(campaign, recipient, {
+          templateData: { lang: data.lang, studentName: profile?.name?.trim() || "" },
+          idempotencyKey,
+        });
+        const status = result.sent ? "sent" : "suppressed";
+        const { error: updateError } = await supabaseAdmin
+          .from("email_campaign_deliveries")
+          .update({
+            status,
+            sent_at: result.sent ? new Date().toISOString() : null,
+            updated_at: new Date().toISOString(),
+            last_error: result.sent ? null : "Recipient suppressed by email provider",
+          })
+          .eq("user_id", context.userId)
+          .eq("campaign", campaign);
+        if (updateError) throw updateError;
+        return result;
+      } catch (sendError) {
+        await supabaseAdmin
+          .from("email_campaign_deliveries")
+          .update({
+            status: "failed",
+            last_error: sendError instanceof Error ? sendError.message.slice(0, 500) : "Unknown email error",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("user_id", context.userId)
+          .eq("campaign", campaign);
+        throw sendError;
+      }
+    };
 
+    const result = await sendAndRecord("welcome");
     if (!result.sent) return { sent: false as const, reason: result.reason };
-
-    // Send the Premium overview immediately after the transactional welcome.
-    // Each message has its own idempotency key, so retries never duplicate either email.
-    const premiumResult = await sendTemplateEmail("premium-benefits", recipient, {
-      templateData: {
-        lang: data.lang,
-        studentName: profile?.name?.trim() || "",
-      },
-      idempotencyKey: `student-premium-benefits:${context.userId}`,
-    });
-
+    const premiumResult = await sendAndRecord("premium-benefits");
     return { sent: true as const, premiumSent: premiumResult.sent };
   });
