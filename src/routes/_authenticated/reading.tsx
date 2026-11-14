@@ -479,7 +479,7 @@ function ReadingWeek({
                       ? "bg-amber-400/15 text-amber-400 ring-1 ring-amber-400/60"
                       : entry.done
                         ? "bg-brand-green/15 text-brand-green ring-1 ring-brand-green/50"
-                        : "bg-white/[0.04] text-muted-foreground",
+                        : "border border-dashed border-muted-foreground bg-white/[0.04] text-muted-foreground",
                     isToday && !entry.done && "ring-1 ring-brand-green/60",
                   )}
                 >
