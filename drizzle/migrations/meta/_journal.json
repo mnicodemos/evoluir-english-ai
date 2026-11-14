@@ -631,6 +631,13 @@
       "when": 1794431000000,
       "tag": "0118_restrict_profile_streak_trigger_execute",
       "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1794700000000,
+      "tag": "0090_email_campaign_delivery_status",
+      "breakpoints": true
     }
   ]
 }
