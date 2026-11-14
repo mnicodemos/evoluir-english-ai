@@ -21,6 +21,17 @@ export function AdminEmailCampaigns() {
     queryKey: ["admin-email-campaign-recipients"],
     queryFn: () => list(),
   });
+  const statusLabel = (status: { status: string; sent_at: string | null } | null) => {
+    if (!status) return pt ? "Não enviado" : "Not sent";
+    const labels: Record<string, string> = {
+      pending: pt ? "Processando" : "Pending",
+      sent: pt ? "Enviado" : "Sent",
+      suppressed: pt ? "Suprimido" : "Suppressed",
+      failed: pt ? "Falhou" : "Failed",
+    };
+    const date = status.sent_at ? new Date(status.sent_at).toLocaleString(pt ? "pt-BR" : "en-US") : "";
+    return date ? `${labels[status.status] ?? status.status} · ${date}` : labels[status.status] ?? status.status;
+  };
   const filtered = (recipients.data ?? []).filter((user) =>
     `${user.name} ${user.email}`.toLowerCase().includes(search.toLowerCase()),
   );
@@ -94,7 +105,7 @@ export function AdminEmailCampaigns() {
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 ? <tr><td colSpan={3} className="py-6 text-center text-sm text-muted-foreground">{pt ? "Nenhum aluno encontrado." : "No students found."}</td></tr> : null}
+              {filtered.length === 0 ? <tr><td colSpan={4} className="py-6 text-center text-sm text-muted-foreground">{pt ? "Nenhum aluno encontrado." : "No students found."}</td></tr> : null}
             </tbody>
           </table>
         </div>
