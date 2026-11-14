@@ -150,7 +150,7 @@ export function FocusSection() {
             />
           </svg>
           <div className="text-center" role="timer" aria-live="off">
-            <p className="font-display text-3xl font-bold tabular-nums xl:text-2xl">
+            <p className="font-display text-lg font-bold tabular-nums text-amber-400">
               {focusClock(leftMs)}
             </p>
             <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
