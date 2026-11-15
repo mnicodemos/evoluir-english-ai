@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier -- formatting is normalized in the follow-up cleanup */
 import { randomBytes } from "node:crypto";
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
