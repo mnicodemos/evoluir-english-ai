@@ -15,7 +15,12 @@ import {
 import { BrandName } from "@/components/BrandName";
 import { Footer } from "@/components/Footer";
 import { Logo } from "@/components/Logo";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { useUiLang } from "@/lib/uiLang";
 
