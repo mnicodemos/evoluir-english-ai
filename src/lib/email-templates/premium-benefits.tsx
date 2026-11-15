@@ -40,7 +40,8 @@ const BENEFITS = [
   },
   {
     title: "Meditações em inglês",
-    description: "Tenha acesso a todas as meditações para incluir o inglês também nos seus momentos de pausa.",
+    description:
+      "Tenha acesso a todas as meditações para incluir o inglês também nos seus momentos de pausa.",
   },
   {
     title: "Music Lab",
@@ -48,7 +49,8 @@ const BENEFITS = [
   },
   {
     title: "Vídeos extras das aulas",
-    description: "Explore vídeos complementares organizados por nível para aprofundar sua aprendizagem.",
+    description:
+      "Explore vídeos complementares organizados por nível para aprofundar sua aprendizagem.",
   },
 ] as const;
 
@@ -125,9 +127,7 @@ export function PremiumBenefitsEmail({ studentName = "" }: PremiumBenefitsProps)
             >
               Leve seu inglês mais longe com o Premium
             </Heading>
-            <Text style={{ color: "#24383a", fontSize: 16, lineHeight: "25px" }}>
-              Olá, {name}!
-            </Text>
+            <Text style={{ color: "#24383a", fontSize: 16, lineHeight: "25px" }}>Olá, {name}!</Text>
             <Text style={{ color: "#536568", fontSize: 15, lineHeight: "25px" }}>
               Você já começou sua jornada no Evoluir+ English AI. O Premium amplia suas
               possibilidades de prática e desenvolvimento, reunindo mais recursos para acompanhar
