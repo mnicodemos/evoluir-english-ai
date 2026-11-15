@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier -- formatting is normalized in the follow-up cleanup */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Loader2, Mail, RefreshCw, Reply, Send } from "lucide-react";
 import { toast } from "sonner";
 
@@ -14,6 +14,7 @@ import {
   syncAdminEmailInbox,
   sendAdminEmailReply,
   getAdminEmailReplyHistory,
+  markAdminEmailMessagesRead,
 } from "@/lib/admin-email.functions";
 
 export function AdminEmailInbox() {
@@ -24,6 +25,8 @@ export function AdminEmailInbox() {
   const syncInbox = useServerFn(syncAdminEmailInbox);
   const sendReply = useServerFn(sendAdminEmailReply);
   const loadReplyHistory = useServerFn(getAdminEmailReplyHistory);
+  const markMessagesRead = useServerFn(markAdminEmailMessagesRead);
+  const markingReadIds = useRef(new Set<string>());
   const [busy, setBusy] = useState<"connect" | "sync" | null>(null);
   const [selectedMailbox, setSelectedMailbox] = useState<"contact" | "support">("contact");
   const inbox = useQuery({
@@ -104,6 +107,27 @@ export function AdminEmailInbox() {
   const contact = messages.filter((message: InboxMessage) => message.mailbox === "contact");
   const support = messages.filter((message: InboxMessage) => message.mailbox === "support");
 
+  useEffect(() => {
+    const visibleUnreadIds = messages
+      .filter((message: InboxMessage) => message.mailbox === selectedMailbox && !message.is_read)
+      .map((message: InboxMessage) => message.id)
+      .filter((id: string) => !markingReadIds.current.has(id));
+    if (!visibleUnreadIds.length) return;
+
+    visibleUnreadIds.forEach((id: string) => markingReadIds.current.add(id));
+    void markMessagesRead({ data: { messageIds: visibleUnreadIds } })
+      .then(async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["admin-email-inbox"] }),
+          queryClient.invalidateQueries({ queryKey: ["admin-email-unread-count"] }),
+        ]);
+      })
+      .catch((error) => {
+        visibleUnreadIds.forEach((id: string) => markingReadIds.current.delete(id));
+        toast.error(error instanceof Error ? error.message : "Não foi possível marcar as mensagens como lidas.");
+      });
+  }, [markMessagesRead, messages, queryClient, selectedMailbox]);
+
   return (
     <section className="card-soft space-y-4 p-3 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -169,6 +193,7 @@ type InboxMessage = {
   subject: string;
   body_text: string;
   received_at: string;
+  is_read: boolean;
 };
 
 
