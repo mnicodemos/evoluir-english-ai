@@ -134,6 +134,7 @@ export function AdminEmailInbox() {
 
 type InboxMessage = {
   id: string;
+  mailbox: "contact" | "support" | "unknown";
   from_address: string;
   subject: string;
   body_text: string;
