@@ -36,9 +36,7 @@ export function AdminEmailHomeNotification() {
       to="/admin"
       search={{ folder: "communication", tab: "inbox" }}
       aria-label={
-        count > 0
-          ? `Caixa de e-mail: ${count} mensagens não lidas`
-          : "Abrir caixa de e-mail"
+        count > 0 ? `Caixa de e-mail: ${count} mensagens não lidas` : "Abrir caixa de e-mail"
       }
       title={count > 0 ? `${count} mensagens não lidas` : "Caixa de e-mail"}
       className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
