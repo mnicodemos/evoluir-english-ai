@@ -225,8 +225,7 @@ export function normalizeGraphMessage(message: GraphInboxMessage) {
     from_address: message.from?.emailAddress?.address?.trim().toLowerCase() || "unknown",
     to_addresses: recipients,
     subject: message.subject ?? "",
-    body_text:
-      message.body?.contentType?.toLowerCase() === "html" ? htmlToText(rawBody) : rawBody,
+    body_text: message.body?.contentType?.toLowerCase() === "html" ? htmlToText(rawBody) : rawBody,
     received_at: message.receivedDateTime ?? new Date().toISOString(),
   };
 }
