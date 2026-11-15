@@ -239,3 +239,135 @@ export const syncAdminEmailInbox = createServerFn({ method: "POST" })
 
     return { synced: result.messages.length };
   });
+
+ 
+export const sendAdminEmailReply = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => {
+    const value = input as { requestId: string; messageId: string; body: string };
+    if (
+      !value ||
+      !/^[0-9a-f-]{36}$/i.test(value.requestId) ||
+      !/^[0-9a-f-]{36}$/i.test(value.messageId) ||
+      typeof value.body !== "string" ||
+      value.body.trim().length < 1 ||
+      value.body.length > 10000
+    ) {
+      throw new Error("Resposta inválida. Verifique o texto e tente novamente.");
+    }
+    return { requestId: value.requestId, messageId: value.messageId, body: value.body.trim() };
+  })
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.supabase, context.userId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin email tables are managed by Lovable Cloud migrations
+    const db = context.supabase as any;
+    const { data: parent, error: parentError } = await db
+      .from("admin_email_messages")
+      .select("id,mailbox,from_address,subject,internet_message_id")
+      .eq("id", data.messageId)
+      .maybeSingle();
+    if (parentError || !parent) throw new Error("Mensagem original não encontrada.");
+    if (!["contact", "support"].includes(parent.mailbox)) {
+      throw new Error("Esta mensagem não pertence às caixas autorizadas.");
+    }
+    const recipient = String(parent.from_address || "").trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) {
+      throw new Error("O remetente original não possui um endereço de resposta válido.");
+    }
+    const expectedSender =
+      parent.mailbox === "contact"
+        ? "contato@evoluirmaisenglishai.com"
+        : "suporte@evoluirmaisenglishai.com";
+    const sender = process.env[
+      parent.mailbox === "contact" ? "RESEND_CONTACT_FROM_EMAIL" : "RESEND_SUPPORT_FROM_EMAIL"
+    ]?.trim();
+    if (!sender) {
+      throw new Error(
+        parent.mailbox === "contact"
+          ? "Configure RESEND_CONTACT_FROM_EMAIL no Lovable Cloud."
+          : "Configure RESEND_SUPPORT_FROM_EMAIL no Lovable Cloud.",
+      );
+    }
+    const senderAddress = sender.match(/<([^>]+)>/)?.[1]?.trim().toLowerCase() ?? sender.toLowerCase();
+    if (senderAddress !== expectedSender) {
+      throw new Error(`O remetente Resend precisa ser ${expectedSender} e estar verificado.`);
+    }
+    const subject = /^re:/i.test(parent.subject || "")
+      ? parent.subject
+      : `Re: ${parent.subject || "(Sem assunto)"}`;
+    const { data: existing, error: existingError } = await db
+      .from("admin_email_replies")
+      .select("id,status,resend_email_id")
+      .eq("request_id", data.requestId)
+      .maybeSingle();
+    if (existingError) throw new Error("Não foi possível verificar o histórico de respostas.");
+    if (existing?.status === "sent" && existing.resend_email_id) {
+      return { sent: true as const, resendId: existing.resend_email_id };
+    }
+    if (!existing) {
+      const { error: insertError } = await db.from("admin_email_replies").insert({
+        request_id: data.requestId,
+        parent_message_id: parent.id,
+        recipient_email: recipient,
+        from_email: sender,
+        subject,
+        body_text: data.body,
+        status: "pending",
+        sent_by: context.userId,
+      });
+      if (insertError) throw new Error("Não foi possível registrar a resposta antes do envio.");
+    }
+    try {
+      const { sendAdminEmailReply: send } = await import("@/lib/admin-email.server");
+      const result = await send({
+        requestId: data.requestId,
+        to: recipient,
+        from: sender,
+        subject,
+        body: data.body,
+        inReplyTo: parent.internet_message_id,
+      });
+      const { error: updateError } = await db
+        .from("admin_email_replies")
+        .update({
+          status: "sent",
+          resend_email_id: result.id,
+          sent_at: new Date().toISOString(),
+          last_error: null,
+        })
+        .eq("request_id", data.requestId);
+      if (updateError) throw new Error("E-mail enviado, mas não foi possível atualizar o histórico.");
+      return { sent: true as const, resendId: result.id };
+    } catch (error) {
+      await db
+        .from("admin_email_replies")
+        .update({
+          status: "failed",
+          last_error: error instanceof Error ? error.message.slice(0, 500) : "Unknown send error",
+        })
+        .eq("request_id", data.requestId);
+      throw error;
+    }
+  });
+
+export const getAdminEmailReplyHistory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => {
+    const value = input as { messageId: string };
+    if (!value || !/^[0-9a-f-]{36}$/i.test(value.messageId)) {
+      throw new Error("Mensagem inválida.");
+    }
+    return { messageId: value.messageId };
+  })
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.supabase, context.userId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin email tables are managed by Lovable Cloud migrations
+    const db = context.supabase as any;
+    const { data: replies, error } = await db
+      .from("admin_email_replies")
+      .select("id,recipient_email,from_email,subject,body_text,status,sent_at,created_at")
+      .eq("parent_message_id", data.messageId)
+      .order("created_at", { ascending: true });
+    if (error) throw new Error("Não foi possível carregar o histórico de respostas.");
+    return replies ?? [];
+  });
