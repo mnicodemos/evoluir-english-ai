@@ -107,7 +107,8 @@ export function AdminEmailInbox() {
         </p>
       ) : !inbox.data?.connected ? (
         <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-          A conexão ainda não foi realizada. Ao conectar, a Microsoft solicitará autorização de leitura da caixa.
+          A conexão ainda não foi realizada. Ao conectar, a Microsoft solicitará autorização de leitura da
+          caixa.
         </p>
       ) : (
         <Tabs defaultValue="contact">
@@ -124,7 +125,8 @@ export function AdminEmailInbox() {
         </Tabs>
       )}
       <p className="text-xs text-muted-foreground">
-        Leitura somente. As mensagens originais não são movidas nem apagadas. Respostas serão adicionadas em uma etapa posterior usando o Resend já configurado.
+        Leitura somente. As mensagens originais não são movidas nem apagadas. Respostas serão adicionadas em
+        uma etapa posterior usando o Resend já configurado.
       </p>
     </section>
   );
@@ -140,9 +142,11 @@ type InboxMessage = {
 
 function MessageList({ messages }: { messages: InboxMessage[] }) {
   if (!messages.length) {
-    return <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-      Nenhuma mensagem sincronizada nesta caixa.
-    </p>;
+    return (
+      <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+        Nenhuma mensagem sincronizada nesta caixa.
+      </p>
+    );
   }
   return (
     <div className="max-h-[55vh] space-y-2 overflow-y-auto">
