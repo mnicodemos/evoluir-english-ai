@@ -143,25 +143,87 @@ export const syncAdminEmailInbox = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- table is introduced by the accompanying migration
     const db = context.supabase as any;
-    const { decryptMicrosoftToken, encryptMicrosoftToken, refreshMicrosoftToken, syncGraphInbox } =
-      await import("@/lib/admin-email.server");
-    const { data: connection, error } = await db.from("admin_email_connections")
-      .select("id,refresh_token_encrypted,delta_link").is("revoked_at", null).maybeSingle();
-    if (error) throw error;
-    if (!connection) throw new Error("Microsoft mailbox is not connected");
-    const refreshed = await refreshMicrosoftToken(decryptMicrosoftToken(connection.refresh_token_encrypted));
-    const result = await syncGraphInbox(refreshed.access_token, connection.delta_link);
-    if (result.messages.length) {
-      const { error: upsertError } = await db.from("admin_email_messages")
-        .upsert(result.messages, { onConflict: "provider_message_id", ignoreDuplicates: false });
-      if (upsertError) throw upsertError;
+    const {
+      decryptMicrosoftToken,
+      encryptMicrosoftToken,
+      refreshMicrosoftToken,
+      syncGraphInbox,
+    } = await import("@/lib/admin-email.server");
+
+    const { data: connection, error: connectionError } = await db
+      .from("admin_email_connections")
+      .select("id,refresh_token_encrypted,delta_link")
+      .is("revoked_at", null)
+      .maybeSingle();
+    if (connectionError) {
+      console.error("[admin-email] Failed to load Microsoft connection", {
+        code: connectionError.code,
+      });
+      throw new Error("Não foi possível carregar a conexão Microsoft do banco de dados.");
     }
-    const { error: updateError } = await db.from("admin_email_connections").update({
-      refresh_token_encrypted: encryptMicrosoftToken(refreshed.refresh_token),
-      token_expires_at: new Date(Date.now() + (refreshed.expires_in ?? 3600) * 1000).toISOString(),
-      delta_link: result.deltaLink ?? connection.delta_link,
-      updated_at: new Date().toISOString(),
-    }).eq("id", connection.id);
-    if (updateError) throw updateError;
+    if (!connection) throw new Error("A caixa Microsoft não está conectada.");
+
+    let refreshed: Awaited<ReturnType<typeof refreshMicrosoftToken>>;
+    try {
+      const refreshToken = decryptMicrosoftToken(connection.refresh_token_encrypted);
+      refreshed = await refreshMicrosoftToken(refreshToken);
+    } catch (error) {
+      console.error("[admin-email] Microsoft token refresh failed", {
+        message: error instanceof Error ? error.message.slice(0, 700) : "Unknown error",
+      });
+      throw new Error(
+        error instanceof Error
+          ? `Falha ao renovar a autorização Microsoft: ${error.message}`
+          : "Falha ao renovar a autorização Microsoft.",
+      );
+    }
+
+    let result: Awaited<ReturnType<typeof syncGraphInbox>>;
+    try {
+      result = await syncGraphInbox(refreshed.access_token, connection.delta_link);
+    } catch (error) {
+      console.error("[admin-email] Microsoft Graph inbox sync failed", {
+        message: error instanceof Error ? error.message.slice(0, 700) : "Unknown error",
+      });
+      throw new Error(
+        error instanceof Error
+          ? `Falha ao ler a caixa no Microsoft Graph: ${error.message}`
+          : "Falha ao ler a caixa no Microsoft Graph.",
+      );
+    }
+
+    if (result.messages.length) {
+      const { error: upsertError } = await db
+        .from("admin_email_messages")
+        .upsert(result.messages, {
+          onConflict: "provider_message_id",
+          ignoreDuplicates: false,
+        });
+      if (upsertError) {
+        console.error("[admin-email] Failed to persist synchronized messages", {
+          code: upsertError.code,
+        });
+        throw new Error("O Microsoft recebeu as mensagens, mas o banco não conseguiu salvá-las.");
+      }
+    }
+
+    const { error: updateError } = await db
+      .from("admin_email_connections")
+      .update({
+        refresh_token_encrypted: encryptMicrosoftToken(refreshed.refresh_token),
+        token_expires_at: new Date(
+          Date.now() + (refreshed.expires_in ?? 3600) * 1000,
+        ).toISOString(),
+        delta_link: result.deltaLink ?? connection.delta_link,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", connection.id);
+    if (updateError) {
+      console.error("[admin-email] Failed to update Microsoft sync cursor", {
+        code: updateError.code,
+      });
+      throw new Error("As mensagens foram lidas, mas não foi possível salvar o estado da sincronização.");
+    }
+
     return { synced: result.messages.length };
   });
