@@ -193,9 +193,14 @@ export const syncAdminEmailInbox = createServerFn({ method: "POST" })
     }
 
     if (result.messages.length) {
+      // Microsoft Graph delta pages can contain the same message more than once.
+      // Postgres rejects an ON CONFLICT batch that targets one row repeatedly.
+      const uniqueMessages = [
+        ...new Map(result.messages.map((message) => [message.provider_message_id, message])).values(),
+      ];
       const { error: upsertError } = await db
         .from("admin_email_messages")
-        .upsert(result.messages, {
+        .upsert(uniqueMessages, {
           onConflict: "provider_message_id",
           ignoreDuplicates: false,
         });
