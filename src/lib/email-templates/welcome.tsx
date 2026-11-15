@@ -115,10 +115,17 @@ export function WelcomeEmail({ studentName = "" }: WelcomeEmailProps) {
           >
             <Img
               src="https://raw.githubusercontent.com/mnicodemos/evoluir-english-ai/main/src/assets/evoluir-symbol-light.webp"
-              alt="Evoluir+ English AI"
-              width="42"
-              height="42"
-              style={{ display: "block", margin: "0 auto 10px" }}
+              alt="Símbolo Evoluir+ English AI"
+              width="28"
+              height="56"
+              style={{
+                display: "block",
+                width: "28px",
+                height: "56px",
+                objectFit: "contain",
+                backgroundColor: "transparent",
+                margin: "0 auto 10px",
+              }}
             />
             <Text
               style={{
