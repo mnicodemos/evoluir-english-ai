@@ -638,6 +638,13 @@
       "when": 1794700000000,
       "tag": "0090_email_campaign_delivery_status",
       "breakpoints": true
+    },
+    {
+      "idx": 91,
+      "version": "7",
+      "when": 1794740000000,
+      "tag": "0119_admin_email_inbox_and_oauth_states",
+      "breakpoints": true
     }
   ]
 }
