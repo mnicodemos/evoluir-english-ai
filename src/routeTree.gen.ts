@@ -57,6 +57,7 @@ import { Route as AuthenticatedLifeGuideRouteImport } from './routes/_authentica
 import { Route as AuthenticatedLifeHabitsRouteImport } from './routes/_authenticated/life/habits'
 import { Route as AuthenticatedLifeRoutineRouteImport } from './routes/_authenticated/life/routine'
 import { Route as ApiPublicCronDailyPushRouteImport } from './routes/api/public/cron/daily-push'
+import { Route as ApiPublicCronAdminEmailSyncRouteImport } from './routes/api/public/cron/admin-email-sync'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as ApiPublicWhatsappWebhookRouteImport } from './routes/api/public/whatsapp/webhook'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -304,6 +305,11 @@ const AuthenticatedLifeRoutineRoute =
     path: '/life/routine',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicCronAdminEmailSyncRoute = ApiPublicCronAdminEmailSyncRouteImport.update({
+  id: '/api/public/cron/admin-email-sync',
+  path: '/api/public/cron/admin-email-sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCronDailyPushRoute = ApiPublicCronDailyPushRouteImport.update({
   id: '/api/public/cron/daily-push',
   path: '/api/public/cron/daily-push',
@@ -373,6 +379,8 @@ export interface FileRoutesByFullPath {
   '/life/routine': typeof AuthenticatedLifeRoutineRoute
   '/learning/': typeof AuthenticatedLearningIndexRoute
   '/life/': typeof AuthenticatedLifeIndexRoute
+  '/api/public/cron/admin-email-sync': typeof ApiPublicCronAdminEmailSyncRoute
+  '/api/public/cron/admin-email-sync': typeof ApiPublicCronAdminEmailSyncRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
@@ -658,6 +666,7 @@ export interface RootRouteChildren {
   ApiSpeechRoute: typeof ApiSpeechRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
   ApiAdminEmailMicrosoftCallbackRoute: typeof ApiAdminEmailMicrosoftCallbackRoute
+  ApiPublicCronAdminEmailSyncRoute: typeof ApiPublicCronAdminEmailSyncRoute
   ApiPublicCronDailyPushRoute: typeof ApiPublicCronDailyPushRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicWhatsappWebhookRoute: typeof ApiPublicWhatsappWebhookRoute
@@ -995,6 +1004,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLifeRoutineRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/cron/admin-email-sync': {
+      id: '/api/public/cron/admin-email-sync'
+      path: '/api/public/cron/admin-email-sync'
+      fullPath: '/api/public/cron/admin-email-sync'
+      preLoaderRoute: typeof ApiPublicCronAdminEmailSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/daily-push': {
       id: '/api/public/cron/daily-push'
       path: '/api/public/cron/daily-push'
@@ -1117,6 +1133,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSpeechRoute: ApiSpeechRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
   ApiAdminEmailMicrosoftCallbackRoute: ApiAdminEmailMicrosoftCallbackRoute,
+  ApiPublicCronAdminEmailSyncRoute: ApiPublicCronAdminEmailSyncRoute,
   ApiPublicCronDailyPushRoute: ApiPublicCronDailyPushRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicWhatsappWebhookRoute: ApiPublicWhatsappWebhookRoute,
