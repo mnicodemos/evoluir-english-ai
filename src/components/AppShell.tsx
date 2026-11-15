@@ -1,8 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
-  BookMarked,
-  CircleHelp,
   BookOpen,
   BookOpenText,
   Briefcase,
@@ -13,6 +11,7 @@ import {
   GraduationCap,
   Headphones,
   House,
+  LifeBuoy,
   LogOut,
   Menu,
   MessageSquareText,
@@ -141,7 +140,7 @@ const browserPageTitles: Array<[string, string]> = [
   ["/call", "Video call"],
   ["/teacher", "AI Teacher"],
   ["/guide", "App guide"],
-  ["/help", "Help center"],
+  ["/help", "Help & Support"],
   ["/premium", "My Subscription"],
   ["/business", "Business English"],
   ["/league", "Weekly league"],
@@ -313,27 +312,15 @@ export function MobileNavigationMenu({
           })}
         </nav>
         <div className="mt-auto border-t border-sidebar-border pt-3">
-          {/* The app guide ("Diário de bordo", user request) sits with the settings rows. */}
-          <SheetClose asChild>
-            <Link
-              to="/guide"
-              className="flex h-11 w-full min-w-0 items-center gap-2 rounded-lg px-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              activeProps={{ className: "text-brand-green" }}
-              inactiveProps={{ className: "text-sidebar-foreground/70" }}
-            >
-              <BookMarked className="size-5 shrink-0 text-sky-400" />
-              <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
-            </Link>
-          </SheetClose>
           <SheetClose asChild>
             <Link
               to="/help"
               className="flex h-11 w-full min-w-0 items-center gap-2 rounded-lg px-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              activeProps={{ className: "text-brand-green" }}
+              activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
               inactiveProps={{ className: "text-sidebar-foreground/70" }}
             >
-              <CircleHelp className="size-5 shrink-0 text-sky-400" />
-              <span className="min-w-0 truncate text-left">{translate("Help center")}</span>
+              <LifeBuoy className="size-5 shrink-0 text-sky-400" />
+              <span className="min-w-0 truncate text-left">{translate("Help & Support")}</span>
             </Link>
           </SheetClose>
           <SheetClose asChild>
@@ -672,24 +659,14 @@ function AppShellContent({
 
             <div className="flex shrink-0 flex-col items-stretch gap-1">
               <div className="flex flex-col items-stretch gap-0.5 border-t border-sidebar-border pb-1 pt-2">
-                {/* The app guide ("Diário de bordo", user request). */}
-                <Link
-                  to="/guide"
-                  className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                  activeProps={{ className: "text-brand-green" }}
-                  inactiveProps={{ className: "text-sidebar-foreground/70" }}
-                >
-                  <BookMarked className="size-5 shrink-0 text-sky-400" />
-                  <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
-                </Link>
                 <Link
                   to="/help"
                   className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                  activeProps={{ className: "text-brand-green" }}
+                  activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
                   inactiveProps={{ className: "text-sidebar-foreground/70" }}
                 >
-                  <CircleHelp className="size-5 shrink-0 text-sky-400" />
-                  <span className="min-w-0 truncate text-left">{translate("Help center")}</span>
+                  <LifeBuoy className="size-5 shrink-0 text-sky-400" />
+                  <span className="min-w-0 truncate text-left">{translate("Help & Support")}</span>
                 </Link>
                 <Link
                   to="/premium"
