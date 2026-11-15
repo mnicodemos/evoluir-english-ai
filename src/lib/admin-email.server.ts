@@ -54,9 +54,9 @@ function sign(value: string): string {
 }
 
 export function createOAuthState(userId: string, nonce: string): string {
-  const payload = Buffer.from(
-    JSON.stringify({ userId, nonce, issuedAt: Date.now() }),
-  ).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({ userId, nonce, issuedAt: Date.now() })).toString(
+    "base64url",
+  );
   return `${payload}.${sign(payload)}`;
 }
 
@@ -112,14 +112,11 @@ type MicrosoftTokenResponse = {
 };
 
 async function tokenRequest(params: URLSearchParams): Promise<MicrosoftTokenResponse> {
-  const response = await fetch(
-    `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/x-www-form-urlencoded" },
-      body: params,
-    },
-  );
+  const response = await fetch(`https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: params,
+  });
   const result = (await response.json().catch(() => null)) as MicrosoftTokenResponse | null;
   if (!response.ok || !result?.access_token) {
     throw new Error("Microsoft token request failed");
@@ -160,10 +157,9 @@ export async function refreshMicrosoftToken(refreshToken: string) {
 }
 
 export async function graphGetProfile(accessToken: string) {
-  const response = await fetch(
-    `${GRAPH_BASE}/me?$select=mail,userPrincipalName,displayName`,
-    { headers: { authorization: `Bearer ${accessToken}` } },
-  );
+  const response = await fetch(`${GRAPH_BASE}/me?$select=mail,userPrincipalName,displayName`, {
+    headers: { authorization: `Bearer ${accessToken}` },
+  });
   if (!response.ok) throw new Error("Could not verify the connected Microsoft mailbox");
   return (await response.json()) as {
     mail?: string | null;
@@ -218,10 +214,7 @@ export type GraphInboxMessage = {
 };
 
 export function normalizeGraphMessage(message: GraphInboxMessage) {
-  const recipients = [
-    ...(message.toRecipients ?? []),
-    ...(message.ccRecipients ?? []),
-  ]
+  const recipients = [...(message.toRecipients ?? []), ...(message.ccRecipients ?? [])]
     .map((item) => item.emailAddress?.address?.trim().toLowerCase())
     .filter((item): item is string => Boolean(item));
   const rawBody = message.body?.content ?? message.bodyPreview ?? "";
@@ -239,17 +232,24 @@ export function normalizeGraphMessage(message: GraphInboxMessage) {
 }
 
 export async function syncGraphInbox(accessToken: string, initialDeltaLink?: string | null) {
-  const select = "id,conversationId,from,toRecipients,ccRecipients,subject,receivedDateTime,body,bodyPreview";
-  let nextUrl = initialDeltaLink ||
+  const select =
+    "id,conversationId,from,toRecipients,ccRecipients,subject,receivedDateTime,body,bodyPreview";
+  let nextUrl =
+    initialDeltaLink ||
     `${GRAPH_BASE}/me/mailFolders/inbox/messages/delta?$select=${encodeURIComponent(select)}&$top=50`;
   let deltaLink: string | null = null;
   const messages: ReturnType<typeof normalizeGraphMessage>[] = [];
   let pages = 0;
   while (nextUrl && pages < 100) {
     const response = await fetch(nextUrl, {
-      headers: { authorization: `Bearer ${accessToken}`, Prefer: 'outlook.body-content-type="text"' },
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        Prefer: 'outlook.body-content-type="text"',
+      },
     });
-    if (!response.ok) throw new Error(`Microsoft Graph inbox sync failed (HTTP ${response.status})`);
+    if (!response.ok) {
+      throw new Error(`Microsoft Graph inbox sync failed (HTTP ${response.status})`);
+    }
     const page = (await response.json()) as {
       value?: GraphInboxMessage[];
       "@odata.nextLink"?: string;
