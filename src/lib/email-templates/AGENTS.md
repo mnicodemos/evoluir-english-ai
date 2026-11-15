@@ -1,1 +1,3 @@
-- Send app emails through the managed server-only helper; reject promotional templates because the managed service is transactional only.
+- Send transactional app emails through the server-only Resend helper in `send-email.ts`.
+- Read Resend credentials only from server-side environment secrets; never expose them to client code or logs.
+- Keep promotional Premium templates blocked from transactional delivery by `assertAppEmailAllowed`.
