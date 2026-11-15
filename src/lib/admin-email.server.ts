@@ -10,12 +10,11 @@ import {
 const CLIENT_ID = "16fe0bc6-0064-48bb-9702-9d656deec9e";
 const TENANT = "consumers";
 const SCOPES = ["openid", "profile", "offline_access", "User.Read", "Mail.Read"];
+const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 
 function required(name: string): string {
   const value = process.env[name]?.trim();
-  if (!value) {
-    throw new Error(`Missing server configuration: ${name}`);
-  }
+  if (!value) throw new Error(`Missing server configuration: ${name}`);
   return value;
 }
 
@@ -35,8 +34,12 @@ export function encryptMicrosoftToken(value: string): string {
 }
 
 export function decryptMicrosoftToken(value: string): string {
-  const [iv, tag, data] = value.split(".").map((part) => Buffer.from(part ?? "", "base64url"));
-  if (!iv || !tag || !data) {
+  const [ivPart, tagPart, dataPart] = value.split(".");
+  if (!ivPart || !tagPart || !dataPart) throw new Error("Invalid encrypted Microsoft token");
+  const iv = Buffer.from(ivPart, "base64url");
+  const tag = Buffer.from(tagPart, "base64url");
+  const data = Buffer.from(dataPart, "base64url");
+  if (iv.length !== 12 || tag.length !== 16 || data.length === 0) {
     throw new Error("Invalid encrypted Microsoft token");
   }
   const decipher = createDecipheriv("aes-256-gcm", encryptionKey(), iv);
@@ -50,19 +53,16 @@ function sign(value: string): string {
     .digest("base64url");
 }
 
-/** Signed, short-lived OAuth state. The PKCE verifier is stored in a separate HttpOnly cookie. */
 export function createOAuthState(userId: string, nonce: string): string {
-  const payload = Buffer.from(JSON.stringify({ userId, nonce, issuedAt: Date.now() })).toString(
-    "base64url",
-  );
+  const payload = Buffer.from(
+    JSON.stringify({ userId, nonce, issuedAt: Date.now() }),
+  ).toString("base64url");
   return `${payload}.${sign(payload)}`;
 }
 
 export function verifyOAuthState(state: string): { userId: string; nonce: string } {
   const [payload, signature] = state.split(".");
-  if (!payload || !signature) {
-    throw new Error("Invalid Microsoft OAuth state");
-  }
+  if (!payload || !signature) throw new Error("Invalid Microsoft OAuth state");
   const expected = Buffer.from(sign(payload));
   const received = Buffer.from(signature);
   if (expected.length !== received.length || !timingSafeEqual(expected, received)) {
@@ -77,7 +77,8 @@ export function verifyOAuthState(state: string): { userId: string; nonce: string
     !parsed.userId ||
     !parsed.nonce ||
     !parsed.issuedAt ||
-    Date.now() - parsed.issuedAt > 10 * 60 * 1000
+    Date.now() - parsed.issuedAt > 10 * 60 * 1000 ||
+    parsed.issuedAt > Date.now() + 30_000
   ) {
     throw new Error("Expired Microsoft OAuth state");
   }
@@ -103,11 +104,36 @@ export function microsoftAuthorizationUrl(
   return url.toString();
 }
 
-export async function exchangeMicrosoftCode(code: string, verifier: string, redirectUri: string) {
-  const response = await fetch(`https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`, {
-    method: "POST",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
+type MicrosoftTokenResponse = {
+  access_token?: string;
+  refresh_token?: string;
+  expires_in?: number;
+  scope?: string;
+};
+
+async function tokenRequest(params: URLSearchParams): Promise<MicrosoftTokenResponse> {
+  const response = await fetch(
+    `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`,
+    {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: params,
+    },
+  );
+  const result = (await response.json().catch(() => null)) as MicrosoftTokenResponse | null;
+  if (!response.ok || !result?.access_token) {
+    throw new Error("Microsoft token request failed");
+  }
+  return result;
+}
+
+export async function exchangeMicrosoftCode(
+  code: string,
+  verifier: string,
+  redirectUri: string,
+): Promise<MicrosoftTokenResponse & { access_token: string; refresh_token: string }> {
+  const result = await tokenRequest(
+    new URLSearchParams({
       client_id: CLIENT_ID,
       grant_type: "authorization_code",
       code,
@@ -115,30 +141,35 @@ export async function exchangeMicrosoftCode(code: string, verifier: string, redi
       code_verifier: verifier,
       scope: SCOPES.join(" "),
     }),
-  });
-  const result = (await response.json()) as {
-    access_token?: string;
-    refresh_token?: string;
-    expires_in?: number;
-    scope?: string;
-  };
-  if (!response.ok || !result.access_token || !result.refresh_token) {
-    throw new Error("Microsoft authorization code exchange failed");
-  }
-  return result;
+  );
+  if (!result.refresh_token) throw new Error("Microsoft did not return a refresh token");
+  return result as MicrosoftTokenResponse & { access_token: string; refresh_token: string };
+}
+
+export async function refreshMicrosoftToken(refreshToken: string) {
+  const result = await tokenRequest(
+    new URLSearchParams({
+      client_id: CLIENT_ID,
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      scope: SCOPES.join(" "),
+    }),
+  );
+  if (!result.refresh_token) throw new Error("Microsoft did not rotate the refresh token");
+  return result as MicrosoftTokenResponse & { access_token: string; refresh_token: string };
 }
 
 export async function graphGetProfile(accessToken: string) {
   const response = await fetch(
-    "https://graph.microsoft.com/v1.0/me?$select=mail,userPrincipalName",
-    {
-      headers: { authorization: `Bearer ${accessToken}` },
-    },
+    `${GRAPH_BASE}/me?$select=mail,userPrincipalName,displayName`,
+    { headers: { authorization: `Bearer ${accessToken}` } },
   );
-  if (!response.ok) {
-    throw new Error("Could not verify the connected Microsoft mailbox");
-  }
-  return (await response.json()) as { mail?: string | null; userPrincipalName?: string };
+  if (!response.ok) throw new Error("Could not verify the connected Microsoft mailbox");
+  return (await response.json()) as {
+    mail?: string | null;
+    userPrincipalName?: string;
+    displayName?: string;
+  };
 }
 
 export function getMicrosoftRedirectUri(requestUrl: string): string {
@@ -150,4 +181,87 @@ export function createPkcePair() {
   const verifier = randomBytes(32).toString("base64url");
   const challenge = createHash("sha256").update(verifier).digest("base64url");
   return { verifier, challenge };
+}
+
+export function classifyAdminMailbox(recipients: string[]): "contact" | "support" | "unknown" {
+  const normalized = recipients.map((item) => item.trim().toLowerCase());
+  if (normalized.includes("contato@evoluirmaisenglishai.com")) return "contact";
+  if (normalized.includes("suporte@evoluirmaisenglishai.com")) return "support";
+  return "unknown";
+}
+
+function htmlToText(value: string): string {
+  return value
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/[ \t\r\n]+/g, " ")
+    .trim();
+}
+
+export type GraphInboxMessage = {
+  id: string;
+  conversationId?: string;
+  from?: { emailAddress?: { address?: string } };
+  toRecipients?: Array<{ emailAddress?: { address?: string } }>;
+  ccRecipients?: Array<{ emailAddress?: { address?: string } }>;
+  subject?: string;
+  receivedDateTime?: string;
+  body?: { contentType?: string; content?: string };
+  bodyPreview?: string;
+};
+
+export function normalizeGraphMessage(message: GraphInboxMessage) {
+  const recipients = [
+    ...(message.toRecipients ?? []),
+    ...(message.ccRecipients ?? []),
+  ]
+    .map((item) => item.emailAddress?.address?.trim().toLowerCase())
+    .filter((item): item is string => Boolean(item));
+  const rawBody = message.body?.content ?? message.bodyPreview ?? "";
+  return {
+    provider_message_id: message.id,
+    provider_conversation_id: message.conversationId ?? null,
+    mailbox: classifyAdminMailbox(recipients),
+    from_address: message.from?.emailAddress?.address?.trim().toLowerCase() || "unknown",
+    to_addresses: recipients,
+    subject: message.subject ?? "",
+    body_text:
+      message.body?.contentType?.toLowerCase() === "html" ? htmlToText(rawBody) : rawBody,
+    received_at: message.receivedDateTime ?? new Date().toISOString(),
+  };
+}
+
+export async function syncGraphInbox(accessToken: string, initialDeltaLink?: string | null) {
+  const select = "id,conversationId,from,toRecipients,ccRecipients,subject,receivedDateTime,body,bodyPreview";
+  let nextUrl = initialDeltaLink ||
+    `${GRAPH_BASE}/me/mailFolders/inbox/messages/delta?$select=${encodeURIComponent(select)}&$top=50`;
+  let deltaLink: string | null = null;
+  const messages: ReturnType<typeof normalizeGraphMessage>[] = [];
+  let pages = 0;
+  while (nextUrl && pages < 100) {
+    const response = await fetch(nextUrl, {
+      headers: { authorization: `Bearer ${accessToken}`, Prefer: 'outlook.body-content-type="text"' },
+    });
+    if (!response.ok) throw new Error(`Microsoft Graph inbox sync failed (HTTP ${response.status})`);
+    const page = (await response.json()) as {
+      value?: GraphInboxMessage[];
+      "@odata.nextLink"?: string;
+      "@odata.deltaLink"?: string;
+    };
+    for (const item of page.value ?? []) {
+      if (item.id) messages.push(normalizeGraphMessage(item));
+    }
+    nextUrl = page["@odata.nextLink"] ?? "";
+    deltaLink = page["@odata.deltaLink"] ?? deltaLink;
+    pages += 1;
+  }
+  if (nextUrl) throw new Error("Microsoft Graph returned too many pages; sync stopped safely");
+  return { messages, deltaLink };
 }
