@@ -47,6 +47,7 @@ export function AdminPanelButton({
         void navigate({
           to: "/admin",
           search: { folder: "communication", tab: "inbox" },
+          hash: "#support",
         })
       }
     >
