@@ -43,7 +43,12 @@ export function AdminPanelButton({
       size={showLabel ? "sm" : "icon"}
       aria-label={t("Admin panel")}
       className={className}
-      onClick={() => void navigate({ to: "/admin", search: { folder: "students", tab: undefined } })}
+      onClick={() =>
+        void navigate({
+          to: "/admin",
+          search: { folder: "students", tab: undefined },
+        })
+      }
     >
       <Settings className="size-5" />
       {showLabel && <span>{t("Admin panel")}</span>}
