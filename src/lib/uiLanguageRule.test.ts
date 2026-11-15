@@ -21,6 +21,8 @@ const SKIP_FILES = [
   /routes\/reset-password\.tsx$/,
   /routes\/(terms|privacy|legal|contact)[^/]*\.tsx$/,
   /components\/Legal[A-Za-z]*\.tsx$/,
+  // Transactional emails are not student-screen UI; this template is intentionally Portuguese-only.
+  /lib\/email-templates\/premium-benefits\.tsx$/,
   /components\/home\//,
   /\.test\.tsx$/,
 ];
