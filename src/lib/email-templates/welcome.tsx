@@ -44,10 +44,7 @@ const COPY = {
         "Prática integrada",
         "Desenvolva vocabulário, gramática, leitura, escrita, compreensão e conversação.",
       ],
-      [
-        "Evolução acompanhada",
-        "Entenda seu progresso e descubra quais são os próximos passos.",
-      ],
+      ["Evolução acompanhada", "Entenda seu progresso e descubra quais são os próximos passos."],
     ],
     nextTitle: "Seu próximo passo",
     next:
@@ -68,18 +65,12 @@ const COPY = {
     sectionTitle: "An experience that evolves with you",
     features: [
       ["Personalized learning", "Lessons and activities adapted to your level and pace."],
-      [
-        "AI Teacher",
-        "Intelligent guidance to practise, ask questions and build confidence.",
-      ],
+      ["AI Teacher", "Intelligent guidance to practise, ask questions and build confidence."],
       [
         "Integrated practice",
         "Develop vocabulary, grammar, reading, writing, listening and speaking.",
       ],
-      [
-        "Progress tracking",
-        "Understand your progress and discover what to practise next.",
-      ],
+      ["Progress tracking", "Understand your progress and discover what to practise next."],
     ],
     nextTitle: "Your next step",
     next:
@@ -170,15 +161,10 @@ export function WelcomeEmail({ lang = "pt", studentName = "" }: WelcomeEmailProp
             <Text style={{ color: "#24383a", fontSize: 16, lineHeight: "25px" }}>
               {t.greeting(name)}
             </Text>
-            <Text style={{ color: "#536568", fontSize: 15, lineHeight: "25px" }}>
-              {t.intro}
-            </Text>
+            <Text style={{ color: "#536568", fontSize: 15, lineHeight: "25px" }}>{t.intro}</Text>
           </Section>
           <Section style={{ padding: "8px 36px 4px" }}>
-            <Heading
-              as="h2"
-              style={{ color: "#102d30", fontSize: 19, margin: "12px 0 18px" }}
-            >
+            <Heading as="h2" style={{ color: "#102d30", fontSize: 19, margin: "12px 0 18px" }}>
               {t.sectionTitle}
             </Heading>
             {t.features.map(([title, description]) => (
@@ -214,10 +200,7 @@ export function WelcomeEmail({ lang = "pt", studentName = "" }: WelcomeEmailProp
               padding: "20px 22px",
             }}
           >
-            <Heading
-              as="h2"
-              style={{ color: "#102d30", fontSize: 18, margin: "0 0 8px" }}
-            >
+            <Heading as="h2" style={{ color: "#102d30", fontSize: 18, margin: "0 0 8px" }}>
               {t.nextTitle}
             </Heading>
             <Text style={{ color: "#536568", fontSize: 14, lineHeight: "23px", margin: 0 }}>
@@ -242,9 +225,7 @@ export function WelcomeEmail({ lang = "pt", studentName = "" }: WelcomeEmailProp
             </Button>
           </Section>
           <Section style={{ padding: "14px 36px 26px" }}>
-            <Text style={{ color: "#536568", fontSize: 14, lineHeight: "23px" }}>
-              {t.closing}
-            </Text>
+            <Text style={{ color: "#536568", fontSize: 14, lineHeight: "23px" }}>{t.closing}</Text>
             <Text
               style={{
                 color: "#24383a",
@@ -268,10 +249,7 @@ export function WelcomeEmail({ lang = "pt", studentName = "" }: WelcomeEmailProp
               {t.help}
             </Text>
             <Text style={{ fontSize: 13, margin: "0 0 12px" }}>
-              <a
-                href={`mailto:${CONTACT}`}
-                style={{ color: "#078f84", textDecoration: "none" }}
-              >
+              <a href={`mailto:${CONTACT}`} style={{ color: "#078f84", textDecoration: "none" }}>
                 {CONTACT}
               </a>
             </Text>
