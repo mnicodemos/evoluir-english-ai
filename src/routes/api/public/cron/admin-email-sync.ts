@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/cron/admin-email-sync")({
     handlers: {
       POST: async ({ request }) => {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const provided = /^Bearer (\S+)$/.exec(request.headers.get("authorization") ?? "")?.[1];
+        const provided = /^Bearer (\\S+)$/.exec(request.headers.get("authorization") ?? "")?.[1];
         const { data: keyRow } = await supabaseAdmin
           .from("push_cron_key")
           .select("key")
@@ -31,8 +31,12 @@ export const Route = createFileRoute("/api/public/cron/admin-email-sync")({
   },
 });
 
-async function syncAdminEmailInbox(supabaseAdmin: typeof import("@/integrations/supabase/client.server").supabaseAdmin) {
-  const { data: connection, error } = await supabaseAdmin
+async function syncAdminEmailInbox(
+  supabaseAdmin: typeof import("@/integrations/supabase/client.server").supabaseAdmin,
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin email tables are managed by Lovable Cloud migrations
+  const db = supabaseAdmin as any;
+  const { data: connection, error } = await db
     .from("admin_email_connections")
     .select("id,refresh_token_encrypted,delta_link")
     .is("revoked_at", null)
@@ -41,12 +45,8 @@ async function syncAdminEmailInbox(supabaseAdmin: typeof import("@/integrations/
   if (error) throw new Error("Could not load the Microsoft email connection");
   if (!connection) return Response.json({ synced: 0, connected: false });
 
-  const {
-    decryptMicrosoftToken,
-    encryptMicrosoftToken,
-    refreshMicrosoftToken,
-    syncGraphInbox,
-  } = await import("@/lib/admin-email.server");
+  const { decryptMicrosoftToken, encryptMicrosoftToken, refreshMicrosoftToken, syncGraphInbox } =
+    await import("@/lib/admin-email.server");
 
   const refreshed = await refreshMicrosoftToken(
     decryptMicrosoftToken(connection.refresh_token_encrypted),
@@ -70,9 +70,7 @@ async function syncAdminEmailInbox(supabaseAdmin: typeof import("@/integrations/
     .from("admin_email_connections")
     .update({
       refresh_token_encrypted: encryptMicrosoftToken(refreshed.refresh_token),
-      token_expires_at: new Date(
-        Date.now() + (refreshed.expires_in ?? 3600) * 1000,
-      ).toISOString(),
+      token_expires_at: new Date(Date.now() + (refreshed.expires_in ?? 3600) * 1000).toISOString(),
       delta_link: result.deltaLink ?? connection.delta_link,
       updated_at: new Date().toISOString(),
     })
