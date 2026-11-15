@@ -329,7 +329,6 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
   '/help': typeof HelpRoute
-  '/help': typeof HelpRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/adventures': typeof AuthenticatedAdventuresRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
@@ -380,6 +379,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
+  '/help': typeof HelpRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/adventures': typeof AuthenticatedAdventuresRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
@@ -432,6 +432,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
+  '/help': typeof HelpRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/adventures': typeof AuthenticatedAdventuresRoute
   '/_authenticated/billing-success': typeof AuthenticatedBillingSuccessRoute
@@ -535,6 +536,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/terms'
+    | '/help'
     | '/admin'
     | '/adventures'
     | '/billing-success'
@@ -586,6 +588,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/terms'
+    | '/help'
     | '/_authenticated/admin'
     | '/_authenticated/adventures'
     | '/_authenticated/billing-success'
@@ -638,6 +641,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
+  HelpRoute: typeof HelpRoute
   ApiCoachStreamRoute: typeof ApiCoachStreamRoute
   ApiMusicRoute: typeof ApiMusicRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
@@ -697,6 +701,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
