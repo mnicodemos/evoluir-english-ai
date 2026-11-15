@@ -7,10 +7,18 @@ import { assertAppEmailAllowed } from "./send-policy";
 const SITE_NAME = "Evoluir+ English AI";
 const DEFAULT_FROM_EMAIL = "noreply@notify.evoluirmaisenglishai.com";
 
-export type SendTemplateEmailResult = { sent: true } | {
+interface SendTemplateEmailSent {
+  sent: true;
+}
+
+interface SendTemplateEmailSuppressed {
   sent: false;
   reason: "recipient_suppressed";
-};
+}
+
+export type SendTemplateEmailResult =
+  | SendTemplateEmailSent
+  | SendTemplateEmailSuppressed;
 
 export interface SendTemplateEmailOptions {
   templateData?: Record<string, unknown>;
