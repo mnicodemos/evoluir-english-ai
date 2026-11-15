@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   ArrowLeft,
+  BookMarked,
   BookOpen,
   CreditCard,
   HelpCircle,
@@ -223,13 +224,58 @@ function HelpCenterPage() {
             Evoluir+ English AI
           </p>
           <h1 className="mt-2 text-center font-display text-3xl font-bold tracking-tight sm:text-4xl">
-            {pt ? "Central de Ajuda" : "Help Center"}
+            {pt ? "Ajuda e suporte" : "Help & Support"}
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-6 text-muted-foreground sm:text-base">
             {pt
               ? "Encontre respostas sobre sua conta, assinatura e como aproveitar os recursos da plataforma."
               : "Find answers about your account, subscription and how to use the platform."}
           </p>
+
+          <div className="mx-auto mt-7 grid max-w-2xl gap-3 sm:grid-cols-2">
+            <Link
+              to="/guide"
+              className="group flex min-h-28 items-start gap-3 rounded-2xl border border-border bg-background/70 p-4 transition-colors hover:border-brand-green/50 hover:bg-brand-green/5"
+            >
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-green/12 text-brand-green">
+                <BookMarked className="size-5" aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold">
+                  {pt ? "Conheça o aplicativo" : "Explore the App"}
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                  {pt
+                    ? "Guia passo a passo dos recursos do Evoluir+."
+                    : "Step-by-step guide to Evoluir+ features."}
+                </span>
+                <span className="mt-2 block text-xs font-semibold text-brand-green">
+                  {pt ? "Abrir App Guide →" : "Open App Guide →"}
+                </span>
+              </span>
+            </Link>
+            <a
+              href="#help-faq"
+              className="group flex min-h-28 items-start gap-3 rounded-2xl border border-border bg-background/70 p-4 transition-colors hover:border-brand-green/50 hover:bg-brand-green/5"
+            >
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-green/12 text-brand-green">
+                <LifeBuoy className="size-5" aria-hidden="true" />
+              </span>
+              <span className="min-w-0">
+                <span className="block text-sm font-semibold">
+                  {pt ? "Encontre respostas" : "Get Help"}
+                </span>
+                <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                  {pt
+                    ? "Dúvidas frequentes e contato com o suporte."
+                    : "Frequently asked questions and support contact."}
+                </span>
+                <span className="mt-2 block text-xs font-semibold text-brand-green">
+                  {pt ? "Ver central de ajuda ↓" : "Browse help center ↓"}
+                </span>
+              </span>
+            </a>
+          </div>
 
           <div className="relative mx-auto mt-7 max-w-2xl">
             <Search
@@ -247,7 +293,7 @@ function HelpCenterPage() {
           </div>
         </section>
 
-        <section className="mt-8 space-y-7">
+        <section id="help-faq" className="mt-8 scroll-mt-6 space-y-7">
           {categories.length === 0 ? (
             <p className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
               {pt
