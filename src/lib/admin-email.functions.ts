@@ -58,7 +58,7 @@ export const startMicrosoftEmailConnection = createServerFn({ method: "POST" })
 
 export const completeMicrosoftEmailConnection = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { code: string; state: string }) => data)
+  .inputValidator((data: { code: string; state: string }) => data)
   .handler(async ({ context, data }) => {
     await assertAdmin(context.supabase, context.userId);
     const { decryptMicrosoftToken, encryptMicrosoftToken, exchangeMicrosoftCode,
