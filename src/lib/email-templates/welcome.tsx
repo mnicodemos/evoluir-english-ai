@@ -114,14 +114,14 @@ export function WelcomeEmail({ studentName = "" }: WelcomeEmailProps) {
             }}
           >
             <Img
-              src="https://raw.githubusercontent.com/mnicodemos/evoluir-english-ai/main/src/assets/evoluir-symbol-light.webp"
+              src="https://evoluirmaisenglishai.com/__l5e/assets-v1/3a38d664-c60e-4a50-9e5a-31f09b278a69/evoluir-logo-official.png"
               alt="Símbolo Evoluir+ English AI"
-              width="28"
-              height="56"
+              width="92"
+              height="132"
               style={{
                 display: "block",
-                width: "28px",
-                height: "56px",
+                width: "92px",
+                height: "132px",
                 objectFit: "contain",
                 backgroundColor: "transparent",
                 margin: "0 auto 10px",
