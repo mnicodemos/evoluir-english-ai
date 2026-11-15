@@ -373,6 +373,31 @@ export const getAdminEmailReplyHistory = createServerFn({ method: "GET" })
   });
 
 
+/** Delete one message from the admin inbox. Admin-only and limited to supported mailboxes. */
+export const deleteAdminEmailMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { messageId: string }) => {
+    if (!input || !/^[0-9a-f-]{36}$/i.test(input.messageId)) {
+      throw new Error("Mensagem inválida.");
+    }
+    return { messageId: input.messageId };
+  })
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.supabase, context.userId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin email tables are managed by Lovable Cloud migrations
+    const db = context.supabase as any;
+    const { data: deleted, error } = await db
+      .from("admin_email_messages")
+      .delete()
+      .eq("id", data.messageId)
+      .in("mailbox", ["contact", "support"])
+      .select("id")
+      .maybeSingle();
+    if (error) throw new Error("Não foi possível excluir a mensagem. Verifique se há registros relacionados.");
+    if (!deleted) throw new Error("Mensagem não encontrada ou não autorizada para exclusão.");
+    return { deleted: true as const };
+  });
+
 /** Mark only messages actually shown in the selected admin mailbox as read. */
 export const markAdminEmailMessagesRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
