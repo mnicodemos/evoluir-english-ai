@@ -131,7 +131,6 @@ async function tokenRequest(params: URLSearchParams): Promise<MicrosoftTokenResp
   if (!response.ok || !payload?.access_token) {
     const errorCode = payload?.error || `http_${response.status}`;
     const description = payload?.error_description?.split("\\r")[0]?.slice(0, 700);
-    // Log Microsoft diagnostics only; never log authorization codes, tokens, or request parameters.
     console.error("[admin-email] Microsoft token exchange rejected", {
       status: response.status,
       error: errorCode,
@@ -215,8 +214,8 @@ export function classifyAdminMailbox(recipients: string[]): "contact" | "support
 
 function htmlToText(value: string): string {
   return value
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\\s\\S]*?<\\/style>/gi, " ")
+    .replace(/<script[\\s\\S]*?<\\/script>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
@@ -224,7 +223,7 @@ function htmlToText(value: string): string {
     .replace(/&gt;/gi, ">")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'")
-    .replace(/[ \t\r\n]+/g, " ")
+    .replace(/[ \\t\\r\\n]+/g, " ")
     .trim();
 }
 
@@ -320,9 +319,7 @@ export async function sendAdminEmailReply(input: {
         : {}),
     }),
   });
-  const payload = (await response.json().catch(() => null)) as
-    | { id?: string; message?: string }
-    | null;
+  const payload = (await response.json().catch(() => null)) as { id?: string; message?: string } | null;
   if (!response.ok || !payload?.id) {
     throw new Error(
       payload?.message
