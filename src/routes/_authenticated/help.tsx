@@ -197,128 +197,142 @@ function HelpCenterPage() {
 
   return (
     <AppShell>
-      <PageHeader icon={LifeBuoy} title={pt ? "Ajuda e suporte" : "Help & Support"} description={pt ? "Encontre respostas sobre sua conta, assinatura e uso da plataforma." : "Find answers about your account, subscription and using the platform."} />
+      <PageHeader
+        icon={LifeBuoy}
+        title={pt ? "Ajuda e suporte" : "Help & Support"}
+        description={
+          pt
+            ? "Encontre respostas sobre sua conta, assinatura e uso da plataforma."
+            : "Find answers about your account, subscription and using the platform."
+        }
+      />
       <div className="card-soft mt-4 flex flex-wrap items-center justify-between gap-3 p-4">
         <div className="min-w-0">
-          <p className="text-sm font-semibold">{pt ? "Conheça os recursos do aplicativo" : "Explore the app features"}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{pt ? "Consulte o guia passo a passo." : "Read the step-by-step app guide."}</p>
+          <p className="text-sm font-semibold">
+            {pt ? "Conheça os recursos do aplicativo" : "Explore the app features"}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {pt ? "Consulte o guia passo a passo." : "Read the step-by-step app guide."}
+          </p>
         </div>
-        <Link to="/guide" className="text-sm font-semibold text-brand-green hover:underline">{pt ? "Abrir App Guide" : "Open App Guide"} →</Link>
+        <Link to="/guide" className="text-sm font-semibold text-brand-green hover:underline">
+          {pt ? "Abrir App Guide" : "Open App Guide"} →
+        </Link>
       </div>
       <div className="relative mt-4">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <Input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={pt ? "Pesquise uma dúvida..." : "Search for an answer..."}
-              aria-label={pt ? "Pesquisar na Central de Ajuda" : "Search the Help Center"}
-              className="h-11 pl-10"
-            />
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <Input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={pt ? "Pesquise uma dúvida..." : "Search for an answer..."}
+          aria-label={pt ? "Pesquisar na Central de Ajuda" : "Search the Help Center"}
+          className="h-11 pl-10"
+        />
       </div>
 
-        <section id="help-faq" className="mt-4 scroll-mt-4 space-y-4">
-          {categories.length === 0 ? (
-            <p className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
-              {pt
-                ? "Não encontramos uma resposta. Tente outras palavras ou fale com o suporte."
-                : "No answer found. Try different words or contact Support."}
-            </p>
-          ) : (
-            categories.map((category) => {
-              const Icon = categoryIcon(category);
-              return (
-                <div key={category}>
-                  <h2 className="mb-2 flex items-center gap-2 px-1 text-sm font-semibold">
-                    <Icon className="size-4 text-brand-green" aria-hidden="true" />
-                    {category}
-                  </h2>
-                  <Accordion
-                    type="multiple"
-                    value={openItems}
-                    onValueChange={setOpenItems}
-                    className="rounded-2xl border border-border bg-card px-4 sm:px-5"
-                  >
-                    {filteredTopics
-                      .filter((topic) => topic.category === category)
-                      .map((topic) => (
-                        <AccordionItem key={topic.id} value={topic.id}>
-                          <AccordionTrigger className="py-4 text-left text-sm font-medium hover:no-underline">
-                            {topic.question}
-                          </AccordionTrigger>
-                          <AccordionContent className="pb-4 text-sm leading-6 text-muted-foreground">
-                            {topic.answer}
-                            {topic.id === "login" || topic.id === "password" ? (
-                              <Link
-                                to="/auth"
-                                className="mt-2 inline-flex font-semibold text-brand-green hover:underline"
-                              >
-                                {pt ? "Abrir acesso à conta" : "Open sign in"}
-                              </Link>
-                            ) : null}
-                            {topic.id === "plans" || topic.id === "cancel" ? (
-                              <Link
-                                to="/auth"
-                                className="mt-2 inline-flex font-semibold text-brand-green hover:underline"
-                              >
-                                {pt ? "Entrar no aplicativo" : "Sign in to the app"}
-                              </Link>
-                            ) : null}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                  </Accordion>
-                </div>
-              );
-            })
-          )}
-        </section>
-
-        <section className="card-soft mt-5 p-4">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex gap-3">
-              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-green/12 text-brand-green">
-                <MessageCircle className="size-5" aria-hidden="true" />
-              </div>
-              <div>
-                <h2 className="font-semibold">
-                  {pt ? "Ainda precisa de ajuda?" : "Still need help?"}
-                </h2>
-                <p className="mt-1 text-sm leading-5 text-muted-foreground">
-                  {pt
-                    ? "Nossa equipe pode ajudar com dúvidas e dificuldades na plataforma."
-                    : "Our team can help with questions and platform issues."}
-                </p>
-              </div>
-            </div>
-            <a
-              href={`mailto:suporte@evoluirmaisenglishai.com?subject=${encodeURIComponent(supportSubject)}&body=${encodeURIComponent(supportBody)}`}
-              className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-green px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-            >
-              <Mail className="size-4" aria-hidden="true" />
-              {pt ? "Falar com o suporte" : "Contact Support"}
-            </a>
-          </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            {pt ? "E-mail de suporte:" : "Support email:"}{" "}
-            <a
-              href="mailto:suporte@evoluirmaisenglishai.com"
-              className="font-medium text-foreground underline underline-offset-4"
-            >
-              suporte@evoluirmaisenglishai.com
-            </a>
+      <section id="help-faq" className="mt-4 scroll-mt-4 space-y-4">
+        {categories.length === 0 ? (
+          <p className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+            {pt
+              ? "Não encontramos uma resposta. Tente outras palavras ou fale com o suporte."
+              : "No answer found. Try different words or contact Support."}
           </p>
-        </section>
+        ) : (
+          categories.map((category) => {
+            const Icon = categoryIcon(category);
+            return (
+              <div key={category}>
+                <h2 className="mb-2 flex items-center gap-2 px-1 text-sm font-semibold">
+                  <Icon className="size-4 text-brand-green" aria-hidden="true" />
+                  {category}
+                </h2>
+                <Accordion
+                  type="multiple"
+                  value={openItems}
+                  onValueChange={setOpenItems}
+                  className="rounded-2xl border border-border bg-card px-4 sm:px-5"
+                >
+                  {filteredTopics
+                    .filter((topic) => topic.category === category)
+                    .map((topic) => (
+                      <AccordionItem key={topic.id} value={topic.id}>
+                        <AccordionTrigger className="py-4 text-left text-sm font-medium hover:no-underline">
+                          {topic.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-4 text-sm leading-6 text-muted-foreground">
+                          {topic.answer}
+                          {topic.id === "login" || topic.id === "password" ? (
+                            <Link
+                              to="/auth"
+                              className="mt-2 inline-flex font-semibold text-brand-green hover:underline"
+                            >
+                              {pt ? "Abrir acesso à conta" : "Open sign in"}
+                            </Link>
+                          ) : null}
+                          {topic.id === "plans" || topic.id === "cancel" ? (
+                            <Link
+                              to="/auth"
+                              className="mt-2 inline-flex font-semibold text-brand-green hover:underline"
+                            >
+                              {pt ? "Entrar no aplicativo" : "Sign in to the app"}
+                            </Link>
+                          ) : null}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                </Accordion>
+              </div>
+            );
+          })
+        )}
+      </section>
 
-        <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-          <HelpCircle className="size-3.5" aria-hidden="true" />
-          {pt
-            ? "As respostas são atualizadas conforme os recursos disponíveis no aplicativo."
-            : "Answers reflect the features currently available in the app."}
+      <section className="card-soft mt-5 p-4">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex gap-3">
+            <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-brand-green/12 text-brand-green">
+              <MessageCircle className="size-5" aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="font-semibold">
+                {pt ? "Ainda precisa de ajuda?" : "Still need help?"}
+              </h2>
+              <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                {pt
+                  ? "Nossa equipe pode ajudar com dúvidas e dificuldades na plataforma."
+                  : "Our team can help with questions and platform issues."}
+              </p>
+            </div>
+          </div>
+          <a
+            href={`mailto:suporte@evoluirmaisenglishai.com?subject=${encodeURIComponent(supportSubject)}&body=${encodeURIComponent(supportBody)}`}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-green px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          >
+            <Mail className="size-4" aria-hidden="true" />
+            {pt ? "Falar com o suporte" : "Contact Support"}
+          </a>
         </div>
-    </AppShell>
-  );
+        <p className="mt-4 text-xs text-muted-foreground">
+          {pt ? "E-mail de suporte:" : "Support email:"}{" "}
+          <a
+            href="mailto:suporte@evoluirmaisenglishai.com"
+            className="font-medium text-foreground underline underline-offset-4"
+          >
+            suporte@evoluirmaisenglishai.com
+          </a>
+        </p>
+      </section>
+
+      <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+        <HelpCircle className="size-3.5" aria-hidden="true" />
+        {pt
+          ? "As respostas são atualizadas conforme os recursos disponíveis no aplicativo."
+          : "Answers reflect the features currently available in the app."}
+      </div>
+  </AppShell>
+);
 }
