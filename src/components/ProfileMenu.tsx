@@ -469,6 +469,7 @@ export function ProfileMenu({
   /* eslint-enable prettier/prettier */
 
   // The form itself, shared by the desktop popover and the phone dialog.
+  /* eslint-disable prettier/prettier */
   const form = (
     <>
 <div className="space-y-5">
