@@ -119,13 +119,15 @@ type MicrosoftTokenError = {
   correlation_id?: string;
 };
 
+type MicrosoftTokenPayload = MicrosoftTokenResponse & MicrosoftTokenError;
+
 async function tokenRequest(params: URLSearchParams): Promise<MicrosoftTokenResponse> {
   const response = await fetch(`https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: params,
   });
-  const payload = (await response.json().catch(() => null)) as (MicrosoftTokenResponse & MicrosoftTokenError) | null;
+  const payload = (await response.json().catch(() => null)) as MicrosoftTokenPayload | null;
   if (!response.ok || !payload?.access_token) {
     const errorCode = payload?.error || `http_${response.status}`;
     const description = payload?.error_description?.split("\\r")[0]?.slice(0, 700);
