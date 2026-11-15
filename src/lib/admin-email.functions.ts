@@ -371,3 +371,20 @@ export const getAdminEmailReplyHistory = createServerFn({ method: "GET" })
     if (error) throw new Error("Não foi possível carregar o histórico de respostas.");
     return replies ?? [];
   });
+
+
+/** Lightweight unread count for the admin home header; no message bodies leave the server. */
+export const getAdminEmailUnreadCount = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin email tables are managed by Lovable Cloud migrations
+    const db = context.supabase as any;
+    const { count, error } = await db
+      .from("admin_email_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("is_read", false)
+      .neq("mailbox", "unknown");
+    if (error) throw new Error("Não foi possível consultar as notificações de e-mail.");
+    return { unread: count ?? 0 };
+  });
