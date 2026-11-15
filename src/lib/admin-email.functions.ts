@@ -373,6 +373,36 @@ export const getAdminEmailReplyHistory = createServerFn({ method: "GET" })
   });
 
 
+/** Mark only messages actually shown in the selected admin mailbox as read. */
+export const markAdminEmailMessagesRead = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { messageIds: string[] }) => {
+    if (
+      !input ||
+      !Array.isArray(input.messageIds) ||
+      input.messageIds.length > 100 ||
+      input.messageIds.some((id) => !/^[0-9a-f-]{36}$/i.test(id))
+    ) {
+      throw new Error("Lista de mensagens inválida.");
+    }
+    return { messageIds: [...new Set(input.messageIds)] };
+  })
+  .handler(async ({ context, data }) => {
+    await assertAdmin(context.supabase, context.userId);
+    if (!data.messageIds.length) return { updated: 0 };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin email tables are managed by Lovable Cloud migrations
+    const db = context.supabase as any;
+    const { data: updated, error } = await db
+      .from("admin_email_messages")
+      .update({ is_read: true })
+      .in("id", data.messageIds)
+      .in("mailbox", ["contact", "support"])
+      .eq("is_read", false)
+      .select("id");
+    if (error) throw new Error("Não foi possível atualizar o estado das mensagens.");
+    return { updated: updated?.length ?? 0 };
+  });
+
 /** Lightweight unread count for the admin home header; no message bodies leave the server. */
 export const getAdminEmailUnreadCount = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
