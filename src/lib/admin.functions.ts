@@ -2283,16 +2283,12 @@ export const sendAdminStudentEmail = createServerFn({ method: "POST" })
       const templateData = { lang: data.lang, studentName: profile.name?.trim() || "" };
       const result =
         data.campaign === "premium-benefits"
-          ? await (await import("@/lib/email-templates/send-marketing-email")).sendMarketingEmail(
-              "premium-benefits",
-              recipient,
-              { templateData, idempotencyKey },
-            )
-          : await (await import("@/lib/email-templates/send-email")).sendTemplateEmail(
-              "welcome",
-              recipient,
-              { templateData, idempotencyKey },
-            );
+          ? await (
+              await import("@/lib/email-templates/send-marketing-email")
+            ).sendMarketingEmail("premium-benefits", recipient, { templateData, idempotencyKey })
+          : await (
+              await import("@/lib/email-templates/send-email")
+            ).sendTemplateEmail("welcome", recipient, { templateData, idempotencyKey });
       const status = result.sent ? "sent" : "suppressed";
       const { error: updateError } = await supabaseAdmin
         .from("email_campaign_deliveries")
