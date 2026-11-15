@@ -43,6 +43,8 @@ import { uiPt } from "@/lib/uiDictionary";
 import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
+import { useServerFn } from "@tanstack/react-start";
+import { isAdminUser } from "@/lib/admin.functions";
 import {
   getFocusInvitationEnabled,
   setFocusInvitationEnabled,
@@ -215,6 +217,13 @@ export function ProfileMenu({
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
   const { data: profile } = useProfile();
+  const checkAdmin = useServerFn(isAdminUser);
+  const { data: adminAccess } = useQuery({
+    queryKey: ["admin-access"],
+    queryFn: () => checkAdmin(),
+    staleTime: 5 * 60 * 1000,
+  });
+  const isAdmin = adminAccess?.isAdmin === true;
   const push = usePushNotifications();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_path);
   const [open, setOpen] = useState(false);
@@ -446,12 +455,14 @@ export function ProfileMenu({
               <span
                 className={cn(
                   "mt-1 inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-bold leading-none",
-                  profileIsPremium(profile)
+                  isAdmin
+                    ? "bg-primary text-primary-foreground"
+                    : profileIsPremium(profile)
                     ? "bg-warning text-warning-foreground"
                     : "bg-sidebar-accent text-sidebar-foreground/70",
                 )}
               >
-                {profileIsPremium(profile) ? "Premium" : "Free"}
+                {isAdmin ? "Admin" : profileIsPremium(profile) ? "Premium" : "Free"}
               </span>
             )}
           </span>

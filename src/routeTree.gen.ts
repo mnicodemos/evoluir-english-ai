@@ -12,11 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as TermsRouteImport } from './routes/terms'
-import { Route as HelpRouteImport } from './routes/help'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdventuresRouteImport } from './routes/_authenticated/adventures'
 import { Route as AuthenticatedBillingSuccessRouteImport } from './routes/_authenticated/billing-success'
@@ -74,6 +74,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LandingRoute = LandingRouteImport.update({
   id: '/landing',
   path: '/landing',
@@ -92,11 +97,6 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/help',
-  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -324,11 +324,11 @@ const LovableEmailTransactionalPreviewRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/help': typeof HelpRoute
   '/landing': typeof LandingRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
-  '/help': typeof HelpRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/adventures': typeof AuthenticatedAdventuresRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
@@ -375,11 +375,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/help': typeof HelpRoute
   '/landing': typeof LandingRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
-  '/help': typeof HelpRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/adventures': typeof AuthenticatedAdventuresRoute
   '/billing-success': typeof AuthenticatedBillingSuccessRoute
@@ -428,11 +428,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/help': typeof HelpRoute
   '/landing': typeof LandingRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terms': typeof TermsRoute
-  '/help': typeof HelpRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/adventures': typeof AuthenticatedAdventuresRoute
   '/_authenticated/billing-success': typeof AuthenticatedBillingSuccessRoute
@@ -481,11 +481,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/help'
     | '/landing'
     | '/privacy'
     | '/reset-password'
     | '/terms'
-    | '/help'
     | '/admin'
     | '/adventures'
     | '/billing-success'
@@ -532,11 +532,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/help'
     | '/landing'
     | '/privacy'
     | '/reset-password'
     | '/terms'
-    | '/help'
     | '/admin'
     | '/adventures'
     | '/billing-success'
@@ -584,11 +584,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/help'
     | '/landing'
     | '/privacy'
     | '/reset-password'
     | '/terms'
-    | '/help'
     | '/_authenticated/admin'
     | '/_authenticated/adventures'
     | '/_authenticated/billing-success'
@@ -637,11 +637,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  HelpRoute: typeof HelpRoute
   LandingRoute: typeof LandingRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TermsRoute: typeof TermsRoute
-  HelpRoute: typeof HelpRoute
   ApiCoachStreamRoute: typeof ApiCoachStreamRoute
   ApiMusicRoute: typeof ApiMusicRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
@@ -675,6 +675,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/landing': {
       id: '/landing'
       path: '/landing'
@@ -701,13 +708,6 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin': {
@@ -1088,11 +1088,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  HelpRoute: HelpRoute,
   LandingRoute: LandingRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TermsRoute: TermsRoute,
-  HelpRoute: HelpRoute,
   ApiCoachStreamRoute: ApiCoachStreamRoute,
   ApiMusicRoute: ApiMusicRoute,
   ApiSpeechRoute: ApiSpeechRoute,
