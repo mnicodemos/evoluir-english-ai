@@ -32,14 +32,25 @@ const COPY = {
       "É um prazer ter você conosco. Aprender inglês é ampliar possibilidades, desenvolver confiança e abrir caminhos para novas oportunidades. O Evoluir+ foi criado para acompanhar essa jornada com inteligência, personalização e consistência.",
     sectionTitle: "Uma experiência que evolui com você",
     features: [
-      ["Aprendizagem personalizada", "Conteúdos e atividades alinhados ao seu nível e ao seu ritmo."],
-      ["AI Teacher", "Orientação inteligente para praticar, esclarecer dúvidas e ganhar confiança."],
-      ["Prática integrada", "Pratique vocabulário, gramática, leitura, escrita, compreensão e conversação."],
-      ["Evolução acompanhada", "Entenda seu progresso e descubra quais são os próximos passos."],
+      [
+        "Aprendizagem personalizada",
+        "Conteúdos e atividades alinhados ao seu nível e ao seu ritmo.",
+      ],
+      [
+        "AI Teacher",
+        "Orientação inteligente para praticar, esclarecer dúvidas e ganhar confiança.",
+      ],
+      [
+        "Prática integrada",
+        "Pratique vocabulário, gramática, leitura, escrita, compreensão e conversação.",
+      ],
+      [
+        "Evolução acompanhada",
+        "Entenda seu progresso e descubra quais são os próximos passos.",
+      ],
     ],
     nextTitle: "Seu próximo passo",
-    next:
-      "Acesse sua plataforma, conheça seu ambiente de aprendizagem e comece pela atividade recomendada para você.",
+    next: "Acesse sua plataforma, conheça seu ambiente de aprendizagem e comece pela atividade recomendada para você.",
     cta: "Acessar minha plataforma",
     closing:
       "Você não precisa aprender tudo de uma vez. Um passo consistente de cada vez faz a diferença.",
@@ -56,13 +67,18 @@ const COPY = {
     sectionTitle: "An experience that evolves with you",
     features: [
       ["Personalized learning", "Lessons and activities adapted to your level and pace."],
-      ["AI Teacher", "Intelligent guidance to practise, ask questions and build confidence."],
-      ["Integrated practice", "Practise vocabulary, grammar, reading, writing, listening and speaking."],
+      [
+        "AI Teacher",
+        "Intelligent guidance to practise, ask questions and build confidence.",
+      ],
+      [
+        "Integrated practice",
+        "Practise vocabulary, grammar, reading, writing, listening and speaking.",
+      ],
       ["Progress tracking", "Understand your progress and discover what to practise next."],
     ],
     nextTitle: "Your next step",
-    next:
-      "Open your platform, explore your learning space and start with your recommended activity.",
+    next: "Open your platform, explore your learning space and start with your recommended activity.",
     cta: "Open my learning platform",
     closing:
       "You do not need to learn everything at once. One consistent step at a time makes a difference.",
