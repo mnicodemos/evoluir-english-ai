@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/api/admin/email/microsoft/callback" as never)({
+export const Route = createFileRoute("/api/admin/email/microsoft/callback")({
   server: {
     handlers: {
       GET: async ({ request }) => {
