@@ -32,18 +32,9 @@ const COPY = {
       "É um prazer ter você conosco. Aprender inglês é ampliar possibilidades, desenvolver confiança e abrir caminhos para novas oportunidades. O Evoluir+ foi criado para acompanhar essa jornada com inteligência, personalização e consistência.",
     sectionTitle: "Uma experiência que evolui com você",
     features: [
-      [
-        "Aprendizagem personalizada",
-        "Conteúdos e atividades alinhados ao seu nível e ao seu ritmo.",
-      ],
-      [
-        "AI Teacher",
-        "Orientação inteligente para praticar, esclarecer dúvidas e ganhar confiança.",
-      ],
-      [
-        "Prática integrada",
-        "Desenvolva vocabulário, gramática, leitura, escrita, compreensão e conversação.",
-      ],
+      ["Aprendizagem personalizada", "Conteúdos e atividades alinhados ao seu nível e ao seu ritmo."],
+      ["AI Teacher", "Orientação inteligente para praticar, esclarecer dúvidas e ganhar confiança."],
+      ["Prática integrada", "Pratique vocabulário, gramática, leitura, escrita, compreensão e conversação."],
       ["Evolução acompanhada", "Entenda seu progresso e descubra quais são os próximos passos."],
     ],
     nextTitle: "Seu próximo passo",
@@ -66,10 +57,7 @@ const COPY = {
     features: [
       ["Personalized learning", "Lessons and activities adapted to your level and pace."],
       ["AI Teacher", "Intelligent guidance to practise, ask questions and build confidence."],
-      [
-        "Integrated practice",
-        "Develop vocabulary, grammar, reading, writing, listening and speaking.",
-      ],
+      ["Integrated practice", "Practise vocabulary, grammar, reading, writing, listening and speaking."],
       ["Progress tracking", "Understand your progress and discover what to practise next."],
     ],
     nextTitle: "Your next step",
