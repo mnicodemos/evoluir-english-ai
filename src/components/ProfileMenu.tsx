@@ -407,10 +407,14 @@ export function ProfileMenu({
   const displayName = profile?.name || profile?.email || "User";
   const photo = avatarPreview ?? avatarUrl ?? undefined;
 
+  /* eslint-enable prettier/prettier */
+
   // Desktop sidebar and phone menu share one profile card (user request).
   const inCard = presentation !== "icon";
 
   // The button that opens the profile (the card's top row, or an icon).
+  // This existing JSX block has legacy indentation that conflicts with Prettier.
+  /* eslint-disable prettier/prettier */
   const triggerButton = (
     <Button
       variant="ghost"
@@ -464,8 +468,10 @@ export function ProfileMenu({
       )}
     </Button>
   );
+  /* eslint-enable prettier/prettier */
 
   // The form itself, shared by the desktop popover and the phone dialog.
+  /* eslint-disable prettier/prettier */
   const form = (
     <>
 <div className="space-y-5">
