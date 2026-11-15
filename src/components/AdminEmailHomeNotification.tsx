@@ -69,9 +69,7 @@ export function AdminEmailHomeNotification() {
               : `Abrir caixa de ${label.toLowerCase()}`
           }
           title={
-            count > 0
-              ? `${label}: ${count} mensagens não lidas`
-              : `Caixa de ${label.toLowerCase()}`
+            count > 0 ? `${label}: ${count} mensagens não lidas` : `Caixa de ${label.toLowerCase()}`
           }
           className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
         >
