@@ -333,6 +333,6 @@ function HelpCenterPage() {
           ? "As respostas são atualizadas conforme os recursos disponíveis no aplicativo."
           : "Answers reflect the features currently available in the app."}
       </div>
-  </AppShell>
-);
+    </AppShell>
+  );
 }
