@@ -61,8 +61,8 @@ export function AdminEmailInbox() {
   };
 
   const messages = inbox.data?.messages ?? [];
-  const contact = messages.filter((message) => message.mailbox === "contact");
-  const support = messages.filter((message) => message.mailbox === "support");
+  const contact = messages.filter((message: InboxMessage) => message.mailbox === "contact");
+  const support = messages.filter((message: InboxMessage) => message.mailbox === "support");
 
   return (
     <section className="card-soft space-y-4 p-3 sm:p-5">
