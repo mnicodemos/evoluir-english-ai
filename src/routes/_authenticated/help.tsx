@@ -23,7 +23,7 @@ import { useUiLang } from "@/lib/uiLang";
 import { PageHeader } from "@/components/PageHeader";
 import { AppShell } from "@/components/AppShell";
 
-export const Route = createFileRoute("/_authenticated/help")({
+export const Route = createFileRoute("/help")({
   head: () => ({
     meta: [
       { title: "Central de Ajuda | Evoluir+ English AI" },
