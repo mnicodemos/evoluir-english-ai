@@ -2255,13 +2255,16 @@ export const sendAdminStudentEmail = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: profile, error } = await supabaseAdmin
       .from("profiles")
-      .select("name, email")
+      .select("name, email, plan")
       .eq("id", data.userId)
       .maybeSingle();
     if (error) throw error;
-    const recipient = profile?.email?.trim();
+    if (!profile) throw new Error("Student not found.");
+    if (data.campaign === "premium-benefits" && profile.plan === "premium") {
+      throw new Error("Premium campaigns can only be sent to Free students.");
+    }
+    const recipient = profile.email?.trim();
     if (!recipient) throw new Error("This student has no email address.");
-    const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
     const idempotencyKey = `admin-${data.campaign}:${data.userId}:${Date.now()}`;
     const { error: pendingError } = await supabaseAdmin.from("email_campaign_deliveries").upsert(
       {
@@ -2277,10 +2280,15 @@ export const sendAdminStudentEmail = createServerFn({ method: "POST" })
     );
     if (pendingError) throw pendingError;
     try {
-      const result = await sendTemplateEmail(data.campaign, recipient, {
-        templateData: { lang: data.lang, studentName: profile?.name?.trim() || "" },
-        idempotencyKey,
-      });
+      const templateData = { lang: data.lang, studentName: profile.name?.trim() || "" };
+      const result =
+        data.campaign === "premium-benefits"
+          ? await (
+              await import("@/lib/email-templates/send-marketing-email")
+            ).sendMarketingEmail("premium-benefits", recipient, { templateData, idempotencyKey })
+          : await (
+              await import("@/lib/email-templates/send-email")
+            ).sendTemplateEmail("welcome", recipient, { templateData, idempotencyKey });
       const status = result.sent ? "sent" : "suppressed";
       const { error: updateError } = await supabaseAdmin
         .from("email_campaign_deliveries")
