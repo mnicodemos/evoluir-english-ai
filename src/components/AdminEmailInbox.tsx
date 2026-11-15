@@ -178,7 +178,7 @@ export function AdminEmailInbox() {
             <TabsTrigger value="support">Suporte ({support.length})</TabsTrigger>
           </TabsList>
           <TabsContent value="contact" className="mt-3 space-y-2"><MessageList messages={contact} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={removeMessage} /></TabsContent>
-          <TabsContent value="support" className="mt-3 space-y-2"><MessageList messages={support} sendReply={sendReply} loadReplyHistory={loadReplyHistory} /></TabsContent>
+          <TabsContent value="support" className="mt-3 space-y-2"><MessageList messages={support} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={removeMessage} /></TabsContent>
         </Tabs>
       )}
       <p className="text-xs text-muted-foreground">
