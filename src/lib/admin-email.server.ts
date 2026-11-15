@@ -7,7 +7,7 @@ import {
   timingSafeEqual,
 } from "node:crypto";
 
-const CLIENT_ID = "16fe0bc6-0064-48bb-9702-9d656deec9e";
+const CLIENT_ID = "16fe0bc6-0064-48bb-9702-9d6566deec9e";
 const TENANT = "consumers";
 const SCOPES = ["openid", "profile", "offline_access", "User.Read", "Mail.Read"];
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
