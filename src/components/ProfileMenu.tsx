@@ -458,8 +458,8 @@ export function ProfileMenu({
           <ArrowRight
             className="size-4 shrink-0 text-sidebar-foreground/60 transition-colors group-hover:translate-x-0.5 group-hover:text-sidebar-foreground"
             strokeWidth={2.25}
-            aria-hidden="true"
-          />
+              aria-hidden="true"
+            />
         </>
       )}
     </Button>
