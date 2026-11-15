@@ -39,8 +39,20 @@ export function AdminEmailHomeNotification() {
   if (admin.data?.isAdmin !== true) return null;
 
   const shortcuts = [
-    { mailbox: "contact", label: "Contato", hash: "#contact", Icon: UserRound, count: contact.data?.unread ?? 0 },
-    { mailbox: "support", label: "Suporte", hash: "#support", Icon: Wrench, count: support.data?.unread ?? 0 },
+    {
+      mailbox: "contact",
+      label: "Contato",
+      hash: "#contact",
+      Icon: UserRound,
+      count: contact.data?.unread ?? 0,
+    },
+    {
+      mailbox: "support",
+      label: "Suporte",
+      hash: "#support",
+      Icon: Wrench,
+      count: support.data?.unread ?? 0,
+    },
   ] as const;
 
   return (
@@ -51,8 +63,16 @@ export function AdminEmailHomeNotification() {
           to="/admin"
           search={{ folder: "communication", tab: "inbox" }}
           hash={hash}
-          aria-label={count > 0 ? `${label}: ${count} mensagens não lidas` : `Abrir caixa de ${label.toLowerCase()}`}
-          title={count > 0 ? `${label}: ${count} mensagens não lidas` : `Caixa de ${label.toLowerCase()}`}
+          aria-label={
+            count > 0
+              ? `${label}: ${count} mensagens não lidas`
+              : `Abrir caixa de ${label.toLowerCase()}`
+          }
+          title={
+            count > 0
+              ? `${label}: ${count} mensagens não lidas`
+              : `Caixa de ${label.toLowerCase()}`
+          }
           className="relative inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-muted-foreground transition-colors hover:bg-white/15 hover:text-foreground"
         >
           <Icon className="size-4" aria-hidden="true" />
