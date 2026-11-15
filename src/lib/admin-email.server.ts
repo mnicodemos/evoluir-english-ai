@@ -111,17 +111,42 @@ type MicrosoftTokenResponse = {
   scope?: string;
 };
 
+type MicrosoftTokenError = {
+  error?: string;
+  error_description?: string;
+  error_codes?: number[];
+  trace_id?: string;
+  correlation_id?: string;
+};
+
 async function tokenRequest(params: URLSearchParams): Promise<MicrosoftTokenResponse> {
   const response = await fetch(`https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: params,
   });
-  const result = (await response.json().catch(() => null)) as MicrosoftTokenResponse | null;
-  if (!response.ok || !result?.access_token) {
-    throw new Error("Microsoft token request failed");
+  const payload = (await response.json().catch(() => null)) as
+    | (MicrosoftTokenResponse & MicrosoftTokenError)
+    | null;
+  if (!response.ok || !payload?.access_token) {
+    const errorCode = payload?.error || `http_${response.status}`;
+    const description = payload?.error_description?.split("\\r")[0]?.slice(0, 700);
+    // Log Microsoft diagnostics only; never log authorization codes, tokens, or request parameters.
+    console.error("[admin-email] Microsoft token exchange rejected", {
+      status: response.status,
+      error: errorCode,
+      error_codes: payload?.error_codes,
+      error_description: description,
+      trace_id: payload?.trace_id,
+      correlation_id: payload?.correlation_id,
+    });
+    throw new Error(
+      description
+        ? `Microsoft OAuth: ${errorCode} — ${description}`
+        : `Microsoft OAuth: ${errorCode} (HTTP ${response.status})`,
+    );
   }
-  return result;
+  return payload;
 }
 
 export async function exchangeMicrosoftCode(
