@@ -3,6 +3,7 @@
 import { appGuidePt } from "./appGuidePt";
 
 const baseUiPt: Record<string, string> = {
+  "Help center": "Central de Ajuda",
   "Planned day": "Dia planejado",
   "Extra study day": "Dia extra de estudo",
   Music: "Música",
