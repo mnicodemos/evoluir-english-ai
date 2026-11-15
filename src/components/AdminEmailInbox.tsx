@@ -25,12 +25,22 @@ export function AdminEmailInbox() {
   const sendReply = useServerFn(sendAdminEmailReply);
   const loadReplyHistory = useServerFn(getAdminEmailReplyHistory);
   const [busy, setBusy] = useState<"connect" | "sync" | null>(null);
+  const [selectedMailbox, setSelectedMailbox] = useState<"contact" | "support">("contact");
   const inbox = useQuery({
     queryKey: ["admin-email-inbox"],
     queryFn: () => loadInbox(),
     staleTime: 15_000,
     retry: false,
   });
+
+  useEffect(() => {
+    const selectFromHash = () => {
+      setSelectedMailbox(window.location.hash === "#support" ? "support" : "contact");
+    };
+    selectFromHash();
+    window.addEventListener("hashchange", selectFromHash);
+    return () => window.removeEventListener("hashchange", selectFromHash);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -136,7 +146,7 @@ export function AdminEmailInbox() {
           A conexão ainda não foi realizada. Ao conectar, a Microsoft solicitará autorização de leitura da caixa.
         </p>
       ) : (
-        <Tabs defaultValue="contact">
+        <Tabs value={selectedMailbox} onValueChange={(value) => setSelectedMailbox(value as "contact" | "support")}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="contact">Contato ({contact.length})</TabsTrigger>
             <TabsTrigger value="support">Suporte ({support.length})</TabsTrigger>
