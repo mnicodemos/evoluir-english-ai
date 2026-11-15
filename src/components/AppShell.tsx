@@ -318,7 +318,10 @@ export function MobileNavigationMenu({
               className="flex h-11 w-full min-w-0 items-center gap-2 rounded-lg px-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
               activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
               inactiveProps={{
-                className: pathname === "/guide" ? "bg-sidebar-accent text-brand-green" : "text-sidebar-foreground/70",
+                className:
+                  pathname === "/guide"
+                    ? "bg-sidebar-accent text-brand-green"
+                    : "text-sidebar-foreground/70",
               }}
             >
               <LifeBuoy className="size-5 shrink-0 text-sky-400" />
@@ -666,7 +669,10 @@ function AppShellContent({
                   className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
                   activeProps={{ className: "bg-sidebar-accent text-brand-green" }}
                   inactiveProps={{
-                    className: location.pathname === "/guide" ? "bg-sidebar-accent text-brand-green" : "text-sidebar-foreground/70",
+                    className:
+                      location.pathname === "/guide"
+                        ? "bg-sidebar-accent text-brand-green"
+                        : "text-sidebar-foreground/70",
                   }}
                 >
                   <LifeBuoy className="size-5 shrink-0 text-sky-400" />
