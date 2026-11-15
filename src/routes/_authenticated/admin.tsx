@@ -42,8 +42,8 @@ import { useUiLang } from "@/lib/uiLang";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   validateSearch: (search: Record<string, unknown>) => ({
-    folder: search.folder === "communication" ? "communication" : undefined,
-    tab: search.tab === "inbox" ? "inbox" : undefined,
+    ...(search["folder"] === "communication" ? { folder: "communication" as const } : {}),
+    ...(search["tab"] === "inbox" ? { tab: "inbox" as const } : {}),
   }),
   head: () => ({
     meta: [
@@ -70,8 +70,8 @@ function AdminPage() {
   const [folder, setFolder] = useState<AdminFolder>("students");
   // Read after mount: the server render has no storage.
   useEffect(() => {
-    if (search.folder) {
-      setFolder(search.folder);
+    if (search["folder"] === "communication") {
+      setFolder("communication");
       return;
     }
     setFolder(readFolder());
@@ -293,7 +293,7 @@ function AdminPage() {
 
             <TabsContent value="communication" className="mt-4">
               <FolderTabs
-                defaultValue={search.tab === "inbox" ? "inbox" : undefined}
+                {...(search["tab"] === "inbox" ? { defaultValue: "inbox" } : {})}
                 tabs={[
                   { value: "push", label: t("Push") },
                   { value: "emails", label: t("Email campaigns") },
