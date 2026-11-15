@@ -28,7 +28,7 @@ const terms: Record<UiLang, LegalDocument> = {
       {
         title: "1. Quem somos",
         paragraphs: [
-          "O Evoluir+ English AI (evoluirmaisenglishai.com) é um serviço de aprendizado de inglês com apoio de inteligência artificial, oferecido por Marcelo Neves Nicodemos. Contato: evoluirmaisoficial@hotmail.com.",
+          "O Evoluir+ English AI (evoluirmaisenglishai.com) é um serviço de aprendizado de inglês com apoio de inteligência artificial, oferecido por Marcelo Neves Nicodemos. Contato: contato@evoluirmaisenglishai.com.",
         ],
       },
       {
@@ -119,7 +119,7 @@ const terms: Record<UiLang, LegalDocument> = {
         title: "16. Lei e foro",
         paragraphs: ["Aplica-se a lei brasileira. Fica eleito o foro do domicílio do consumidor."],
       },
-      { title: "17. Contato", paragraphs: ["evoluirmaisoficial@hotmail.com"] },
+      { title: "17. Contato", paragraphs: ["contato@evoluirmaisenglishai.com"] },
     ],
   },
   en: {
@@ -131,7 +131,7 @@ const terms: Record<UiLang, LegalDocument> = {
       {
         title: "1. Who we are",
         paragraphs: [
-          "Evoluir+ English AI (evoluirmaisenglishai.com) is an English-learning service supported by artificial intelligence, offered by Marcelo Neves Nicodemos. Contact: evoluirmaisoficial@hotmail.com.",
+          "Evoluir+ English AI (evoluirmaisenglishai.com) is an English-learning service supported by artificial intelligence, offered by Marcelo Neves Nicodemos. Contact: contato@evoluirmaisenglishai.com.",
         ],
       },
       {
@@ -224,7 +224,7 @@ const terms: Record<UiLang, LegalDocument> = {
           "Brazilian law applies. The courts of the consumer's place of residence shall have jurisdiction.",
         ],
       },
-      { title: "17. Contact", paragraphs: ["evoluirmaisoficial@hotmail.com"] },
+      { title: "17. Contact", paragraphs: ["contato@evoluirmaisenglishai.com"] },
     ],
   },
 };
@@ -238,7 +238,7 @@ const privacy: Record<UiLang, LegalDocument> = {
       {
         title: "1. Controlador",
         paragraphs: [
-          "Marcelo Neves Nicodemos, responsável pelo Evoluir+ English AI. Canal para assuntos de privacidade: evoluirmaisoficial@hotmail.com.",
+          "Marcelo Neves Nicodemos, responsável pelo Evoluir+ English AI. Canal para assuntos de privacidade: contato@evoluirmaisenglishai.com.",
         ],
       },
       {
@@ -310,7 +310,7 @@ const privacy: Record<UiLang, LegalDocument> = {
           "Podemos atualizar esta Política. Mudanças relevantes serão avisadas no app ou por e-mail.",
         ],
       },
-      { title: "12. Contato", paragraphs: ["evoluirmaisoficial@hotmail.com"] },
+      { title: "12. Contato", paragraphs: ["contato@evoluirmaisenglishai.com"] },
     ],
   },
   en: {
@@ -322,7 +322,7 @@ const privacy: Record<UiLang, LegalDocument> = {
       {
         title: "1. Data controller",
         paragraphs: [
-          "Marcelo Neves Nicodemos is responsible for Evoluir+ English AI. Privacy contact: evoluirmaisoficial@hotmail.com.",
+          "Marcelo Neves Nicodemos is responsible for Evoluir+ English AI. Privacy contact: contato@evoluirmaisenglishai.com.",
         ],
       },
       {
@@ -394,7 +394,7 @@ const privacy: Record<UiLang, LegalDocument> = {
           "We may update this Policy. Material changes will be communicated in the app or by email.",
         ],
       },
-      { title: "12. Contact", paragraphs: ["evoluirmaisoficial@hotmail.com"] },
+      { title: "12. Contact", paragraphs: ["contato@evoluirmaisenglishai.com"] },
     ],
   },
 };

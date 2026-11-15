@@ -83,7 +83,7 @@ export function Footer({
                 {t.privacy}
               </Link>
               <a
-                href="mailto:evoluirmaisoficial@hotmail.com"
+                href="mailto:contato@evoluirmaisenglishai.com"
                 className="transition-colors hover:text-foreground dark:hover:text-white"
               >
                 {lang === "pt" ? "Contato" : "Contact"}
@@ -149,11 +149,11 @@ export function Footer({
                 ))}
               </div>
               <a
-                href="mailto:evoluirmaisoficial@hotmail.com"
+                href="mailto:contato@evoluirmaisenglishai.com"
                 className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground dark:text-[#A1A1AA] dark:hover:text-white"
               >
                 <Mail className="size-4" aria-hidden="true" />
-                <span>evoluirmaisoficial@hotmail.com</span>
+                <span>contato@evoluirmaisenglishai.com</span>
               </a>
             </TooltipProvider>
           </div>

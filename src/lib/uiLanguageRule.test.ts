@@ -36,7 +36,7 @@ const SAME_IN_BOTH = new Set([
   "US /",
   "UK /",
   "Marcelo",
-  "evoluirmaisoficial@hotmail.com",
+  "contato@evoluirmaisenglishai.com",
   // Accessible title identifying an English learning video, not interface copy.
   "B1 Unit 1 Lesson 6 — Present Perfect vs Past Simple",
 ]);
