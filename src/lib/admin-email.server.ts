@@ -125,9 +125,7 @@ async function tokenRequest(params: URLSearchParams): Promise<MicrosoftTokenResp
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: params,
   });
-  const payload = (await response.json().catch(() => null)) as
-    | (MicrosoftTokenResponse & MicrosoftTokenError)
-    | null;
+  const payload = (await response.json().catch(() => null)) as (MicrosoftTokenResponse & MicrosoftTokenError) | null;
   if (!response.ok || !payload?.access_token) {
     const errorCode = payload?.error || `http_${response.status}`;
     const description = payload?.error_description?.split("\\r")[0]?.slice(0, 700);
