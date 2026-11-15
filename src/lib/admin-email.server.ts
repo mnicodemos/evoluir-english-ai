@@ -103,26 +103,19 @@ export function microsoftAuthorizationUrl(
   return url.toString();
 }
 
-export async function exchangeMicrosoftCode(
-  code: string,
-  verifier: string,
-  redirectUri: string,
-) {
-  const response = await fetch(
-    `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`,
-    {
-      method: "POST",
-      headers: { "content-type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: CLIENT_ID,
-        grant_type: "authorization_code",
-        code,
-        redirect_uri: redirectUri,
-        code_verifier: verifier,
-        scope: SCOPES.join(" "),
-      }),
-    },
-  );
+export async function exchangeMicrosoftCode(code: string, verifier: string, redirectUri: string) {
+  const response = await fetch(`https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/token`, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: CLIENT_ID,
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: redirectUri,
+      code_verifier: verifier,
+      scope: SCOPES.join(" "),
+    }),
+  });
   const result = (await response.json()) as {
     access_token?: string;
     refresh_token?: string;
