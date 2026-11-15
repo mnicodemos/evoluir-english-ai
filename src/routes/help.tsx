@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -163,21 +163,20 @@ function HelpCenterPage() {
         },
       ];
 
-  const filteredTopics = useMemo(() => {
-    const normalized = query
-      .trim()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase();
-    if (!normalized) return topics;
-    return topics.filter((topic) =>
-      `${topic.category} ${topic.question} ${topic.answer}`
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .includes(normalized),
-    );
-  }, [query, pt]);
+  const normalizedQuery = query
+    .trim()
+    .normalize("NFD")
+    .replace(/[\\u0300-\\u036f]/g, "")
+    .toLowerCase();
+  const filteredTopics = normalizedQuery
+    ? topics.filter((topic) =>
+        `${topic.category} ${topic.question} ${topic.answer}`
+          .normalize("NFD")
+          .replace(/[\\u0300-\\u036f]/g, "")
+          .toLowerCase()
+          .includes(normalizedQuery),
+      )
+    : topics;
 
   const categories = [...new Set(filteredTopics.map((topic) => topic.category))];
   const categoryIcon = (category: string) => {
