@@ -876,7 +876,6 @@ function Dashboard() {
                       <WeatherTalk translate={t} placement="desktop" />
                       <FocusHeaderButton translate={t} placement="desktop" />
                       <AdminEmailHomeNotification />
-                      <AdminEmailHomeNotification />
                       <DashboardNotifications
                         indicators={indicators}
                         reviewCount={reviewCount}
