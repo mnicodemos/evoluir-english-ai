@@ -2,7 +2,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { Loader2, Mail, RefreshCw } from "lucide-react";
+import { Loader2, Mail, RefreshCw, Reply, Send } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import {
   getAdminEmailInbox,
   startMicrosoftEmailConnection,
   syncAdminEmailInbox,
+  sendAdminEmailReply,
+  getAdminEmailReplyHistory,
 } from "@/lib/admin-email.functions";
 
 export function AdminEmailInbox() {
@@ -20,6 +22,8 @@ export function AdminEmailInbox() {
   const startConnection = useServerFn(startMicrosoftEmailConnection);
   const completeConnection = useServerFn(completeMicrosoftEmailConnection);
   const syncInbox = useServerFn(syncAdminEmailInbox);
+  const sendReply = useServerFn(sendAdminEmailReply);
+  const loadReplyHistory = useServerFn(getAdminEmailReplyHistory);
   const [busy, setBusy] = useState<"connect" | "sync" | null>(null);
   const inbox = useQuery({
     queryKey: ["admin-email-inbox"],
@@ -137,12 +141,12 @@ export function AdminEmailInbox() {
             <TabsTrigger value="contact">Contato ({contact.length})</TabsTrigger>
             <TabsTrigger value="support">Suporte ({support.length})</TabsTrigger>
           </TabsList>
-          <TabsContent value="contact" className="mt-3 space-y-2"><MessageList messages={contact} /></TabsContent>
-          <TabsContent value="support" className="mt-3 space-y-2"><MessageList messages={support} /></TabsContent>
+          <TabsContent value="contact" className="mt-3 space-y-2"><MessageList messages={contact} sendReply={sendReply} loadReplyHistory={loadReplyHistory} /></TabsContent>
+          <TabsContent value="support" className="mt-3 space-y-2"><MessageList messages={support} sendReply={sendReply} loadReplyHistory={loadReplyHistory} /></TabsContent>
         </Tabs>
       )}
       <p className="text-xs text-muted-foreground">
-        Leitura somente. As mensagens originais não são movidas nem apagadas. Respostas serão adicionadas em uma etapa posterior usando o Resend já configurado.
+        As mensagens originais permanecem no Hotmail. As respostas são enviadas pelo Resend e registradas no histórico.
       </p>
     </section>
   );
@@ -157,24 +161,98 @@ type InboxMessage = {
   received_at: string;
 };
 
-function MessageList({ messages }: { messages: InboxMessage[] }) {
+
+type ReplySender = (args: { data: { requestId: string; messageId: string; body: string } }) => Promise<{ sent: true; resendId: string }>;
+type ReplyHistoryLoader = (args: { data: { messageId: string } }) => Promise<Array<{
+  id: string; body_text: string; status: string; sent_at: string | null;
+}>>;
+
+function MessageList({
+  messages,
+  sendReply,
+  loadReplyHistory,
+}: {
+  messages: InboxMessage[];
+  sendReply: ReplySender;
+  loadReplyHistory: ReplyHistoryLoader;
+}) {
   if (!messages.length) {
     return <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Nenhuma mensagem sincronizada nesta caixa.</p>;
   }
   return (
-    <div className="max-h-[55vh] space-y-2 overflow-y-auto">
+    <div className="max-h-[55vh] space-y-3 overflow-y-auto">
       {messages.map((message) => (
-        <article key={message.id} className="rounded-lg border border-border/70 p-3">
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <p className="text-sm font-medium">{message.subject || "(Sem assunto)"}</p>
-            <time className="text-xs text-muted-foreground" dateTime={message.received_at}>
-              {new Date(message.received_at).toLocaleString("pt-BR")}
-            </time>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">{message.from_address}</p>
-          <p className="mt-2 whitespace-pre-wrap break-words text-sm">{message.body_text}</p>
-        </article>
+        <ReplyMessage key={message.id} message={message} sendReply={sendReply} loadReplyHistory={loadReplyHistory} />
       ))}
     </div>
+  );
+}
+
+function ReplyMessage({
+  message,
+  sendReply,
+  loadReplyHistory,
+}: {
+  message: InboxMessage;
+  sendReply: ReplySender;
+  loadReplyHistory: ReplyHistoryLoader;
+}) {
+  const [open, setOpen] = useState(false);
+  const [body, setBody] = useState("");
+  const [busy, setBusy] = useState(false);
+  const history = useQuery({
+    queryKey: ["admin-email-replies", message.id],
+    queryFn: () => loadReplyHistory({ data: { messageId: message.id } }),
+    enabled: open,
+    retry: false,
+  });
+  const submit = async () => {
+    if (!body.trim() || busy) return;
+    setBusy(true);
+    try {
+      await sendReply({ data: { requestId: crypto.randomUUID(), messageId: message.id, body: body.trim() } });
+      toast.success("Resposta enviada pelo Resend.");
+      setBody("");
+      await history.refetch();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível enviar a resposta.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <article className="rounded-lg border border-border/70 p-3">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <p className="text-sm font-medium">{message.subject || "(Sem assunto)"}</p>
+        <time className="text-xs text-muted-foreground" dateTime={message.received_at}>{new Date(message.received_at).toLocaleString("pt-BR")}</time>
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">{message.from_address}</p>
+      <p className="mt-2 whitespace-pre-wrap break-words text-sm">{message.body_text}</p>
+      <div className="mt-3 border-t border-border/60 pt-3">
+        <Button size="sm" variant="outline" onClick={() => setOpen((value) => !value)}>
+          <Reply className="mr-2 size-4" /> {open ? "Fechar resposta" : "Responder"}
+        </Button>
+        {open ? (
+          <div className="mt-3 space-y-3">
+            {history.data?.map((reply) => (
+              <div key={reply.id} className="rounded-md bg-muted/40 p-3 text-sm">
+                <div className="flex justify-between gap-2">
+                  <span className="font-medium">Resposta {reply.status === "sent" ? "enviada" : reply.status}</span>
+                  <span className="text-xs text-muted-foreground">{reply.sent_at ? new Date(reply.sent_at).toLocaleString("pt-BR") : ""}</span>
+                </div>
+                <p className="mt-2 whitespace-pre-wrap">{reply.body_text}</p>
+              </div>
+            ))}
+            <textarea className="min-h-28 w-full rounded-md border border-input bg-background p-3 text-sm" value={body} onChange={(event) => setBody(event.target.value)} maxLength={10000} placeholder="Escreva sua resposta…" />
+            <div className="flex justify-end">
+              <Button size="sm" onClick={submit} disabled={!body.trim() || busy}>
+                {busy ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Send className="mr-2 size-4" />}
+                Enviar resposta
+              </Button>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </article>
   );
 }
