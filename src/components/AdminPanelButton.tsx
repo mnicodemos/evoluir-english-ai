@@ -46,7 +46,7 @@ export function AdminPanelButton({
       onClick={() =>
         void navigate({
           to: "/admin",
-          search: { folder: "students", tab: undefined },
+          search: { folder: "communication", tab: "inbox" },
         })
       }
     >
