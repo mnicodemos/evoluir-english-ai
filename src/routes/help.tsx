@@ -197,7 +197,7 @@ function HelpCenterPage() {
     : "Hello Evoluir+ team,\n\nAccount email:\nSubject:\nWhat happened:\nDevice/browser:\n\nThank you.";
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="dashboard-shell brand-dashboard-theme dark min-h-screen overflow-x-clip bg-background text-foreground">
       <header className="border-b border-border/70 bg-background/90">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label="Evoluir+ home">
