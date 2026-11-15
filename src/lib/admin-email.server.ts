@@ -231,6 +231,7 @@ function htmlToText(value: string): string {
 export type GraphInboxMessage = {
   id: string;
   conversationId?: string;
+  internetMessageId?: string;
   from?: { emailAddress?: { address?: string } };
   toRecipients?: Array<{ emailAddress?: { address?: string } }>;
   ccRecipients?: Array<{ emailAddress?: { address?: string } }>;
@@ -248,6 +249,7 @@ export function normalizeGraphMessage(message: GraphInboxMessage) {
   return {
     provider_message_id: message.id,
     provider_conversation_id: message.conversationId ?? null,
+    internet_message_id: message.internetMessageId ?? null,
     mailbox: classifyAdminMailbox(recipients),
     from_address: message.from?.emailAddress?.address?.trim().toLowerCase() || "unknown",
     to_addresses: recipients,
@@ -259,7 +261,7 @@ export function normalizeGraphMessage(message: GraphInboxMessage) {
 
 export async function syncGraphInbox(accessToken: string, initialDeltaLink?: string | null) {
   const select =
-    "id,conversationId,from,toRecipients,ccRecipients,subject,receivedDateTime,body,bodyPreview";
+    "id,conversationId,internetMessageId,from,toRecipients,ccRecipients,subject,receivedDateTime,body,bodyPreview";
   let nextUrl =
     initialDeltaLink ||
     `${GRAPH_BASE}/me/mailFolders/inbox/messages/delta?$select=${encodeURIComponent(select)}&$top=50`;
@@ -290,4 +292,43 @@ export async function syncGraphInbox(accessToken: string, initialDeltaLink?: str
   }
   if (nextUrl) throw new Error("Microsoft Graph returned too many pages; sync stopped safely");
   return { messages, deltaLink };
+}
+
+export async function sendAdminEmailReply(input: {
+  requestId: string;
+  to: string;
+  from: string;
+  subject: string;
+  body: string;
+  inReplyTo?: string | null;
+}): Promise<{ id: string }> {
+  const apiKey = required("RESEND_API_KEY");
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "Idempotency-Key": `admin-email-reply:${input.requestId}`,
+    },
+    body: JSON.stringify({
+      from: input.from,
+      to: [input.to],
+      subject: input.subject,
+      text: input.body,
+      ...(input.inReplyTo
+        ? { headers: { "In-Reply-To": input.inReplyTo, References: input.inReplyTo } }
+        : {}),
+    }),
+  });
+  const payload = (await response.json().catch(() => null)) as
+    | { id?: string; message?: string }
+    | null;
+  if (!response.ok || !payload?.id) {
+    throw new Error(
+      payload?.message
+        ? `Resend rejected the reply: ${payload.message.slice(0, 400)}`
+        : `Resend reply failed (HTTP ${response.status})`,
+    );
+  }
+  return { id: payload.id };
 }
