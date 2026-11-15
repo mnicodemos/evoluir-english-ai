@@ -2,7 +2,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Mail, RefreshCw, Reply, Send } from "lucide-react";
+import { Loader2, Mail, RefreshCw, Reply, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
   sendAdminEmailReply,
   getAdminEmailReplyHistory,
   markAdminEmailMessagesRead,
+  deleteAdminEmailMessage,
 } from "@/lib/admin-email.functions";
 
 export function AdminEmailInbox() {
@@ -26,6 +27,7 @@ export function AdminEmailInbox() {
   const sendReply = useServerFn(sendAdminEmailReply);
   const loadReplyHistory = useServerFn(getAdminEmailReplyHistory);
   const markMessagesRead = useServerFn(markAdminEmailMessagesRead);
+  const removeMessage = useServerFn(deleteAdminEmailMessage);
   const markingReadIds = useRef(new Set<string>());
   const [busy, setBusy] = useState<"connect" | "sync" | null>(null);
   const [selectedMailbox, setSelectedMailbox] = useState<"contact" | "support">("contact");
@@ -175,8 +177,8 @@ export function AdminEmailInbox() {
             <TabsTrigger value="contact">Contato ({contact.length})</TabsTrigger>
             <TabsTrigger value="support">Suporte ({support.length})</TabsTrigger>
           </TabsList>
-          <TabsContent value="contact" className="mt-3 space-y-2"><MessageList messages={contact} sendReply={sendReply} loadReplyHistory={loadReplyHistory} /></TabsContent>
-          <TabsContent value="support" className="mt-3 space-y-2"><MessageList messages={support} sendReply={sendReply} loadReplyHistory={loadReplyHistory} /></TabsContent>
+          <TabsContent value="contact" className="mt-3 space-y-2"><MessageList messages={contact} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={removeMessage} /></TabsContent>
+          <TabsContent value="support" className="mt-3 space-y-2"><MessageList messages={support} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={removeMessage} /></TabsContent>
         </Tabs>
       )}
       <p className="text-xs text-muted-foreground">
@@ -198,6 +200,7 @@ type InboxMessage = {
 
 
 type ReplySender = (args: { data: { requestId: string; messageId: string; body: string } }) => Promise<{ sent: true; resendId: string }>;
+type MessageDeleter = (args: { data: { messageId: string } }) => Promise<{ deleted: true }>;
 type ReplyHistoryLoader = (args: { data: { messageId: string } }) => Promise<Array<{
   id: string; body_text: string; status: string; sent_at: string | null;
 }>>;
@@ -206,10 +209,12 @@ function MessageList({
   messages,
   sendReply,
   loadReplyHistory,
+  deleteMessage,
 }: {
   messages: InboxMessage[];
   sendReply: ReplySender;
   loadReplyHistory: ReplyHistoryLoader;
+  deleteMessage: MessageDeleter;
 }) {
   if (!messages.length) {
     return <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Nenhuma mensagem sincronizada nesta caixa.</p>;
@@ -217,7 +222,7 @@ function MessageList({
   return (
     <div className="max-h-[55vh] space-y-3 overflow-y-auto">
       {messages.map((message) => (
-        <ReplyMessage key={message.id} message={message} sendReply={sendReply} loadReplyHistory={loadReplyHistory} />
+        <ReplyMessage key={message.id} message={message} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={deleteMessage} />
       ))}
     </div>
   );
@@ -227,20 +232,40 @@ function ReplyMessage({
   message,
   sendReply,
   loadReplyHistory,
+  deleteMessage,
 }: {
   message: InboxMessage;
   sendReply: ReplySender;
   loadReplyHistory: ReplyHistoryLoader;
+  deleteMessage: MessageDeleter;
 }) {
   const [open, setOpen] = useState(false);
   const [body, setBody] = useState("");
   const [busy, setBusy] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const queryClient = useQueryClient();
   const history = useQuery({
     queryKey: ["admin-email-replies", message.id],
     queryFn: () => loadReplyHistory({ data: { messageId: message.id } }),
     enabled: open,
     retry: false,
   });
+  const remove = async () => {
+    if (deleting || !window.confirm("Excluir esta mensagem da caixa de entrada?")) return;
+    setDeleting(true);
+    try {
+      await deleteMessage({ data: { messageId: message.id } });
+      toast.success("Mensagem excluída.");
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["admin-email-inbox"] }),
+        queryClient.invalidateQueries({ queryKey: ["admin-email-unread-count"] }),
+      ]);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível excluir a mensagem.");
+    } finally {
+      setDeleting(false);
+    }
+  };
   const submit = async () => {
     if (!body.trim() || busy) return;
     setBusy(true);
@@ -264,9 +289,15 @@ function ReplyMessage({
       <p className="mt-1 text-xs text-muted-foreground">{message.from_address}</p>
       <p className="mt-2 whitespace-pre-wrap break-words text-sm">{message.body_text}</p>
       <div className="mt-3 border-t border-border/60 pt-3">
-        <Button size="sm" variant="outline" onClick={() => setOpen((value) => !value)}>
-          <Reply className="mr-2 size-4" /> {open ? "Fechar resposta" : "Responder"}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm" variant="outline" onClick={() => setOpen((value) => !value)}>
+            <Reply className="mr-2 size-4" /> {open ? "Fechar resposta" : "Responder"}
+          </Button>
+          <Button size="sm" variant="destructive" onClick={remove} disabled={deleting}>
+            {deleting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Trash2 className="mr-2 size-4" />}
+            Excluir
+          </Button>
+        </div>
         {open ? (
           <div className="mt-3 space-y-3">
             {history.data?.map((reply) => (
