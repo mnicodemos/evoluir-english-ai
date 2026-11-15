@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 const CLIENT_ID = "16fe0bc6-0064-48bb-9702-9d656deec9e";
 const TENANT = "consumers";
@@ -30,19 +30,20 @@ export function decryptMicrosoftToken(value: string): string {
 function sign(value: string): string {
   return createHmac("sha256", required("MICROSOFT_OAUTH_STATE_SECRET")).update(value).digest("base64url");
 }
-export function createOAuthState(userId: string, verifier: string): string {
-  const payload = Buffer.from(JSON.stringify({ userId, verifier, issuedAt: Date.now() })).toString("base64url");
+/** Signed, short-lived OAuth state. The PKCE verifier must be stored in a separate HttpOnly cookie. */
+export function createOAuthState(userId: string, nonce: string): string {
+  const payload = Buffer.from(JSON.stringify({ userId, nonce, issuedAt: Date.now() })).toString("base64url");
   return `${payload}.${sign(payload)}`;
 }
-export function verifyOAuthState(state: string): { userId: string; verifier: string } {
+export function verifyOAuthState(state: string): { userId: string; nonce: string } {
   const [payload, signature] = state.split(".");
   if (!payload || !signature) throw new Error("Invalid Microsoft OAuth state");
   const expected = Buffer.from(sign(payload));
   const received = Buffer.from(signature);
   if (expected.length !== received.length || !timingSafeEqual(expected, received)) throw new Error("Invalid Microsoft OAuth state");
-  const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as { userId?: string; verifier?: string; issuedAt?: number };
-  if (!parsed.userId || !parsed.verifier || !parsed.issuedAt || Date.now() - parsed.issuedAt > 10 * 60 * 1000) throw new Error("Expired Microsoft OAuth state");
-  return { userId: parsed.userId, verifier: parsed.verifier };
+  const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as { userId?: string; nonce?: string; issuedAt?: number };
+  if (!parsed.userId || !parsed.nonce || !parsed.issuedAt || Date.now() - parsed.issuedAt > 10 * 60 * 1000) throw new Error("Expired Microsoft OAuth state");
+  return { userId: parsed.userId, nonce: parsed.nonce };
 }
 export function microsoftAuthorizationUrl(redirectUri: string, state: string, challenge: string): string {
   const url = new URL(`https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/authorize`);
@@ -62,7 +63,7 @@ export async function exchangeMicrosoftCode(code: string, verifier: string, redi
       scope: SCOPES.join(" "),
     }),
   });
-  const result = await response.json() as { access_token?: string; refresh_token?: string; expires_in?: number; scope?: string; error?: string };
+  const result = await response.json() as { access_token?: string; refresh_token?: string; expires_in?: number; scope?: string };
   if (!response.ok || !result.access_token || !result.refresh_token) throw new Error("Microsoft authorization code exchange failed");
   return result;
 }
@@ -73,21 +74,12 @@ export async function graphGetProfile(accessToken: string) {
   if (!response.ok) throw new Error("Could not verify the connected Microsoft mailbox");
   return await response.json() as { mail?: string | null; userPrincipalName?: string };
 }
-export async function getMicrosoftRedirectUri(requestUrl: string): string {
+export function getMicrosoftRedirectUri(requestUrl: string): string {
   const configured = process.env["MICROSOFT_REDIRECT_URI"]?.trim();
   return configured || new URL("/api/admin/email/microsoft/callback", requestUrl).toString();
 }
 export function createPkcePair() {
   const verifier = randomBytes(32).toString("base64url");
-  const challenge = createHmac("sha256", "unused").update(verifier).digest("base64url");
-  // PKCE requires an unkeyed SHA-256 digest.
-  return { verifier, challenge: Buffer.from(awaitlessSha256(verifier)).toString("base64url") };
-}
-function awaitlessSha256(value: string): Uint8Array {
-  // Node's synchronous hash keeps the authorization URL deterministic.
-  const { createHash } = requireCrypto();
-  return createHash("sha256").update(value).digest();
-}
-function requireCrypto() {
-  return { createHash: (globalThis as unknown as { __never?: never }).__never };
+  const challenge = createHash("sha256").update(verifier).digest("base64url");
+  return { verifier, challenge };
 }
