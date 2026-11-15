@@ -57,12 +57,10 @@ async function syncAdminEmailInbox(
     const uniqueMessages = [
       ...new Map(result.messages.map((message) => [message.provider_message_id, message])).values(),
     ];
-    const { error: upsertError } = await db
-      .from("admin_email_messages")
-      .upsert(uniqueMessages, {
-        onConflict: "provider_message_id",
-        ignoreDuplicates: false,
-      });
+    const { error: upsertError } = await db.from("admin_email_messages").upsert(uniqueMessages, {
+      onConflict: "provider_message_id",
+      ignoreDuplicates: false,
+    });
     if (upsertError) throw new Error("Could not save synchronized admin email messages");
   }
 
