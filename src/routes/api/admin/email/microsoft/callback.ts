@@ -56,7 +56,9 @@ export const Route = createFileRoute("/api/admin/email/microsoft/callback")({
             getMicrosoftRedirectUri(request.url),
           );
           const profile = await graphGetProfile(tokens.access_token);
-          const mailboxEmail = (profile.mail || profile.userPrincipalName || "").trim().toLowerCase();
+          const mailboxEmail = (profile.mail || profile.userPrincipalName || "")
+            .trim()
+            .toLowerCase();
           if (!mailboxEmail || !mailboxEmail.includes("@")) {
             throw new Error("Microsoft mailbox address is unavailable");
           }
@@ -72,7 +74,9 @@ export const Route = createFileRoute("/api/admin/email/microsoft/callback")({
             mailbox_email: mailboxEmail,
             connected_by: verified.userId,
             refresh_token_encrypted: encryptMicrosoftToken(tokens.refresh_token),
-            token_expires_at: new Date(Date.now() + (tokens.expires_in ?? 3600) * 1000).toISOString(),
+            token_expires_at: new Date(
+              Date.now() + (tokens.expires_in ?? 3600) * 1000,
+            ).toISOString(),
             scopes: (tokens.scope ?? "").split(" ").filter(Boolean),
             updated_at: new Date().toISOString(),
             revoked_at: null,
