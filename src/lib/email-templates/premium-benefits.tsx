@@ -12,7 +12,6 @@ import {
   Text,
 } from "@react-email/components";
 
-import symbolLight from "@/assets/evoluir-symbol-light.webp";
 import type { TemplateEntry } from "./registry";
 
 const SITE = "https://evoluirmaisenglishai.com/premium";
@@ -85,11 +84,18 @@ export function PremiumBenefitsEmail({ studentName = "" }: PremiumBenefitsProps)
             }}
           >
             <Img
-              src={symbolLight}
-              alt="Evoluir+ English AI"
-              width="42"
-              height="42"
-              style={{ display: "block", margin: "0 auto 10px" }}
+              src="https://raw.githubusercontent.com/mnicodemos/evoluir-english-ai/main/src/assets/evoluir-symbol-light.webp"
+              alt="Símbolo Evoluir+ English AI"
+              width="28"
+              height="56"
+              style={{
+                display: "block",
+                width: "28px",
+                height: "56px",
+                objectFit: "contain",
+                backgroundColor: "transparent",
+                margin: "0 auto 10px",
+              }}
             />
             <Text
               style={{
@@ -228,7 +234,7 @@ export function PremiumBenefitsEmail({ studentName = "" }: PremiumBenefitsProps)
               </a>
             </Text>
             <Text style={{ color: "#879493", fontSize: 11, letterSpacing: "0.5px", margin: 0 }}>
-              Your progress. Your possibilities.
+              Sua evolução. Suas possibilidades.
             </Text>
             <Text style={{ color: "#a0abaa", fontSize: 10, margin: "7px 0 0" }}>
               © Evoluir+ English AI. Todos os direitos reservados.
