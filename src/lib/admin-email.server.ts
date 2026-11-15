@@ -214,13 +214,13 @@ export function classifyAdminMailbox(recipients: string[]): "contact" | "support
 
 function htmlToText(value: string): string {
   return value
-    .replace(/<style[\\s\\S]*?<\\/style>/gi, " ")
-    .replace(/<script[\\s\\S]*?<\\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
     .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
+    .replace(/[ \t\r\n]+/g, " ")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'")
     .replace(/[ \\t\\r\\n]+/g, " ")
