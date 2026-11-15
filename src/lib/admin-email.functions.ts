@@ -200,10 +200,17 @@ export const syncAdminEmailInbox = createServerFn({ method: "POST" })
           ignoreDuplicates: false,
         });
       if (upsertError) {
+        const databaseMessage =
+          typeof upsertError.message === "string"
+            ? upsertError.message.replace(/[\\r\\n]+/g, " ").slice(0, 500)
+            : "Database rejected the message batch";
         console.error("[admin-email] Failed to persist synchronized messages", {
           code: upsertError.code,
+          message: databaseMessage,
         });
-        throw new Error("O Microsoft recebeu as mensagens, mas o banco não conseguiu salvá-las.");
+        throw new Error(
+          `Falha ao salvar mensagens no banco (${upsertError.code ?? "sem código"}): ${databaseMessage}`,
+        );
       }
     }
 
