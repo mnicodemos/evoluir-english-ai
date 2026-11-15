@@ -43,6 +43,8 @@ import { uiPt } from "@/lib/uiDictionary";
 import { graphitePanelClass } from "@/lib/surfaces";
 import { cn } from "@/lib/utils";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
+import { useServerFn } from "@tanstack/react-start";
+import { isAdminUser } from "@/lib/admin.functions";
 import {
   getFocusInvitationEnabled,
   setFocusInvitationEnabled,
@@ -215,6 +217,13 @@ export function ProfileMenu({
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
   const { data: profile } = useProfile();
+  const checkAdmin = useServerFn(isAdminUser);
+  const { data: adminAccess } = useQuery({
+    queryKey: ["admin-access"],
+    queryFn: () => checkAdmin(),
+    staleTime: 5 * 60 * 1000,
+  });
+  const isAdmin = adminAccess?.isAdmin === true;
   const push = usePushNotifications();
   const { data: avatarUrl } = useAvatarUrl(profile?.avatar_path);
   const [open, setOpen] = useState(false);
@@ -411,8 +420,6 @@ export function ProfileMenu({
   const inCard = presentation !== "icon";
 
   // The button that opens the profile (the card's top row, or an icon).
-  // This existing JSX block has legacy indentation that conflicts with Prettier.
-  /* eslint-disable prettier/prettier */
   const triggerButton = (
     <Button
       variant="ghost"
@@ -448,33 +455,33 @@ export function ProfileMenu({
               <span
                 className={cn(
                   "mt-1 inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-bold leading-none",
-                  profileIsPremium(profile)
+                  isAdmin
+                    ? "bg-primary text-primary-foreground"
+                    : profileIsPremium(profile)
                     ? "bg-warning text-warning-foreground"
                     : "bg-sidebar-accent text-sidebar-foreground/70",
                 )}
               >
-                {profileIsPremium(profile) ? "Premium" : "Free"}
+                {isAdmin ? "Admin" : profileIsPremium(profile) ? "Premium" : "Free"}
               </span>
             )}
           </span>
           <ArrowRight
             className="size-4 shrink-0 text-sidebar-foreground/60 transition-colors group-hover:translate-x-0.5 group-hover:text-sidebar-foreground"
             strokeWidth={2.25}
-                    aria-hidden="true"
-                  />
+            aria-hidden="true"
+          />
         </>
       )}
     </Button>
   );
-  /* eslint-enable prettier/prettier */
 
   // The form itself, shared by the desktop popover and the phone dialog.
-  /* eslint-disable prettier/prettier */
   const form = (
     <>
-<div className="space-y-5">
-  <div className="flex items-center gap-4">
-    <ProfilePhoto
+      <div className="space-y-5">
+        <div className="flex items-center gap-4">
+          <ProfilePhoto
             src={photo}
             alt={displayName}
             className="size-16"
@@ -706,7 +713,6 @@ export function ProfileMenu({
       </div>
     </>
   );
-  /* eslint-enable prettier/prettier */
 
   // The photo/name row is the only profile entry point; language is the only
   // control in the lower row.
