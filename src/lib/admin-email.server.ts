@@ -319,7 +319,10 @@ export async function sendAdminEmailReply(input: {
         : {}),
     }),
   });
-  const payload = (await response.json().catch(() => null)) as { id?: string; message?: string } | null;
+  const payload = (await response.json().catch(() => null)) as {
+    id?: string;
+    message?: string;
+  } | null;
   if (!response.ok || !payload?.id) {
     throw new Error(
       payload?.message
