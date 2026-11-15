@@ -16,9 +16,7 @@ interface SendTemplateEmailSuppressed {
   reason: "recipient_suppressed";
 }
 
-export type SendTemplateEmailResult =
-  | SendTemplateEmailSent
-  | SendTemplateEmailSuppressed;
+export type SendTemplateEmailResult = SendTemplateEmailSent | SendTemplateEmailSuppressed;
 
 export interface SendTemplateEmailOptions {
   templateData?: Record<string, unknown>;
