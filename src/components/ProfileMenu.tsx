@@ -458,8 +458,8 @@ export function ProfileMenu({
                   isAdmin
                     ? "bg-primary text-primary-foreground"
                     : profileIsPremium(profile)
-                      ? "bg-warning text-warning-foreground"
-                      : "bg-sidebar-accent text-sidebar-foreground/70",
+                    ? "bg-warning text-warning-foreground"
+                    : "bg-sidebar-accent text-sidebar-foreground/70",
                 )}
               >
                 {isAdmin ? "Admin" : profileIsPremium(profile) ? "Premium" : "Free"}
