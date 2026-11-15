@@ -301,7 +301,7 @@ export async function sendAdminEmailReply(input: {
   body: string;
   inReplyTo?: string | null;
 }): Promise<{ id: string }> {
-  const apiKey = required("RESEND_API_KEY");
+  const apiKey = required("RESEND_ADMIN_EMAIL_API_KEY");
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
