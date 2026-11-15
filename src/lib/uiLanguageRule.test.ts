@@ -22,6 +22,8 @@ const SKIP_FILES = [
   /routes\/(terms|privacy|legal|contact)[^/]*\.tsx$/,
   /components\/Legal[A-Za-z]*\.tsx$/,
   /components\/home\//,
+  // Transactional email templates are not student-screen UI; copy may be Portuguese-only.
+  /lib\/email-templates\/(premium-benefits|welcome)\.tsx$/,
   /\.test\.tsx$/,
 ];
 /** Brand names, units and symbols read the same in both languages. */
