@@ -14,7 +14,7 @@ export const Route = createFileRoute("/api/public/cron/admin-email-sync")({
     handlers: {
       POST: async ({ request }) => {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const provided = /^Bearer (\\S+)$/.exec(request.headers.get("authorization") ?? "")?.[1];
+        const provided = /^Bearer (\S+)$/.exec(request.headers.get("authorization") ?? "")?.[1];
         const { data: keyRow } = await supabaseAdmin
           .from("push_cron_key")
           .select("key")
