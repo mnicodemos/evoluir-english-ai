@@ -407,8 +407,6 @@ export function ProfileMenu({
   const displayName = profile?.name || profile?.email || "User";
   const photo = avatarPreview ?? avatarUrl ?? undefined;
 
-  /* eslint-enable prettier/prettier */
-
   // Desktop sidebar and phone menu share one profile card (user request).
   const inCard = presentation !== "icon";
 
@@ -471,7 +469,6 @@ export function ProfileMenu({
   /* eslint-enable prettier/prettier */
 
   // The form itself, shared by the desktop popover and the phone dialog.
-  /* eslint-disable prettier/prettier */
   const form = (
     <>
 <div className="space-y-5">
@@ -708,6 +705,7 @@ export function ProfileMenu({
       </div>
     </>
   );
+  /* eslint-enable prettier/prettier */
 
   // The photo/name row is the only profile entry point; language is the only
   // control in the lower row.
