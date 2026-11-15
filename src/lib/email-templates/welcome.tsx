@@ -12,7 +12,6 @@ import {
   Text,
 } from "@react-email/components";
 
-import symbolLight from "@/assets/evoluir-symbol-light.webp";
 import type { TemplateEntry } from "./registry";
 
 const SITE = "https://evoluirmaisenglishai.com/dashboard";
@@ -53,7 +52,7 @@ const COPY = {
       "Você não precisa aprender tudo de uma vez. Um passo consistente de cada vez faz a diferença.",
     sign: "Conte com a gente nessa jornada.\nEquipe Evoluir+ English AI",
     help: "Precisa de ajuda? Fale conosco:",
-    footer: "Your progress. Your possibilities.",
+    footer: "Sua evolução. Suas possibilidades.",
   },
   en: {
     preview: "Your English learning journey starts now!",
@@ -82,9 +81,10 @@ const COPY = {
   },
 } as const;
 
-export function WelcomeEmail({ lang = "pt", studentName = "" }: WelcomeEmailProps) {
-  const t = COPY[lang] ?? COPY.pt;
-  const name = studentName.trim() || (lang === "pt" ? "estudante" : "student");
+export function WelcomeEmail({ studentName = "" }: WelcomeEmailProps) {
+  // The welcome email is always sent in Portuguese, regardless of the UI language.
+  const t = COPY.pt;
+  const name = studentName.trim() || "estudante";
 
   return (
     <Html>
@@ -114,7 +114,7 @@ export function WelcomeEmail({ lang = "pt", studentName = "" }: WelcomeEmailProp
             }}
           >
             <Img
-              src={symbolLight}
+              src="https://raw.githubusercontent.com/mnicodemos/evoluir-english-ai/main/src/assets/evoluir-symbol-light.webp"
               alt="Evoluir+ English AI"
               width="42"
               height="42"
@@ -275,8 +275,6 @@ export const template = {
   component: WelcomeEmail,
   displayName: "Student welcome",
   subject: (data: Record<string, unknown>) =>
-    data["lang"] === "en"
-      ? "Welcome to Evoluir+ English AI!"
-      : "Bem-vindo(a) ao Evoluir+ | Sua jornada em inglês começa agora",
+    "Bem-vindo(a) ao Evoluir+ | Sua jornada em inglês começa agora",
   previewData: { lang: "pt", studentName: "Ana" },
 } satisfies TemplateEntry;
