@@ -7,7 +7,9 @@ import { assertAppEmailAllowed } from "./send-policy";
 const SITE_NAME = "Evoluir+ English AI";
 const DEFAULT_FROM_EMAIL = "noreply@notify.evoluirmaisenglishai.com";
 
-export type SendTemplateEmailResult = { sent: true } | { sent: false; reason: "recipient_suppressed" };
+export type SendTemplateEmailResult =
+  | { sent: true }
+  | { sent: false; reason: "recipient_suppressed" };
 
 export interface SendTemplateEmailOptions {
   templateData?: Record<string, unknown>;
@@ -55,9 +57,7 @@ export async function sendTemplateEmail(
 
   const configuredFrom = process.env["RESEND_FROM_EMAIL"] || DEFAULT_FROM_EMAIL;
   // Accept either a bare email address or a complete "Name <email>" header.
-  const from = configuredFrom.includes("<")
-    ? configuredFrom
-    : `${SITE_NAME} <${configuredFrom}>`;
+  const from = configuredFrom.includes("<") ? configuredFrom : `${SITE_NAME} <${configuredFrom}>`;
   const replyTo = options.replyTo || process.env["RESEND_REPLY_TO"];
   const idempotencyKey = options.idempotencyKey || crypto.randomUUID();
 
