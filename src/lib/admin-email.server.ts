@@ -157,6 +157,7 @@ export async function exchangeMicrosoftCode(
   const result = await tokenRequest(
     new URLSearchParams({
       client_id: CLIENT_ID,
+      client_secret: required("MICROSOFT_CLIENT_SECRET"),
       grant_type: "authorization_code",
       code,
       redirect_uri: redirectUri,
@@ -172,6 +173,7 @@ export async function refreshMicrosoftToken(refreshToken: string) {
   const result = await tokenRequest(
     new URLSearchParams({
       client_id: CLIENT_ID,
+      client_secret: required("MICROSOFT_CLIENT_SECRET"),
       grant_type: "refresh_token",
       refresh_token: refreshToken,
       scope: SCOPES.join(" "),
