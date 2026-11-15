@@ -376,7 +376,8 @@ export const getAdminEmailReplyHistory = createServerFn({ method: "GET" })
 /** Lightweight unread count for the admin home header; no message bodies leave the server. */
 export const getAdminEmailUnreadCount = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator((input: { mailbox: "contact" | "support" }) => input)
+  .handler(async ({ context, data }) => {
     await assertAdmin(context.supabase, context.userId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin email tables are managed by Lovable Cloud migrations
     const db = context.supabase as any;
@@ -384,7 +385,7 @@ export const getAdminEmailUnreadCount = createServerFn({ method: "GET" })
       .from("admin_email_messages")
       .select("id", { count: "exact", head: true })
       .eq("is_read", false)
-      .neq("mailbox", "unknown");
+      .eq("mailbox", data.mailbox);
     if (error) throw new Error("Não foi possível consultar as notificações de e-mail.");
     return { unread: count ?? 0 };
   });
