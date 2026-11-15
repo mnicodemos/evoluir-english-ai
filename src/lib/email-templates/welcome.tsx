@@ -44,10 +44,7 @@ const COPY = {
         "Prática integrada",
         "Pratique vocabulário, gramática, leitura, escrita, compreensão e conversação.",
       ],
-      [
-        "Evolução acompanhada",
-        "Entenda seu progresso e descubra quais são os próximos passos.",
-      ],
+      ["Evolução acompanhada", "Entenda seu progresso e descubra quais são os próximos passos."],
     ],
     nextTitle: "Seu próximo passo",
     next: "Acesse sua plataforma, conheça seu ambiente de aprendizagem e comece pela atividade recomendada para você.",
@@ -67,10 +64,7 @@ const COPY = {
     sectionTitle: "An experience that evolves with you",
     features: [
       ["Personalized learning", "Lessons and activities adapted to your level and pace."],
-      [
-        "AI Teacher",
-        "Intelligent guidance to practise, ask questions and build confidence.",
-      ],
+      ["AI Teacher", "Intelligent guidance to practise, ask questions and build confidence."],
       [
         "Integrated practice",
         "Practise vocabulary, grammar, reading, writing, listening and speaking.",
