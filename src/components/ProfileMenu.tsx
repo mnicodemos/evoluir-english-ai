@@ -458,8 +458,8 @@ export function ProfileMenu({
           <ArrowRight
             className="size-4 shrink-0 text-sidebar-foreground/60 transition-colors group-hover:translate-x-0.5 group-hover:text-sidebar-foreground"
             strokeWidth={2.25}
-                  aria-hidden="true"
-                />
+                    aria-hidden="true"
+                  />
         </>
       )}
     </Button>
@@ -468,9 +468,9 @@ export function ProfileMenu({
   // The form itself, shared by the desktop popover and the phone dialog.
   const form = (
     <>
-    <div className="space-y-5">
-      <div className="flex items-center gap-4">
-        <ProfilePhoto
+<div className="space-y-5">
+  <div className="flex items-center gap-4">
+    <ProfilePhoto
             src={photo}
             alt={displayName}
             className="size-16"
