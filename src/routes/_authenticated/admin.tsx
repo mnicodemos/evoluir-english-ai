@@ -41,6 +41,10 @@ import { uiPt } from "@/lib/uiDictionary";
 import { useUiLang } from "@/lib/uiLang";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    folder: search.folder === "communication" ? "communication" : undefined,
+    tab: search.tab === "inbox" ? "inbox" : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Admin panel - Evoluir+ English AI" },
@@ -59,12 +63,19 @@ export const Route = createFileRoute("/_authenticated/admin")({
 
 function AdminPage() {
   const { lang } = useUiLang();
+  const search = Route.useSearch();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
   const navigate = useNavigate();
   const [sentrySent, setSentrySent] = useState(false);
   const [folder, setFolder] = useState<AdminFolder>("students");
   // Read after mount: the server render has no storage.
-  useEffect(() => setFolder(readFolder()), []);
+  useEffect(() => {
+    if (search.folder) {
+      setFolder(search.folder);
+      return;
+    }
+    setFolder(readFolder());
+  }, [search.folder]);
   const chooseFolder = (value: string) => {
     const next = ADMIN_FOLDERS.some((item) => item.value === value)
       ? (value as AdminFolder)
@@ -282,6 +293,7 @@ function AdminPage() {
 
             <TabsContent value="communication" className="mt-4">
               <FolderTabs
+                defaultValue={search.tab === "inbox" ? "inbox" : undefined}
                 tabs={[
                   { value: "push", label: t("Push") },
                   { value: "emails", label: t("Email campaigns") },
@@ -365,12 +377,14 @@ function readFolder(): AdminFolder {
 function FolderTabs({
   tabs,
   children,
+  defaultValue,
 }: {
   tabs: { value: string; label: string }[];
   children: ReactNode;
+  defaultValue?: string;
 }) {
   return (
-    <Tabs defaultValue={tabs[0]!.value} className="min-w-0">
+    <Tabs defaultValue={defaultValue ?? tabs[0]!.value} className="min-w-0">
       {tabs.length > 1 ? (
         <TabsList className="flex h-auto w-full flex-wrap gap-1 sm:w-auto">
           {tabs.map((tab) => (
