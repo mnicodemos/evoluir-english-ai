@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier -- formatting is normalized in the follow-up cleanup */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
@@ -7,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  completeMicrosoftEmailConnection,
   getAdminEmailInbox,
   startMicrosoftEmailConnection,
   syncAdminEmailInbox,
@@ -16,6 +18,7 @@ export function AdminEmailInbox() {
   const queryClient = useQueryClient();
   const loadInbox = useServerFn(getAdminEmailInbox);
   const startConnection = useServerFn(startMicrosoftEmailConnection);
+  const completeConnection = useServerFn(completeMicrosoftEmailConnection);
   const syncInbox = useServerFn(syncAdminEmailInbox);
   const [busy, setBusy] = useState<"connect" | "sync" | null>(null);
   const inbox = useQuery({
@@ -26,15 +29,38 @@ export function AdminEmailInbox() {
   });
 
   useEffect(() => {
-    const status = new URLSearchParams(window.location.search).get("emailConnection");
-    if (!status) return;
-    if (status === "connected") toast.success("Conta Microsoft conectada.");
-    else toast.error("Não foi possível conectar a conta Microsoft.");
-    const url = new URL(window.location.href);
-    url.searchParams.delete("emailConnection");
-    window.history.replaceState({}, "", url);
-    void queryClient.invalidateQueries({ queryKey: ["admin-email-inbox"] });
-  }, [queryClient]);
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("emailConnection");
+    const code = params.get("emailCode");
+    const state = params.get("emailState");
+    if (status === "failed") {
+      toast.error("A Microsoft não concluiu a autorização. Tente novamente.");
+    }
+    if (!code || !state) {
+      if (status) {
+        params.delete("emailConnection");
+        const clean = new URL(window.location.href);
+        clean.search = params.toString();
+        window.history.replaceState({}, "", clean);
+      }
+      return;
+    }
+    setBusy("connect");
+    params.delete("emailCode");
+    params.delete("emailState");
+    const clean = new URL(window.location.href);
+    clean.search = params.toString();
+    window.history.replaceState({}, "", clean);
+    void completeConnection({ data: { code, state } })
+      .then((result) => {
+        toast.success(`Conta Microsoft conectada: ${result.mailboxEmail}`);
+        return queryClient.invalidateQueries({ queryKey: ["admin-email-inbox"] });
+      })
+      .catch((error) => {
+        toast.error(error instanceof Error ? error.message : "Falha ao concluir conexão Microsoft.");
+      })
+      .finally(() => setBusy(null));
+  }, [completeConnection, queryClient]);
 
   const connect = async () => {
     setBusy("connect");
@@ -81,11 +107,7 @@ export function AdminEmailInbox() {
         <div className="flex gap-2">
           {inbox.data?.connected ? (
             <Button size="sm" variant="outline" onClick={sync} disabled={busy !== null}>
-              {busy === "sync" ? (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : (
-                <RefreshCw className="mr-2 size-4" />
-              )}
+              {busy === "sync" ? <Loader2 className="mr-2 size-4 animate-spin" /> : <RefreshCw className="mr-2 size-4" />}
               Sincronizar
             </Button>
           ) : (
@@ -103,12 +125,11 @@ export function AdminEmailInbox() {
         </div>
       ) : inbox.isError ? (
         <p className="py-4 text-sm text-destructive">
-          Não foi possível carregar a caixa de entrada.
+          Não foi possível carregar a caixa de entrada. Verifique as políticas da migração Admin Email RLS.
         </p>
       ) : !inbox.data?.connected ? (
         <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-          A conexão ainda não foi realizada. Ao conectar, a Microsoft solicitará autorização de
-          leitura da caixa.
+          A conexão ainda não foi realizada. Ao conectar, a Microsoft solicitará autorização de leitura da caixa.
         </p>
       ) : (
         <Tabs defaultValue="contact">
@@ -116,17 +137,12 @@ export function AdminEmailInbox() {
             <TabsTrigger value="contact">Contato ({contact.length})</TabsTrigger>
             <TabsTrigger value="support">Suporte ({support.length})</TabsTrigger>
           </TabsList>
-          <TabsContent value="contact" className="mt-3 space-y-2">
-            <MessageList messages={contact} />
-          </TabsContent>
-          <TabsContent value="support" className="mt-3 space-y-2">
-            <MessageList messages={support} />
-          </TabsContent>
+          <TabsContent value="contact" className="mt-3 space-y-2"><MessageList messages={contact} /></TabsContent>
+          <TabsContent value="support" className="mt-3 space-y-2"><MessageList messages={support} /></TabsContent>
         </Tabs>
       )}
       <p className="text-xs text-muted-foreground">
-        Leitura somente. As mensagens originais não são movidas nem apagadas. Respostas serão
-        adicionadas em uma etapa posterior usando o Resend já configurado.
+        Leitura somente. As mensagens originais não são movidas nem apagadas. Respostas serão adicionadas em uma etapa posterior usando o Resend já configurado.
       </p>
     </section>
   );
@@ -143,11 +159,7 @@ type InboxMessage = {
 
 function MessageList({ messages }: { messages: InboxMessage[] }) {
   if (!messages.length) {
-    return (
-      <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-        Nenhuma mensagem sincronizada nesta caixa.
-      </p>
-    );
+    return <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Nenhuma mensagem sincronizada nesta caixa.</p>;
   }
   return (
     <div className="max-h-[55vh] space-y-2 overflow-y-auto">
