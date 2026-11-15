@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
   BookMarked,
+  CircleHelp,
   BookOpen,
   BookOpenText,
   Briefcase,
@@ -140,6 +141,7 @@ const browserPageTitles: Array<[string, string]> = [
   ["/call", "Video call"],
   ["/teacher", "AI Teacher"],
   ["/guide", "App guide"],
+  ["/help", "Help center"],
   ["/premium", "My Subscription"],
   ["/business", "Business English"],
   ["/league", "Weekly league"],
@@ -321,6 +323,17 @@ export function MobileNavigationMenu({
             >
               <BookMarked className="size-5 shrink-0 text-sky-400" />
               <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
+            </Link>
+          </SheetClose>
+          <SheetClose asChild>
+            <Link
+              to="/help"
+              className="flex h-11 w-full min-w-0 items-center gap-2 rounded-lg px-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              activeProps={{ className: "text-brand-green" }}
+              inactiveProps={{ className: "text-sidebar-foreground/70" }}
+            >
+              <CircleHelp className="size-5 shrink-0 text-sky-400" />
+              <span className="min-w-0 truncate text-left">{translate("Help center")}</span>
             </Link>
           </SheetClose>
           <SheetClose asChild>
@@ -668,6 +681,15 @@ function AppShellContent({
                 >
                   <BookMarked className="size-5 shrink-0 text-sky-400" />
                   <span className="min-w-0 truncate text-left">{translate("App guide")}</span>
+                </Link>
+                <Link
+                  to="/help"
+                  className="flex h-11 min-w-0 items-center gap-2 rounded-lg px-2 text-sm font-medium transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  activeProps={{ className: "text-brand-green" }}
+                  inactiveProps={{ className: "text-sidebar-foreground/70" }}
+                >
+                  <CircleHelp className="size-5 shrink-0 text-sky-400" />
+                  <span className="min-w-0 truncate text-left">{translate("Help center")}</span>
                 </Link>
                 <Link
                   to="/premium"
