@@ -82,6 +82,12 @@ export function Footer({
               >
                 {t.privacy}
               </Link>
+              <Link
+                to="/help"
+                className="transition-colors hover:text-foreground dark:hover:text-white"
+              >
+                {lang === "pt" ? "Central de Ajuda" : "Help Center"}
+              </Link>
               <a
                 href="mailto:contato@evoluirmaisenglishai.com"
                 className="transition-colors hover:text-foreground dark:hover:text-white"
@@ -185,6 +191,12 @@ export function Footer({
               className="transition-colors hover:text-foreground dark:hover:text-white"
             >
               {t.privacy}
+            </Link>
+            <Link
+              to="/help"
+              className="transition-colors hover:text-foreground dark:hover:text-white"
+            >
+              {lang === "pt" ? "Central de Ajuda" : "Help Center"}
             </Link>
           </div>
         </div>
