@@ -20,6 +20,7 @@ import { AdminAiCostByActivity } from "@/components/AdminAiCostByActivity";
 import { AdminFinancialProjection } from "@/components/AdminFinancialProjection";
 import { AdminPushTest } from "@/components/AdminPushTest";
 import { AdminEmailCampaigns } from "@/components/AdminEmailCampaigns";
+import { AdminEmailInbox } from "@/components/AdminEmailInbox";
 import { AdminLessonCompare } from "@/components/AdminLessonCompare";
 import { AdminLevelIntroVideos } from "@/components/AdminLevelIntroVideos";
 import { AdminLessonAudioPrep } from "@/components/AdminLessonAudioPrep";
@@ -284,6 +285,7 @@ function AdminPage() {
                 tabs={[
                   { value: "push", label: t("Push") },
                   { value: "emails", label: t("Email campaigns") },
+                  { value: "inbox", label: t("Inbox") },
                 ]}
               >
                 <TabsContent value="push">
@@ -291,6 +293,9 @@ function AdminPage() {
                 </TabsContent>
                 <TabsContent value="emails">
                   <AdminEmailCampaigns />
+                </TabsContent>
+                <TabsContent value="inbox">
+                  <AdminEmailInbox />
                 </TabsContent>
               </FolderTabs>
             </TabsContent>

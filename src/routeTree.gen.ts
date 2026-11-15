@@ -43,6 +43,7 @@ import { Route as ApiCoachStreamRouteImport } from './routes/api/coach-stream'
 import { Route as ApiMusicRouteImport } from './routes/api/music'
 import { Route as ApiSpeechRouteImport } from './routes/api/speech'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
+import { Route as ApiAdminEmailMicrosoftCallbackRouteImport } from './routes/api/admin/email/microsoft/callback'
 import { Route as AuthenticatedLearningIndexRouteImport } from './routes/_authenticated/learning/index'
 import { Route as AuthenticatedLearningLessonIdRouteImport } from './routes/_authenticated/learning/$lessonId'
 import { Route as AuthenticatedLearningFinalTestRouteImport } from './routes/_authenticated/learning/final-test'
@@ -230,6 +231,11 @@ const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
   path: '/api/transcribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminEmailMicrosoftCallbackRoute = ApiAdminEmailMicrosoftCallbackRouteImport.update({
+  id: '/api/admin/email/microsoft/callback',
+  path: '/api/admin/email/microsoft/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedLearningIndexRoute =
   AuthenticatedLearningIndexRouteImport.update({
     id: '/learning/',
@@ -371,6 +377,7 @@ export interface FileRoutesByFullPath {
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/api/admin/email/microsoft/callback': typeof ApiAdminEmailMicrosoftCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -422,6 +429,7 @@ export interface FileRoutesByTo {
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/api/admin/email/microsoft/callback': typeof ApiAdminEmailMicrosoftCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -475,6 +483,7 @@ export interface FileRoutesById {
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/api/admin/email/microsoft/callback': typeof ApiAdminEmailMicrosoftCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -528,6 +537,7 @@ export interface FileRouteTypes {
     | '/api/public/stripe/webhook'
     | '/api/public/whatsapp/webhook'
     | '/lovable/email/transactional/preview'
+    | '/api/admin/email/microsoft/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -578,7 +588,8 @@ export interface FileRouteTypes {
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/api/public/whatsapp/webhook'
-    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/preview'    | '/api/admin/email/microsoft/callback'
+
   id:
     | '__root__'
     | '/'
@@ -646,6 +657,7 @@ export interface RootRouteChildren {
   ApiMusicRoute: typeof ApiMusicRoute
   ApiSpeechRoute: typeof ApiSpeechRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
+  ApiAdminEmailMicrosoftCallbackRoute: typeof ApiAdminEmailMicrosoftCallbackRoute
   ApiPublicCronDailyPushRoute: typeof ApiPublicCronDailyPushRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicWhatsappWebhookRoute: typeof ApiPublicWhatsappWebhookRoute
@@ -892,6 +904,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTranscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/email/microsoft/callback': {
+      id: '/api/admin/email/microsoft/callback'
+      path: '/api/admin/email/microsoft/callback'
+      fullPath: '/api/admin/email/microsoft/callback'
+      preLoaderRoute: typeof ApiAdminEmailMicrosoftCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/learning/': {
       id: '/_authenticated/learning/'
       path: '/learning'
@@ -1097,6 +1116,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiMusicRoute: ApiMusicRoute,
   ApiSpeechRoute: ApiSpeechRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
+  ApiAdminEmailMicrosoftCallbackRoute: ApiAdminEmailMicrosoftCallbackRoute,
   ApiPublicCronDailyPushRoute: ApiPublicCronDailyPushRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicWhatsappWebhookRoute: ApiPublicWhatsappWebhookRoute,
