@@ -39,6 +39,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { FocusHeaderButton } from "@/components/focus/FocusHeaderButton";
+import { AdminEmailHomeNotification } from "@/components/AdminEmailHomeNotification";
 import { ShortsHeaderButton } from "@/components/shorts/ShortsHeaderButton";
 import { CelebrationBurst } from "@/components/CelebrationBurst";
 import { AppShell } from "@/components/AppShell";
@@ -874,6 +875,7 @@ function Dashboard() {
                     <div className="flex h-11 items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1">
                       <WeatherTalk translate={t} placement="desktop" />
                       <FocusHeaderButton translate={t} placement="desktop" />
+                      <AdminEmailHomeNotification />
                       <DashboardNotifications
                         indicators={indicators}
                         reviewCount={reviewCount}
