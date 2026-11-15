@@ -57,7 +57,7 @@ async function syncAdminEmailInbox(supabaseAdmin: typeof import("@/integrations/
     const uniqueMessages = [
       ...new Map(result.messages.map((message) => [message.provider_message_id, message])).values(),
     ];
-    const { error: upsertError } = await supabaseAdmin
+    const { error: upsertError } = await db
       .from("admin_email_messages")
       .upsert(uniqueMessages, {
         onConflict: "provider_message_id",
@@ -66,7 +66,7 @@ async function syncAdminEmailInbox(supabaseAdmin: typeof import("@/integrations/
     if (upsertError) throw new Error("Could not save synchronized admin email messages");
   }
 
-  const { error: updateError } = await supabaseAdmin
+  const { error: updateError } = await db
     .from("admin_email_connections")
     .update({
       refresh_token_encrypted: encryptMicrosoftToken(refreshed.refresh_token),
