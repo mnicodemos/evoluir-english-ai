@@ -4,7 +4,15 @@ import { getRequest } from "@tanstack/react-start/server";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-async function assertAdmin(supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => PromiseLike<{ data: boolean | null; error: unknown }> }, userId: string) {
+async function assertAdmin(
+  supabase: {
+    rpc: (
+      fn: "has_role",
+      args: { _user_id: string; _role: "admin" },
+    ) => PromiseLike<{ data: boolean | null; error: unknown }>;
+  },
+  userId: string,
+) {
   const { data, error } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
   if (error || data !== true) throw new Error("Forbidden");
 }
@@ -36,7 +44,13 @@ export const startMicrosoftEmailConnection = createServerFn({ method: "POST" })
     const request = getRequest();
     if (!request?.url) throw new Error("Request URL unavailable");
     const state = createOAuthState(context.userId, nonce);
-    return { authorizationUrl: microsoftAuthorizationUrl(getMicrosoftRedirectUri(request.url), state, challenge) };
+    return {
+      authorizationUrl: microsoftAuthorizationUrl(
+        getMicrosoftRedirectUri(request.url),
+        state,
+        challenge,
+      ),
+    };
   });
 
 export const getAdminEmailInbox = createServerFn({ method: "GET" })
@@ -54,12 +68,19 @@ export const getAdminEmailInbox = createServerFn({ method: "GET" })
     if (connectionError) throw connectionError;
     const { data: messages, error } = await db
       .from("admin_email_messages")
-      .select("id,mailbox,from_address,to_addresses,subject,body_text,received_at,is_read,provider_conversation_id")
+      .select(
+        "id,mailbox,from_address,to_addresses,subject,body_text,received_at,is_read,provider_conversation_id",
+      )
       .neq("mailbox", "unknown")
       .order("received_at", { ascending: false })
       .limit(100);
     if (error) throw error;
-    return { connected: Boolean(connection), mailboxEmail: connection?.mailbox_email ?? null, updatedAt: connection?.updated_at ?? null, messages: messages ?? [] };
+    return {
+      connected: Boolean(connection),
+      mailboxEmail: connection?.mailbox_email ?? null,
+      updatedAt: connection?.updated_at ?? null,
+      messages: messages ?? [],
+    };
   });
 
 export const syncAdminEmailInbox = createServerFn({ method: "POST" })
@@ -67,7 +88,12 @@ export const syncAdminEmailInbox = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { decryptMicrosoftToken, encryptMicrosoftToken, refreshMicrosoftToken, syncGraphInbox } = await import("@/lib/admin-email.server");
+    const {
+      decryptMicrosoftToken,
+      encryptMicrosoftToken,
+      refreshMicrosoftToken,
+      syncGraphInbox,
+    } = await import("@/lib/admin-email.server");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- service-only tables are intentionally absent from client types
     const db = supabaseAdmin as any;
     const { data: connection, error } = await db
@@ -77,7 +103,9 @@ export const syncAdminEmailInbox = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw error;
     if (!connection) throw new Error("Microsoft mailbox is not connected");
-    const refreshed = await refreshMicrosoftToken(decryptMicrosoftToken(connection.refresh_token_encrypted));
+    const refreshed = await refreshMicrosoftToken(
+      decryptMicrosoftToken(connection.refresh_token_encrypted),
+    );
     const result = await syncGraphInbox(refreshed.access_token, connection.delta_link);
     if (result.messages.length) {
       const { error: upsertError } = await db
@@ -89,7 +117,9 @@ export const syncAdminEmailInbox = createServerFn({ method: "POST" })
       .from("admin_email_connections")
       .update({
         refresh_token_encrypted: encryptMicrosoftToken(refreshed.refresh_token),
-        token_expires_at: new Date(Date.now() + (refreshed.expires_in ?? 3600) * 1000).toISOString(),
+        token_expires_at: new Date(
+          Date.now() + (refreshed.expires_in ?? 3600) * 1000,
+        ).toISOString(),
         delta_link: result.deltaLink ?? connection.delta_link,
         updated_at: new Date().toISOString(),
       })
