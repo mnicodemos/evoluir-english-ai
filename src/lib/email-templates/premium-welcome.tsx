@@ -60,25 +60,37 @@ export function PremiumWelcomeEmail({ lang = "pt", studentName = "" }: Props) {
             overflow: "hidden",
           }}
         >
-          <Section style={{ backgroundColor: "#082f32", padding: "24px 32px", textAlign: "center" }}>
+          <Section
+            style={{
+              backgroundColor: "#082f32",
+              padding: "24px 32px",
+              textAlign: "center",
+            }}
+          >
             <Img
               src="https://evoluirmaisenglishai.com/__l5e/assets-v1/3a38d664-c60e-4a50-9e5a-31f09b278a69/evoluir-logo-official.png"
               alt="Evoluir+ English AI"
               width="92"
               height="132"
-              style={{ display: "block", width: "92px", height: "132px", objectFit: "contain", margin: "0 auto" }}
+              style={{
+                display: "block",
+                width: "92px",
+                height: "132px",
+                objectFit: "contain",
+                margin: "0 auto",
+              }}
             />
           </Section>
           <Section style={{ padding: "28px 32px 32px" }}>
-          <Heading style={{ color: "#111827", fontSize: 24 }}>{t.title}</Heading>
-          <Text>{t.hello(name)}</Text>
-          <Text style={{ color: "#4b5563", lineHeight: "24px" }}>{t.intro}</Text>
+            <Heading style={{ color: "#111827", fontSize: 24 }}>{t.title}</Heading>
+            <Text>{t.hello(name)}</Text>
+            <Text style={{ color: "#4b5563", lineHeight: "24px" }}>{t.intro}</Text>
           {t.benefits.map((x) => (
-            <Text key={x} style={{ color: "#4b5563", fontSize: 14 }}>
-              ✓ {x}
-            </Text>
+              <Text key={x} style={{ color: "#4b5563", fontSize: 14 }}>
+                ✓ {x}
+              </Text>
           ))}
-          <Button
+            <Button
             href="https://evoluirmaisenglishai.com/dashboard"
             style={{
               backgroundColor: "#00cdb3",
@@ -90,7 +102,7 @@ export function PremiumWelcomeEmail({ lang = "pt", studentName = "" }: Props) {
             }}
           >
             {t.cta}
-          </Button>
+            </Button>
           </Section>
         </Container>
       </Body>
