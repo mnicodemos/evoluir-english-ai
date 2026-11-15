@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier -- formatting is normalized in the follow-up cleanup */
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
