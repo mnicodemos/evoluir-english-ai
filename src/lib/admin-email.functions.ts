@@ -88,12 +88,8 @@ export const syncAdminEmailInbox = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     await assertAdmin(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const {
-      decryptMicrosoftToken,
-      encryptMicrosoftToken,
-      refreshMicrosoftToken,
-      syncGraphInbox,
-    } = await import("@/lib/admin-email.server");
+    const { decryptMicrosoftToken, encryptMicrosoftToken, refreshMicrosoftToken, syncGraphInbox } =
+      await import("@/lib/admin-email.server");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- service-only tables are intentionally absent from client types
     const db = supabaseAdmin as any;
     const { data: connection, error } = await db
