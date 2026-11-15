@@ -85,23 +85,23 @@ export function PremiumWelcomeEmail({ lang = "pt", studentName = "" }: Props) {
             <Heading style={{ color: "#111827", fontSize: 24 }}>{t.title}</Heading>
             <Text>{t.hello(name)}</Text>
             <Text style={{ color: "#4b5563", lineHeight: "24px" }}>{t.intro}</Text>
-          {t.benefits.map((x) => (
+            {t.benefits.map((x) => (
               <Text key={x} style={{ color: "#4b5563", fontSize: 14 }}>
                 ✓ {x}
               </Text>
-          ))}
+            ))}
             <Button
-            href="https://evoluirmaisenglishai.com/dashboard"
-            style={{
-              backgroundColor: "#00cdb3",
-              borderRadius: 8,
-              color: "#062b29",
-              display: "inline-block",
-              padding: "13px 22px",
-              textDecoration: "none",
-            }}
-          >
-            {t.cta}
+              href="https://evoluirmaisenglishai.com/dashboard"
+              style={{
+                backgroundColor: "#00cdb3",
+                borderRadius: 8,
+                color: "#062b29",
+                display: "inline-block",
+                padding: "13px 22px",
+                textDecoration: "none",
+              }}
+            >
+              {t.cta}
             </Button>
           </Section>
         </Container>
