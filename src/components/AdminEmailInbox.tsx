@@ -81,7 +81,11 @@ export function AdminEmailInbox() {
         <div className="flex gap-2">
           {inbox.data?.connected ? (
             <Button size="sm" variant="outline" onClick={sync} disabled={busy !== null}>
-              {busy === "sync" ? <Loader2 className="mr-2 size-4 animate-spin" /> : <RefreshCw className="mr-2 size-4" />}
+              {busy === "sync" ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-2 size-4" />
+              )}
               Sincronizar
             </Button>
           ) : (
@@ -98,7 +102,9 @@ export function AdminEmailInbox() {
           <Loader2 className="size-4 animate-spin" /> Carregando caixa de entrada…
         </div>
       ) : inbox.isError ? (
-        <p className="py-4 text-sm text-destructive">Não foi possível carregar a caixa de entrada.</p>
+        <p className="py-4 text-sm text-destructive">
+          Não foi possível carregar a caixa de entrada.
+        </p>
       ) : !inbox.data?.connected ? (
         <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
           A conexão ainda não foi realizada. Ao conectar, a Microsoft solicitará autorização de leitura da caixa.
@@ -134,7 +140,9 @@ type InboxMessage = {
 
 function MessageList({ messages }: { messages: InboxMessage[] }) {
   if (!messages.length) {
-    return <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Nenhuma mensagem sincronizada nesta caixa.</p>;
+    return <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
+      Nenhuma mensagem sincronizada nesta caixa.
+    </p>;
   }
   return (
     <div className="max-h-[55vh] space-y-2 overflow-y-auto">
