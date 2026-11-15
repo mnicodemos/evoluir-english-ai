@@ -5,7 +5,9 @@ import {
   Head,
   Heading,
   Html,
+  Img,
   Preview,
+  Section,
   Text,
 } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
@@ -55,9 +57,19 @@ export function PremiumWelcomeEmail({ lang = "pt", studentName = "" }: Props) {
             borderRadius: 12,
             margin: "24px auto",
             maxWidth: 600,
-            padding: 32,
+            overflow: "hidden",
           }}
         >
+          <Section style={{ backgroundColor: "#082f32", padding: "24px 32px", textAlign: "center" }}>
+            <Img
+              src="https://evoluirmaisenglishai.com/__l5e/assets-v1/3a38d664-c60e-4a50-9e5a-31f09b278a69/evoluir-logo-official.png"
+              alt="Evoluir+ English AI"
+              width="92"
+              height="132"
+              style={{ display: "block", width: "92px", height: "132px", objectFit: "contain", margin: "0 auto" }}
+            />
+          </Section>
+          <Section style={{ padding: "28px 32px 32px" }}>
           <Heading style={{ color: "#111827", fontSize: 24 }}>{t.title}</Heading>
           <Text>{t.hello(name)}</Text>
           <Text style={{ color: "#4b5563", lineHeight: "24px" }}>{t.intro}</Text>
@@ -79,6 +91,7 @@ export function PremiumWelcomeEmail({ lang = "pt", studentName = "" }: Props) {
           >
             {t.cta}
           </Button>
+          </Section>
         </Container>
       </Body>
     </Html>
