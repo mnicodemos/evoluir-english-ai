@@ -213,7 +213,16 @@ export function VoiceCoach({
       });
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [checkpointReady, sessionFinished, finishing, presentation, voiceState, scenario, messages, saveCheckpoint]);
+  }, [
+    checkpointReady,
+    sessionFinished,
+    finishing,
+    presentation,
+    voiceState,
+    scenario,
+    messages,
+    saveCheckpoint,
+  ]);
   useEffect(() => {
     if (!checkpointReady || presentation === "call" || lessonTopic || started.current) return;
     started.current = true;
