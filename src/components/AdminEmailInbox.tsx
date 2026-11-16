@@ -177,7 +177,7 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
         </Tabs>
       )}
       <p className="text-xs text-muted-foreground">
-        As mensagens originais permanecem no Hotmail. As respostas são enviadas pelo Resend e registradas no histórico.
+        As mensagens excluídas são movidas para Itens Excluídos do Hotmail e podem ser recuperadas por lá. As respostas são enviadas pelo Resend e registradas no histórico.
       </p>
     </section>
   );
@@ -246,11 +246,11 @@ function ReplyMessage({
     retry: false,
   });
   const remove = async () => {
-    if (deleting || !window.confirm("Excluir esta mensagem da caixa de entrada?")) return;
+    if (deleting || !window.confirm("Mover esta mensagem para Itens Excluídos do Hotmail? Ela poderá ser recuperada por lá.")) return;
     setDeleting(true);
     try {
       await deleteMessage({ data: { messageId: message.id } });
-      toast.success("Mensagem excluída.");
+      toast.success("Mensagem movida para Itens Excluídos do Hotmail.");
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin-email-inbox"] }),
         queryClient.invalidateQueries({ queryKey: ["admin-email-unread-count"] }),
