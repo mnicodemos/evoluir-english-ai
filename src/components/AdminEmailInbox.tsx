@@ -18,7 +18,7 @@ import {
   deleteAdminEmailMessage,
 } from "@/lib/admin-email.functions";
 
-export function AdminEmailInbox() {
+export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox?: "contact" | "support" }) {
   const queryClient = useQueryClient();
   const loadInbox = useServerFn(getAdminEmailInbox);
   const startConnection = useServerFn(startMicrosoftEmailConnection);
@@ -30,22 +30,17 @@ export function AdminEmailInbox() {
   const removeMessage = useServerFn(deleteAdminEmailMessage);
   const markingReadIds = useRef(new Set<string>());
   const [busy, setBusy] = useState<"connect" | "sync" | null>(null);
-  const [selectedMailbox, setSelectedMailbox] = useState<"contact" | "support">("contact");
+  const [selectedMailbox, setSelectedMailbox] = useState<"contact" | "support">(initialMailbox);
+
+  useEffect(() => {
+    setSelectedMailbox(initialMailbox);
+  }, [initialMailbox]);
   const inbox = useQuery({
     queryKey: ["admin-email-inbox"],
     queryFn: () => loadInbox(),
     staleTime: 15_000,
     retry: false,
   });
-
-  useEffect(() => {
-    const selectFromHash = () => {
-      setSelectedMailbox(window.location.hash === "#support" ? "support" : "contact");
-    };
-    selectFromHash();
-    window.addEventListener("hashchange", selectFromHash);
-    return () => window.removeEventListener("hashchange", selectFromHash);
-  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
