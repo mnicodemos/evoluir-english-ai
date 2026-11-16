@@ -96,6 +96,8 @@ export function AdminEmailCampaigns() {
               <tr className="border-b text-xs text-muted-foreground">
                 <th className="py-2 pr-2">{pt ? "Aluno" : "Student"}</th>
                 <th className="py-2 pr-2">{pt ? "Plano" : "Plan"}</th>
+                <th className="py-2 pr-2">{pt ? "Boas-vindas" : "Welcome status"}</th>
+                <th className="py-2 pr-2">{pt ? "Premium" : "Premium status"}</th>
                 <th className="py-2">{pt ? "Ações" : "Actions"}</th>
               </tr>
             </thead>
@@ -109,12 +111,22 @@ export function AdminEmailCampaigns() {
                   <td className="py-2 pr-2 text-xs">
                     {user.plan === "premium" ? "Premium" : "Free"}
                   </td>
+                  <td className="py-2 pr-2 text-xs text-muted-foreground">
+                    {statusLabel(user.welcomeStatus)}
+                  </td>
+                  <td className="py-2 pr-2 text-xs text-muted-foreground">
+                    {statusLabel(user.premiumStatus)}
+                  </td>
                   <td className="py-2">
                     <div className="flex flex-wrap gap-1.5">
                       <Button
                         size="sm"
                         variant="outline"
-                        disabled={sending !== null}
+                        disabled={
+                          sending !== null ||
+                          user.welcomeStatus?.status === "sent" ||
+                          user.welcomeStatus?.status === "pending"
+                        }
                         onClick={() => void sendEmail(user.id, "welcome")}
                       >
                         {sending === `${user.id}:welcome` ? (
@@ -127,7 +139,12 @@ export function AdminEmailCampaigns() {
                       <Button
                         size="sm"
                         variant="outline"
-                        disabled={sending !== null || user.plan === "premium"}
+                        disabled={
+                          sending !== null ||
+                          user.plan === "premium" ||
+                          user.premiumStatus?.status === "sent" ||
+                          user.premiumStatus?.status === "pending"
+                        }
                         onClick={() => void sendEmail(user.id, "premium-benefits")}
                       >
                         {sending === `${user.id}:premium-benefits` ? (
@@ -143,7 +160,7 @@ export function AdminEmailCampaigns() {
               ))}
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-6 text-center text-sm text-muted-foreground">
+                  <td colSpan={5} className="py-6 text-center text-sm text-muted-foreground">
                     {pt ? "Nenhum aluno encontrado." : "No students found."}
                   </td>
                 </tr>
