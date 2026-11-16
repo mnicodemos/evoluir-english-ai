@@ -309,7 +309,9 @@ function AdminPage() {
                   <AdminEmailCampaigns />
                 </TabsContent>
                 <TabsContent value="inbox">
-                  <AdminEmailInbox initialMailbox={search["mailbox"] === "support" ? "support" : "contact"} />
+                  <AdminEmailInbox
+                    initialMailbox={search["mailbox"] === "support" ? "support" : "contact"}
+                  />
                 </TabsContent>
               </FolderTabs>
             </TabsContent>
