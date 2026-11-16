@@ -479,6 +479,8 @@ export function VoiceCoach({
               callStyle,
             ),
             (delta) => {
+              // Ignore late provider chunks as soon as Finish invalidates this turn.
+              if (!mounted.current || generation !== sessionGeneration.current) return;
               marks.firstTextAt ??= performance.now();
               streamedReply += delta;
               phraseBuffer += delta;
