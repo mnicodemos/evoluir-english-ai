@@ -216,6 +216,7 @@ export function MobileNavigationMenu({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const pathname = useLocation().pathname;
+  const [open, setOpen] = useState(false);
   const normalizedLevel = studentLevel?.trim().toUpperCase();
   const isA1A2 = normalizedLevel === "A1" || normalizedLevel === "A2";
   const isB1ToC2 = ["B1", "B2", "C1", "C2"].includes(normalizedLevel ?? "");
@@ -241,7 +242,7 @@ export function MobileNavigationMenu({
   }
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         {presentation === "bottom-tab" ? (
           <Button
@@ -351,7 +352,12 @@ export function MobileNavigationMenu({
           </SheetClose>
           {/* The same profile card as the desktop sidebar (user request); the
               menu stays open behind the profile dialog. */}
-          <ProfileMenu className="mt-2" presentation="mobile-menu" toolbar={<UtilityButtons />} />
+          <ProfileMenu
+            className="mt-2"
+            presentation="mobile-menu"
+            toolbar={<UtilityButtons />}
+            onAdminNavigate={() => setOpen(false)}
+          />
         </div>
       </SheetContent>
     </Sheet>
