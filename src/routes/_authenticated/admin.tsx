@@ -226,7 +226,9 @@ function AdminPage() {
                   {usersQuery.isPending ? (
                     <div className="py-6 text-sm text-muted-foreground">{t("Loading")}</div>
                   ) : usersQuery.isError ? (
-                    <p className="py-6 text-sm text-muted-foreground">{t("Could not load the users right now.")}</p>
+                    <p className="py-6 text-sm text-muted-foreground">
+                      {t("Could not load the users right now.")}
+                    </p>
                   ) : (
                     <div className="max-h-[60vh] overflow-auto">
                       <table className="w-full text-left text-sm">
@@ -246,7 +248,11 @@ function AdminPage() {
                                 <span className="text-xs text-muted-foreground">{user.email}</span>
                               </td>
                               <td className="py-2 pr-3 whitespace-nowrap text-muted-foreground">
-                                {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString(lang === "pt" ? "pt-BR" : "en-US") : "—"}
+                                {user.lastLoginAt
+                                  ? new Date(user.lastLoginAt).toLocaleString(
+                                      lang === "pt" ? "pt-BR" : "en-US",
+                                    )
+                                  : "—"}
                               </td>
                               <td className="py-2 pr-3 font-medium">{user.currentLevel ?? "—"}</td>
                               <td className="py-2 text-muted-foreground">
