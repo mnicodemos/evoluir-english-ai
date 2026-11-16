@@ -298,26 +298,31 @@ export async function syncGraphInbox(accessToken: string, initialDeltaLink?: str
 
 /** Move a message to the mailbox's Deleted Items folder (recoverable soft delete). */
 export async function moveGraphMessageToDeletedItems(accessToken: string, messageId: string) {
-  const response = await fetch(
-    `${GRAPH_BASE}/me/messages/${encodeURIComponent(messageId)}/move`,
-    {
-      method: "POST",
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({ destinationId: "deleteditems" }),
+  const response = await fetch(`${GRAPH_BASE}/me/messages/${encodeURIComponent(messageId)}/move`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
     },
-  );
+    body: JSON.stringify({ destinationId: "deleteditems" }),
+  });
   if (!response.ok) {
-    const detail = (await response.text().catch(() => "")).replace(/[\\r\\n]+/g, " ").slice(0, 300);
+    const detail = (await response.text().catch(() => ""))
+      .replace(/[\\r\\n]+/g, " ")
+      .slice(0, 300);
     if (response.status === 403) {
-      throw new Error("A Microsoft ainda não autorizou a exclusão. Reconecte o Hotmail e aceite a permissão de leitura e gravação.");
+      throw new Error(
+        "A Microsoft ainda não autorizou a exclusão. Reconecte o Hotmail e aceite a permissão de leitura e gravação.",
+      );
     }
     if (response.status === 404) {
-      throw new Error("A mensagem não foi encontrada no Hotmail; atualize a caixa e tente novamente.");
+      throw new Error(
+        "A mensagem não foi encontrada no Hotmail; atualize a caixa e tente novamente.",
+      );
     }
-    throw new Error(`Microsoft Graph não conseguiu mover a mensagem (HTTP ${response.status})${detail ? `: ${detail}` : ""}`);
+    throw new Error(
+      `Microsoft Graph não conseguiu mover a mensagem (HTTP ${response.status})${detail ? `: ${detail}` : ""}`,
+    );
   }
 }
 
