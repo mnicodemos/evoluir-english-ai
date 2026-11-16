@@ -125,6 +125,8 @@ export function VoiceCoach({
   const topicOffset = useRef(0);
   const speechQueue = useRef<Promise<void>>(Promise.resolve());
   const replyAbort = useRef<AbortController | null>(null);
+  // Keep the active stream promise so Finish waits for server-side cancellation to settle.
+  const activeReplyPromise = useRef<Promise<string> | null>(null);
   // Set synchronously: a second tap before React re-renders cannot send twice.
   const answering = useRef(false);
   // Stages of the current answer, saved once EVO's first sound plays.
@@ -464,7 +466,7 @@ export function VoiceCoach({
       replyAbort.current?.abort();
       const abort = new AbortController();
       replyAbort.current = abort;
-      const raw = await talkingTurn(
+      const replyRequest = talkingTurn(
         () =>
           streamCoachReply(
             coachReplyMessages(
@@ -477,6 +479,8 @@ export function VoiceCoach({
               callStyle,
             ),
             (delta) => {
+              // Ignore late provider chunks as soon as Finish invalidates this turn.
+              if (!mounted.current || generation !== sessionGeneration.current) return;
               marks.firstTextAt ??= performance.now();
               streamedReply += delta;
               phraseBuffer += delta;
@@ -498,6 +502,10 @@ export function VoiceCoach({
           ),
         { signal: abort.signal },
       );
+      activeReplyPromise.current = replyRequest;
+      const raw = await replyRequest.finally(() => {
+        if (activeReplyPromise.current === replyRequest) activeReplyPromise.current = null;
+      });
       if (generation !== sessionGeneration.current) return;
       const reply = raw.trim();
       if (phraseBuffer.trim()) queueSpeech(phraseBuffer.trim());
@@ -531,10 +539,18 @@ export function VoiceCoach({
       toast.error("Answer at least three times before finishing the session.");
       return;
     }
+    // Finish explicitly cancels the active reply and waits for Gemini/server lock release.
+    sessionGeneration.current += 1;
+    replyAbort.current?.abort();
+    replyAbort.current = null;
+    cancelVoiceRecording();
+    answering.current = false;
+    speechQueue.current = Promise.resolve();
     stopSpeaking();
     setVoiceState("idle");
     setFinishing(true);
     try {
+      await activeReplyPromise.current?.catch(() => undefined);
       const result = await finishTalking({
         data: {
           operationKey: talkingOperationKey.current,
@@ -571,7 +587,8 @@ export function VoiceCoach({
     voiceState === "sending" ||
     voiceState === "transcribing" ||
     voiceState === "thinking";
-  const canFinish = hasEnoughAnswers && !isProcessingAnswer && !finishing;
+  // Finishing remains available during a streamed reply; finish() aborts it safely.
+  const canFinish = hasEnoughAnswers && !finishing;
   const statusText =
     voiceState === "recording"
       ? "Listening… tap again when you finish"
