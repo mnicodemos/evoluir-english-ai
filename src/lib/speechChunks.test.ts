@@ -51,7 +51,7 @@ describe("takeStreamBlocks", () => {
       "What else did you do there with your friends on Sunday afternoon? Tell me more. ";
     const { blocks } = takeStreamBlocks(burst, false);
     // The first natural pause after 24 characters ends the opening block.
-    expect(blocks[0]).toBe("Nice, you went to the beach! ");
+    expect(blocks[0]).toBe("Nice, you went to the beach!");
     expect(blocks.length).toBeLessThanOrEqual(2);
     expect(blocks.slice(1).every((block) => block.length >= 140)).toBe(true);
   });
