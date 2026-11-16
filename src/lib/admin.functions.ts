@@ -100,7 +100,13 @@ export const listRegisteredUsers = createServerFn({ method: "GET" })
               .select("user_id, expires_at, revoked_at")
               .in("user_id", ids)
               .eq("plan", "premium")
-          : Promise.resolve({ data: [] as { user_id: string; expires_at: string | null; revoked_at: string | null }[] }),
+          : Promise.resolve({
+              data: [] as {
+                user_id: string;
+                expires_at: string | null;
+                revoked_at: string | null;
+              }[],
+            }),
         ids.length
           ? supabaseAdmin
               .from("premium_campaign_grants")
@@ -112,7 +118,9 @@ export const listRegisteredUsers = createServerFn({ method: "GET" })
               .from("current_skill_profile")
               .select("user_id, cefr_level")
               .in("user_id", ids)
-          : Promise.resolve({ data: [] as { user_id: string | null; cefr_level: string | null }[] }),
+          : Promise.resolve({
+              data: [] as { user_id: string | null; cefr_level: string | null }[],
+            }),
         supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
       ]);
 
