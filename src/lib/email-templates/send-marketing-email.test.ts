@@ -34,6 +34,7 @@ describe("sendMarketingEmail", () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValue(new Response(JSON.stringify({ id: "email_test_123" }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
 
     await expect(
       sendMarketingEmail("premium-benefits", "student@example.com", {
@@ -58,21 +59,25 @@ describe("sendMarketingEmail", () => {
   it("surfaces Resend 4xx and 5xx response messages", async () => {
     process.env["RESEND_API_KEY"] = "test-resend-key";
     for (const status of [422, 500]) {
-      const fetchMock = vi.fn().mockResolvedValue(
       const fetchMock = vi
         .fn()
-        .mockResolvedValue(new Response(JSON.stringify({ message: "Resend rejected the request" }), { status }));
-        sendMarketingEmail("premium-benefits", "student@example.com"),
+        .mockResolvedValue(
+          new Response(JSON.stringify({ message: "Resend rejected the request" }), { status }),
+        );
+      vi.stubGlobal("fetch", fetchMock);
       await expect(sendMarketingEmail("premium-benefits", "student@example.com")).rejects.toThrow(
         `Resend marketing email failed (${status}): Resend rejected the request`,
       );
+    }
+  });
+
   it("requires the Resend API key before making a request", async () => {
     delete process.env["RESEND_API_KEY"];
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);
-    await expect(
-      sendMarketingEmail("premium-benefits", "student@example.com"),
-    ).rejects.toThrow("RESEND_API_KEY is not configured");
     await expect(sendMarketingEmail("premium-benefits", "student@example.com")).rejects.toThrow(
       "RESEND_API_KEY is not configured",
     );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
