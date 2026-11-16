@@ -91,6 +91,15 @@ export const pronunciationLegacyInputSchema = z
   })
   .strict();
 
+export function completedTalkingMessages(
+  messages: readonly { role: "user" | "assistant"; content: string }[],
+) {
+  // A reply may still be streaming when the student finishes; never submit its empty placeholder.
+  return messages
+    .filter((message) => message.content.trim().length > 0)
+    .map((message) => ({ ...message, content: message.content.trim() }));
+}
+
 export const talkingLegacyInputSchema = z
   .object({
     operationKey,
