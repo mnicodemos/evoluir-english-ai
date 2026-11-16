@@ -16,6 +16,15 @@ describe("describeServerError", () => {
     });
   });
 
+  it("classifies invalid server function IDs without exposing the generated identifier", () => {
+    expect(
+      describeServerError(["Invalid server function ID: 0123456789abcdef0123456789abcdef"]),
+    ).toEqual({
+      area: "Funções remotas (TanStack)",
+      message: "Invalid server function ID: <token>",
+    });
+  });
+
   it("files unknown errors under Servidor, first line only", () => {
     const error = new TypeError("Cannot read properties of undefined");
     error.stack = "TypeError: Cannot read properties of undefined\n    at secret.ts:1";
