@@ -373,7 +373,7 @@ export const getAdminEmailReplyHistory = createServerFn({ method: "GET" })
   });
 
 
-/** Delete one message from the admin inbox. Admin-only and limited to supported mailboxes. */
+/** Move one message from Inbox to the connected Hotmail Deleted Items folder. */
 export const deleteAdminEmailMessage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { messageId: string }) => {
@@ -386,15 +386,72 @@ export const deleteAdminEmailMessage = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- admin email tables are managed by Lovable Cloud migrations
     const db = context.supabase as any;
-    const { data: deleted, error } = await db
+    const { data: message, error: messageError } = await db
       .from("admin_email_messages")
-      .delete()
+      .select("id,provider_message_id,mailbox")
       .eq("id", data.messageId)
       .in("mailbox", ["contact", "support"])
-      .select("id")
       .maybeSingle();
-    if (error) throw new Error("Não foi possível excluir a mensagem. Verifique se há registros relacionados.");
-    if (!deleted) throw new Error("Mensagem não encontrada ou não autorizada para exclusão.");
+    if (messageError || !message) {
+      throw new Error("Mensagem não encontrada ou não autorizada para exclusão.");
+    }
+    if (!message.provider_message_id) {
+      throw new Error("A mensagem não possui identificador Microsoft e não pode ser removida do Hotmail.");
+    }
+
+    const { data: connection, error: connectionError } = await db
+      .from("admin_email_connections")
+      .select("id,refresh_token_encrypted")
+      .is("revoked_at", null)
+      .maybeSingle();
+    if (connectionError || !connection) {
+      throw new Error("Conecte novamente a caixa Hotmail antes de excluir mensagens.");
+    }
+
+    const {
+      decryptMicrosoftToken,
+      encryptMicrosoftToken,
+      refreshMicrosoftToken,
+      moveGraphMessageToDeletedItems,
+    } = await import("@/lib/admin-email.server");
+    let refreshed: Awaited<ReturnType<typeof refreshMicrosoftToken>>;
+    try {
+      refreshed = await refreshMicrosoftToken(
+        decryptMicrosoftToken(connection.refresh_token_encrypted),
+      );
+    } catch (error) {
+      throw new Error(
+        error instanceof Error
+          ? `Não foi possível renovar a autorização Microsoft: ${error.message}`
+          : "Não foi possível renovar a autorização Microsoft.",
+      );
+    }
+
+    // Persist the rotated refresh token before performing the remote mailbox action.
+    const { error: tokenUpdateError } = await db
+      .from("admin_email_connections")
+      .update({
+        refresh_token_encrypted: encryptMicrosoftToken(refreshed.refresh_token),
+        token_expires_at: new Date(
+          Date.now() + (refreshed.expires_in ?? 3600) * 1000,
+        ).toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", connection.id);
+    if (tokenUpdateError) {
+      throw new Error("Não foi possível atualizar a autorização Microsoft. A mensagem não foi movida.");
+    }
+
+    // Move first; if Microsoft rejects the operation, keep the local message intact.
+    await moveGraphMessageToDeletedItems(refreshed.access_token, message.provider_message_id);
+
+    const { error: deleteError } = await db
+      .from("admin_email_messages")
+      .delete()
+      .eq("id", message.id);
+    if (deleteError) {
+      throw new Error("A mensagem foi movida para Itens Excluídos no Hotmail, mas não foi possível atualizar a caixa do Evoluir+. Sincronize novamente.");
+    }
     return { deleted: true as const };
   });
 

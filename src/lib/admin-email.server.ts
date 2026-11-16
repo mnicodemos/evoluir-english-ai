@@ -9,7 +9,7 @@ import {
 
 const CLIENT_ID = "16fe0bc6-0064-48bb-9702-9d6566deec9e";
 const TENANT = "consumers";
-const SCOPES = ["openid", "profile", "offline_access", "User.Read", "Mail.Read"];
+const SCOPES = ["openid", "profile", "offline_access", "User.Read", "Mail.ReadWrite"];
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 
 function required(name: string): string {
@@ -97,6 +97,7 @@ export function microsoftAuthorizationUrl(
     redirect_uri: redirectUri,
     response_mode: "query",
     scope: SCOPES.join(" "),
+    prompt: "consent",
     state,
     code_challenge: challenge,
     code_challenge_method: "S256",
@@ -223,7 +224,7 @@ function htmlToText(value: string): string {
     .replace(/[ \t\r\n]+/g, " ")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'")
-    .replace(/[ \\t\\r\\n]+/g, " ")
+    .replace(/[ \t\r\n]+/g, " ")
     .trim();
 }
 
@@ -238,6 +239,7 @@ export type GraphInboxMessage = {
   receivedDateTime?: string;
   body?: { contentType?: string; content?: string };
   bodyPreview?: string;
+  "@removed"?: { reason?: string };
 };
 
 export function normalizeGraphMessage(message: GraphInboxMessage) {
@@ -283,7 +285,8 @@ export async function syncGraphInbox(accessToken: string, initialDeltaLink?: str
       "@odata.deltaLink"?: string;
     };
     for (const item of page.value ?? []) {
-      if (item.id) messages.push(normalizeGraphMessage(item));
+      // Delta tombstones represent messages moved/deleted from Inbox; never upsert them.
+      if (item.id && !item["@removed"]) messages.push(normalizeGraphMessage(item));
     }
     nextUrl = page["@odata.nextLink"] ?? "";
     deltaLink = page["@odata.deltaLink"] ?? deltaLink;
@@ -291,6 +294,34 @@ export async function syncGraphInbox(accessToken: string, initialDeltaLink?: str
   }
   if (nextUrl) throw new Error("Microsoft Graph returned too many pages; sync stopped safely");
   return { messages, deltaLink };
+}
+
+/** Move a message to the mailbox's Deleted Items folder (recoverable soft delete). */
+export async function moveGraphMessageToDeletedItems(accessToken: string, messageId: string) {
+  const response = await fetch(`${GRAPH_BASE}/me/messages/${encodeURIComponent(messageId)}/move`, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({ destinationId: "deleteditems" }),
+  });
+  if (!response.ok) {
+    const detail = (await response.text().catch(() => "")).replace(/[\\r\\n]+/g, " ").slice(0, 300);
+    if (response.status === 403) {
+      throw new Error(
+        "A Microsoft ainda não autorizou a exclusão. Reconecte o Hotmail e aceite a permissão de leitura e gravação.",
+      );
+    }
+    if (response.status === 404) {
+      throw new Error(
+        "A mensagem não foi encontrada no Hotmail; atualize a caixa e tente novamente.",
+      );
+    }
+    throw new Error(
+      `Microsoft Graph não conseguiu mover a mensagem (HTTP ${response.status})${detail ? `: ${detail}` : ""}`,
+    );
+  }
 }
 
 export async function sendAdminEmailReply(input: {

@@ -141,10 +141,16 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
         </div>
         <div className="flex gap-2">
           {inbox.data?.connected ? (
-            <Button size="sm" variant="outline" onClick={sync} disabled={busy !== null}>
-              {busy === "sync" ? <Loader2 className="mr-2 size-4 animate-spin" /> : <RefreshCw className="mr-2 size-4" />}
-              Sincronizar
-            </Button>
+            <>
+              <Button size="sm" variant="outline" onClick={connect} disabled={busy !== null}>
+                {busy === "connect" ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+                Reconectar Hotmail
+              </Button>
+              <Button size="sm" variant="outline" onClick={sync} disabled={busy !== null}>
+                {busy === "sync" ? <Loader2 className="mr-2 size-4 animate-spin" /> : <RefreshCw className="mr-2 size-4" />}
+                Sincronizar
+              </Button>
+            </>
           ) : (
             <Button size="sm" onClick={connect} disabled={busy !== null}>
               {busy === "connect" ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
@@ -177,7 +183,7 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
         </Tabs>
       )}
       <p className="text-xs text-muted-foreground">
-        As mensagens originais permanecem no Hotmail. As respostas são enviadas pelo Resend e registradas no histórico.
+        As mensagens excluídas são movidas para Itens Excluídos do Hotmail e podem ser recuperadas por lá. As respostas são enviadas pelo Resend e registradas no histórico.
       </p>
     </section>
   );
@@ -246,11 +252,11 @@ function ReplyMessage({
     retry: false,
   });
   const remove = async () => {
-    if (deleting || !window.confirm("Excluir esta mensagem da caixa de entrada?")) return;
+    if (deleting || !window.confirm("Mover esta mensagem para Itens Excluídos do Hotmail? Ela poderá ser recuperada por lá.")) return;
     setDeleting(true);
     try {
       await deleteMessage({ data: { messageId: message.id } });
-      toast.success("Mensagem excluída.");
+      toast.success("Mensagem movida para Itens Excluídos do Hotmail.");
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin-email-inbox"] }),
         queryClient.invalidateQueries({ queryKey: ["admin-email-unread-count"] }),
