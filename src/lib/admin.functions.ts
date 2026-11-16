@@ -8,6 +8,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { latencyByDay } from "@/lib/aiLatencyTrend";
 import { estimateAiCost } from "@/lib/aiPricing";
 import { studyToday } from "@/lib/today";
+import { assertCampaignDeliveryCanStart } from "@/lib/email-templates/campaign-delivery";
 
 async function hasAdminRole(
   supabase: {
@@ -2272,12 +2273,7 @@ export const sendAdminStudentEmail = createServerFn({ method: "POST" })
       .eq("campaign", data.campaign)
       .maybeSingle();
     if (deliveryLookupError) throw deliveryLookupError;
-    if (previousDelivery?.status === "sent") {
-      throw new Error("This campaign has already been sent to this student.");
-    }
-    if (previousDelivery?.status === "pending") {
-      throw new Error("This campaign is already being processed for this student.");
-    }
+    assertCampaignDeliveryCanStart(previousDelivery?.status ?? null);
 
     const idempotencyKey = `admin-${data.campaign}:${data.userId}:${crypto.randomUUID()}`;
     const pendingDelivery = {
