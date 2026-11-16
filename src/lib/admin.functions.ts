@@ -8,6 +8,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { latencyByDay } from "@/lib/aiLatencyTrend";
 import { estimateAiCost } from "@/lib/aiPricing";
 import { studyToday } from "@/lib/today";
+import { assertCampaignDeliveryCanStart } from "@/lib/email-templates/campaign-delivery";
 
 async function hasAdminRole(
   supabase: {
@@ -2265,20 +2266,49 @@ export const sendAdminStudentEmail = createServerFn({ method: "POST" })
     }
     const recipient = profile.email?.trim();
     if (!recipient) throw new Error("This student has no email address.");
-    const idempotencyKey = `admin-${data.campaign}:${data.userId}:${Date.now()}`;
-    const { error: pendingError } = await supabaseAdmin.from("email_campaign_deliveries").upsert(
-      {
-        user_id: data.userId,
-        campaign: data.campaign,
-        status: "pending",
-        recipient_email: recipient,
-        idempotency_key: idempotencyKey,
-        last_error: null,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "user_id,campaign" },
-    );
-    if (pendingError) throw pendingError;
+    const { data: previousDelivery, error: deliveryLookupError } = await supabaseAdmin
+      .from("email_campaign_deliveries")
+      .select("status")
+      .eq("user_id", data.userId)
+      .eq("campaign", data.campaign)
+      .maybeSingle();
+    if (deliveryLookupError) throw deliveryLookupError;
+    assertCampaignDeliveryCanStart(previousDelivery?.status ?? null);
+
+    const idempotencyKey = `admin-${data.campaign}:${data.userId}:${crypto.randomUUID()}`;
+    const pendingDelivery = {
+      user_id: data.userId,
+      campaign: data.campaign,
+      status: "pending",
+      recipient_email: recipient,
+      idempotency_key: idempotencyKey,
+      last_error: null,
+      updated_at: new Date().toISOString(),
+    };
+    if (previousDelivery) {
+      // Compare-and-set: only one concurrent retry can claim a failed/suppressed row.
+      const { data: claimed, error: claimError } = await supabaseAdmin
+        .from("email_campaign_deliveries")
+        .update(pendingDelivery)
+        .eq("user_id", data.userId)
+        .eq("campaign", data.campaign)
+        .eq("status", previousDelivery.status)
+        .select("user_id")
+        .maybeSingle();
+      if (claimError) throw claimError;
+      if (!claimed) throw new Error("This campaign is already being processed for this student.");
+    } else {
+      // The unique (user_id, campaign) constraint arbitrates simultaneous first sends.
+      const { error: insertError } = await supabaseAdmin
+        .from("email_campaign_deliveries")
+        .insert(pendingDelivery);
+      if (insertError) {
+        if (insertError.code === "23505") {
+          throw new Error("This campaign is already being processed for this student.");
+        }
+        throw insertError;
+      }
+    }
     try {
       const templateData = { lang: data.lang, studentName: profile.name?.trim() || "" };
       const result =
