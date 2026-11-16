@@ -151,13 +151,13 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
               </Button>
               <Button size="sm" variant="outline" onClick={sync} disabled={busy !== null}>
                 {busy === "sync" ? <Loader2 className="mr-2 size-4 animate-spin" /> : <RefreshCw className="mr-2 size-4" />}
-                Sincronizar
+                {pt ? "Sincronizar" : "Sync"}
               </Button>
             </>
           ) : (
             <Button size="sm" onClick={connect} disabled={busy !== null}>
               {busy === "connect" ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-              Conectar Hotmail
+              {pt ? "Conectar Hotmail" : "Connect Hotmail"}
             </Button>
           )}
         </div>
@@ -214,8 +214,10 @@ function MessageList({
   sendReply,
   loadReplyHistory,
   deleteMessage,
+  pt,
 }: {
   messages: InboxMessage[];
+  pt: boolean;
   sendReply: ReplySender;
   loadReplyHistory: ReplyHistoryLoader;
   deleteMessage: MessageDeleter;
@@ -237,8 +239,10 @@ function ReplyMessage({
   sendReply,
   loadReplyHistory,
   deleteMessage,
+  pt,
 }: {
   message: InboxMessage;
+  pt: boolean;
   sendReply: ReplySender;
   loadReplyHistory: ReplyHistoryLoader;
   deleteMessage: MessageDeleter;
@@ -287,7 +291,7 @@ function ReplyMessage({
   return (
     <article className="rounded-lg border border-border/70 p-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <p className="text-sm font-medium">{message.subject || pt ? "(Sem assunto)" : "(No subject)"}</p>
+        <p className="text-sm font-medium">{message.subject || (pt ? "(Sem assunto)" : "(No subject)") }</p>
         <time className="text-xs text-muted-foreground" dateTime={message.received_at}>{new Date(message.received_at).toLocaleString(pt ? "pt-BR" : "en-US")}</time>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">{message.from_address}</p>
@@ -299,7 +303,7 @@ function ReplyMessage({
           </Button>
           <Button size="sm" variant="destructive" onClick={remove} disabled={deleting}>
             {deleting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Trash2 className="mr-2 size-4" />}
-            Excluir
+            {pt ? "Excluir" : "Delete"}
           </Button>
         </div>
         {open ? (
@@ -317,7 +321,7 @@ function ReplyMessage({
             <div className="flex justify-end">
               <Button size="sm" onClick={submit} disabled={!body.trim() || busy}>
                 {busy ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Send className="mr-2 size-4" />}
-                Enviar resposta
+                {pt ? "Enviar resposta" : "Send reply"}
               </Button>
             </div>
           </div>
