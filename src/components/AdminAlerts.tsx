@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { CircleAlert, CircleCheck, TriangleAlert } from "lucide-react";
+import { CircleAlert, CircleCheck, Trash2, TriangleAlert } from "lucide-react";
 
-import { getOpsAlerts } from "@/lib/admin.functions";
+import { dismissOpsAlerts, getOpsAlerts } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -31,6 +32,9 @@ export function AdminAlerts() {
   const { lang } = useUiLang();
   const pt = lang === "pt";
   const load = useServerFn(getOpsAlerts);
+  const dismiss = useServerFn(dismissOpsAlerts);
+  const queryClient = useQueryClient();
+  const [clearing, setClearing] = useState(false);
   const query = useQuery({ queryKey: ["admin", "ops-alerts"], queryFn: () => load() });
   if (query.isPending) return null;
   if (query.isError) {
