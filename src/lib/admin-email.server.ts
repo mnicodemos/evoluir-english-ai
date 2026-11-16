@@ -215,16 +215,16 @@ export function classifyAdminMailbox(recipients: string[]): "contact" | "support
 
 function htmlToText(value: string): string {
   return value
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\\s\\S]*?<\\/style>/gi, " ")
+    .replace(/<script[\\s\\S]*?<\\/script>/gi, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/gi, " ")
     .replace(/&amp;/gi, "&")
     .replace(/&lt;/gi, "<")
-    .replace(/[ \t\r\n]+/g, " ")
+    .replace(/[ \\t\\r\\n]+/g, " ")
     .replace(/&quot;/gi, '"')
     .replace(/&#39;/gi, "'")
-    .replace(/[ \\t\\r\\n]+/g, " ")
+    .replace(/[ \\\\t\\\\r\\\\n]+/g, " ")
     .trim();
 }
 
@@ -307,9 +307,7 @@ export async function moveGraphMessageToDeletedItems(accessToken: string, messag
     body: JSON.stringify({ destinationId: "deleteditems" }),
   });
   if (!response.ok) {
-    const detail = (await response.text().catch(() => ""))
-      .replace(/[\\r\\n]+/g, " ")
-      .slice(0, 300);
+    const detail = (await response.text().catch(() => "")).replace(/[\\r\\n]+/g, " ").slice(0, 300);
     if (response.status === 403) {
       throw new Error(
         "A Microsoft ainda não autorizou a exclusão. Reconecte o Hotmail e aceite a permissão de leitura e gravação.",
