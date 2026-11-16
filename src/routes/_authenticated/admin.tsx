@@ -44,6 +44,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   validateSearch: (search: Record<string, unknown>) => ({
     ...(search["folder"] === "communication" ? { folder: "communication" as const } : {}),
     ...(search["tab"] === "inbox" ? { tab: "inbox" as const } : {}),
+    ...(search["mailbox"] === "support" ? { mailbox: "support" as const } : {}),
   }),
   head: () => ({
     meta: [
@@ -293,6 +294,7 @@ function AdminPage() {
 
             <TabsContent value="communication" className="mt-4">
               <FolderTabs
+                key={search["tab"] ?? "default"}
                 {...(search["tab"] === "inbox" ? { defaultValue: "inbox" } : {})}
                 tabs={[
                   { value: "push", label: t("Push") },
@@ -307,7 +309,7 @@ function AdminPage() {
                   <AdminEmailCampaigns />
                 </TabsContent>
                 <TabsContent value="inbox">
-                  <AdminEmailInbox />
+                  <AdminEmailInbox initialMailbox={search["mailbox"] === "support" ? "support" : "contact"} />
                 </TabsContent>
               </FolderTabs>
             </TabsContent>
