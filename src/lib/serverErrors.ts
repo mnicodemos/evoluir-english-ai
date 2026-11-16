@@ -13,6 +13,7 @@ const MESSAGE_LIMIT = 240;
 
 /** Prefixes used by the server's own console.error calls, in Portuguese for the Admin. */
 const AREAS: Array<[RegExp, string]> = [
+  [/Invalid server function ID/i, "Funções remotas (TanStack)"],
   [/^\[speech\]|^\[tts-cache\]/i, "Voz (TTS)"],
   [/^Gemini talking/i, "Conversa (voz)"],
   [/^\[stripe\]/i, "Pagamentos (Stripe)"],
