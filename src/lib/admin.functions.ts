@@ -44,6 +44,28 @@ export const getOpsAlerts = createServerFn({ method: "GET" })
     return loadOpsAlerts(supabaseAdmin, new Date(), { includeProduct: true });
   });
 
+export const dismissOpsAlerts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ alertKeys: z.array(z.string().min(1).max(500)).min(1).max(100) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    if (!(await hasAdminRole(context.supabase, context.userId))) {
+      throw new Error("Forbidden");
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("admin_alert_dismissals").upsert(
+      data.alertKeys.map((alert_key) => ({
+        alert_key,
+        dismissed_by: context.userId,
+        dismissed_at: new Date().toISOString(),
+      })),
+      { onConflict: "alert_key" },
+    );
+    if (error) throw error;
+    return { dismissed: data.alertKeys.length };
+  });
+
 export const listRegisteredUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {

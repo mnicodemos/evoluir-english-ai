@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { CircleAlert, CircleCheck, TriangleAlert } from "lucide-react";
+import { CircleAlert, CircleCheck, Trash2, TriangleAlert } from "lucide-react";
 
-import { getOpsAlerts } from "@/lib/admin.functions";
+import { dismissOpsAlerts, getOpsAlerts } from "@/lib/admin.functions";
 import { cn } from "@/lib/utils";
 import { useUiLang } from "@/lib/uiLang";
 
@@ -31,6 +32,9 @@ export function AdminAlerts() {
   const { lang } = useUiLang();
   const pt = lang === "pt";
   const load = useServerFn(getOpsAlerts);
+  const dismiss = useServerFn(dismissOpsAlerts);
+  const queryClient = useQueryClient();
+  const [clearing, setClearing] = useState(false);
   const query = useQuery({ queryKey: ["admin", "ops-alerts"], queryFn: () => load() });
   if (query.isPending) return null;
   if (query.isError) {
@@ -84,6 +88,37 @@ export function AdminAlerts() {
             </li>
           ))}
         </ul>
+      )}
+      {alerts.length > 0 && (
+        <div className="mt-3 flex justify-end">
+          <button
+            type="button"
+            disabled={clearing}
+            onClick={async () => {
+              const message = pt
+                ? "Apagar os alertas atuais da tela? O histórico técnico será preservado."
+                : "Dismiss the current alerts? Technical history will be preserved.";
+              if (!window.confirm(message)) return;
+              setClearing(true);
+              try {
+                await dismiss({ data: { alertKeys: alerts.map((alert) => alert.id) } });
+                await queryClient.invalidateQueries({ queryKey: ["admin", "ops-alerts"] });
+              } finally {
+                setClearing(false);
+              }
+            }}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
+          >
+            <Trash2 className="size-3.5" aria-hidden="true" />
+            {clearing
+              ? pt
+                ? "Apagando..."
+                : "Dismissing..."
+              : pt
+                ? "Apagar alertas"
+                : "Dismiss alerts"}
+          </button>
+        </div>
       )}
       {lastRun && (
         <p className="mt-2 text-xs text-muted-foreground">
