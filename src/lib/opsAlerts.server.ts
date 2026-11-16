@@ -64,7 +64,20 @@ export async function loadOpsAlerts(
       }),
     );
   }
-  return { alerts, recentRuns: pushRuns.slice(0, 6) };
+  const keyedAlerts = alerts.map((alert) => ({ ...alert, id: `${alert.area}:${alert.title}` }));
+  if (options.includeProduct && keyedAlerts.length > 0) {
+    const { data: dismissed, error: dismissalError } = await supabaseAdmin
+      .from("admin_alert_dismissals")
+      .select("alert_key");
+    if (!dismissalError) {
+      const dismissedKeys = new Set((dismissed ?? []).map((row) => row.alert_key));
+      return {
+        alerts: keyedAlerts.filter((alert) => !dismissedKeys.has(alert.id)),
+        recentRuns: pushRuns.slice(0, 6),
+      };
+    }
+  }
+  return { alerts: keyedAlerts, recentRuns: pushRuns.slice(0, 6) };
 }
 
 /** Sends the admins one push when an alert needs attention. */
