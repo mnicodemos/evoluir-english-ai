@@ -141,10 +141,16 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
         </div>
         <div className="flex gap-2">
           {inbox.data?.connected ? (
-            <Button size="sm" variant="outline" onClick={sync} disabled={busy !== null}>
-              {busy === "sync" ? <Loader2 className="mr-2 size-4 animate-spin" /> : <RefreshCw className="mr-2 size-4" />}
-              Sincronizar
-            </Button>
+            <>
+              <Button size="sm" variant="outline" onClick={connect} disabled={busy !== null}>
+                {busy === "connect" ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
+                Reconectar Hotmail
+              </Button>
+              <Button size="sm" variant="outline" onClick={sync} disabled={busy !== null}>
+                {busy === "sync" ? <Loader2 className="mr-2 size-4 animate-spin" /> : <RefreshCw className="mr-2 size-4" />}
+                Sincronizar
+              </Button>
+            </>
           ) : (
             <Button size="sm" onClick={connect} disabled={busy !== null}>
               {busy === "connect" ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
