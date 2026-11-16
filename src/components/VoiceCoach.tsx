@@ -32,6 +32,7 @@ import {
   stopVoiceRecording,
 } from "@/lib/voice-recorder";
 import { finishTalkingLegacy } from "@/lib/legacyActivity.functions";
+import { completedTalkingMessages } from "@/lib/legacyActivity.schemas";
 import {
   clearSpeakingCheckpoint,
   getSpeakingCheckpoint,
@@ -114,6 +115,7 @@ export function VoiceCoach({
   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
   const [report, setReport] = useState<ConversationReport | null>(null);
   const [finishing, setFinishing] = useState(false);
+  const [sessionFinished, setSessionFinished] = useState(false);
   const talkingOperationKey = useRef(crypto.randomUUID());
   const sessionGeneration = useRef(0);
   const finishTalking = useServerFn(finishTalkingLegacy);
@@ -190,6 +192,8 @@ export function VoiceCoach({
   useEffect(() => {
     if (
       !checkpointReady ||
+      sessionFinished ||
+      finishing ||
       presentation !== "chat" ||
       voiceState !== "idle" ||
       !scenario ||
@@ -209,7 +213,16 @@ export function VoiceCoach({
       });
     }, 400);
     return () => window.clearTimeout(timer);
-  }, [checkpointReady, presentation, voiceState, scenario, messages, saveCheckpoint]);
+  }, [
+    checkpointReady,
+    sessionFinished,
+    finishing,
+    presentation,
+    voiceState,
+    scenario,
+    messages,
+    saveCheckpoint,
+  ]);
   useEffect(() => {
     if (!checkpointReady || presentation === "call" || lessonTopic || started.current) return;
     started.current = true;
@@ -337,6 +350,7 @@ export function VoiceCoach({
     speechQueue.current = Promise.resolve();
     setMessages([]);
     setFinishing(false);
+    setSessionFinished(false);
     setVoiceState("idle");
   }
 
@@ -555,11 +569,13 @@ export function VoiceCoach({
         data: {
           operationKey: talkingOperationKey.current,
           scenario: scenario as "everyday" | "professional" | "travel",
-          messages,
+          messages: completedTalkingMessages(messages),
           minutes: minutesSpent(1),
         },
       });
       setReport(result);
+      // Prevent the idle-state autosave from recreating a checkpoint after completion.
+      setSessionFinished(true);
       try {
         await clearCheckpoint({ data: { operationKey: talkingOperationKey.current } });
       } catch {
