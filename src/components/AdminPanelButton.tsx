@@ -15,9 +15,11 @@ import { useUiLang } from "@/lib/uiLang";
 export function AdminPanelButton({
   className,
   showLabel = false,
+  onNavigate,
 }: {
   className?: string;
   showLabel?: boolean;
+  onNavigate?: () => void;
 }) {
   const { lang } = useUiLang();
   const t = (label: string) => (lang === "pt" ? (uiPt[label] ?? label) : label);
@@ -43,12 +45,13 @@ export function AdminPanelButton({
       size={showLabel ? "sm" : "icon"}
       aria-label={t("Admin panel")}
       className={className}
-      onClick={() =>
+      onClick={() => {
+        onNavigate?.();
         void navigate({
           to: "/admin",
           search: { folder: "communication", tab: "inbox", mailbox: "support" },
-        })
-      }
+        });
+      }}
     >
       <Settings className="size-5" />
       {showLabel && <span>{t("Admin panel")}</span>}
