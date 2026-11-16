@@ -11,7 +11,7 @@ export const MIN_SPEECH_BLOCK_CHARS = 140;
  * this many characters, so the voice starts after the first sentence instead
  * of waiting for most of the reply to be written.
  */
-export const FIRST_STREAM_BLOCK_CHARS = 40;
+export const FIRST_STREAM_BLOCK_CHARS = 24;
 
 const PAUSE = /[.!?,;](?:\s|$)/g;
 
