@@ -74,35 +74,48 @@ export const listRegisteredUsers = createServerFn({ method: "GET" })
     }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error, count } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from("profiles")
-      .select("id, name, email, created_at, plan, plan_expires_at", { count: "exact" })
+      .select("id, name, email, created_at, plan, plan_expires_at, level")
       .order("created_at", { ascending: false })
       .limit(500);
 
     if (error) throw error;
 
-    // Premium = a valid entitlement (the commercial authority), else a profile
-    // plan that has not ended; the launch campaign's places are marked.
-    const ids = (data ?? []).map((row) => row.id);
+    // E2E accounts are excluded centrally so they do not enter any student view
+    // that consumes this canonical roster.
+    const excludedTestAliases = ["lmnicodemos+e2e1", "lmnicodemos+e2e2"];
+    const students = (data ?? []).filter((row) => {
+      const email = (row.email ?? "").toLowerCase();
+      return !excludedTestAliases.some((alias) => email.includes(alias));
+    });
+    const ids = students.map((row) => row.id);
     const now = new Date();
-    const [{ data: entitlements }, { data: grants }] = await Promise.all([
-      ids.length
-        ? supabaseAdmin
-            .from("entitlements")
-            .select("user_id, expires_at, revoked_at")
-            .in("user_id", ids)
-            .eq("plan", "premium")
-        : Promise.resolve({
-            data: [] as { user_id: string; expires_at: string | null; revoked_at: string | null }[],
-          }),
-      ids.length
-        ? supabaseAdmin
-            .from("premium_campaign_grants")
-            .select("user_id, expires_at")
-            .in("user_id", ids)
-        : Promise.resolve({ data: [] }),
-    ]);
+
+    const [{ data: entitlements }, { data: grants }, { data: skillRows }, authUsers] =
+      await Promise.all([
+        ids.length
+          ? supabaseAdmin
+              .from("entitlements")
+              .select("user_id, expires_at, revoked_at")
+              .in("user_id", ids)
+              .eq("plan", "premium")
+          : Promise.resolve({ data: [] as { user_id: string; expires_at: string | null; revoked_at: string | null }[] }),
+        ids.length
+          ? supabaseAdmin
+              .from("premium_campaign_grants")
+              .select("user_id, expires_at")
+              .in("user_id", ids)
+          : Promise.resolve({ data: [] }),
+        ids.length
+          ? supabaseAdmin
+              .from("current_skill_profile")
+              .select("user_id, cefr_level")
+              .in("user_id", ids)
+          : Promise.resolve({ data: [] as { user_id: string | null; cefr_level: string | null }[] }),
+        supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
+      ]);
+
     const premiumUntil = new Map<string, string | null>();
     for (const row of entitlements ?? []) {
       if (row.revoked_at) continue;
@@ -115,14 +128,28 @@ export const listRegisteredUsers = createServerFn({ method: "GET" })
       );
     }
     const campaign = new Set(((grants ?? []) as { user_id: string }[]).map((row) => row.user_id));
+    const lastLogin = new Map(
+      (authUsers.data?.users ?? []).map((user) => [user.id, user.last_sign_in_at ?? null]),
+    );
+    const levels = new Map<string, string>();
+    const levelRank = ["A1", "A2", "B1", "B2", "C1", "C2"];
+    for (const row of skillRows ?? []) {
+      if (!row.user_id || !row.cefr_level) continue;
+      const level = row.cefr_level.toUpperCase();
+      const current = levels.get(row.user_id);
+      if (!current || levelRank.indexOf(level) > levelRank.indexOf(current)) {
+        levels.set(row.user_id, level);
+      }
+    }
 
     return {
-      total: count ?? data.length,
-      users: (data ?? []).map((row) => {
+      total: students.length,
+      users: students.map((row) => {
         const profilePremium =
           row.plan === "premium" && (!row.plan_expires_at || new Date(row.plan_expires_at) > now);
         const premium = premiumUntil.has(row.id) || profilePremium;
         return {
+          id: row.id,
           name: row.name,
           email: row.email ?? "",
           createdAt: row.created_at,
@@ -131,6 +158,9 @@ export const listRegisteredUsers = createServerFn({ method: "GET" })
             ? (premiumUntil.get(row.id) ?? (profilePremium ? row.plan_expires_at : null))
             : null,
           campaign: campaign.has(row.id),
+          lastLoginAt: lastLogin.get(row.id) ?? null,
+          currentLevel: levels.get(row.id) ?? row.level ?? null,
+          lastLoginDurationMinutes: null,
         };
       }),
     };
