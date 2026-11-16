@@ -6,6 +6,7 @@ import {
   pronunciationLegacyInputSchema,
   quizLegacyInputSchema,
   talkingLegacyInputSchema,
+  completedTalkingMessages,
   telemetryInputSchema,
 } from "./legacyActivity.schemas";
 import { listeningAnswerScore, pronunciationSimilarity } from "./legacyScores";
@@ -84,6 +85,27 @@ describe("legacy authoritative contracts", () => {
     ).toThrow();
   });
 
+  it("removes an unfinished empty EVO placeholder before saving the final AI Speaking session", () => {
+    const transcript = [
+      { role: "assistant" as const, content: "How are you?" },
+      { role: "user" as const, content: "I am fine." },
+      { role: "assistant" as const, content: "What did you do today?" },
+      { role: "user" as const, content: "I went to work." },
+      { role: "assistant" as const, content: "What was your main task?" },
+      { role: "user" as const, content: "I finished a project." },
+      { role: "assistant" as const, content: "" },
+    ];
+    const messages = completedTalkingMessages(transcript);
+    expect(messages).toHaveLength(6);
+    expect(
+      talkingLegacyInputSchema.parse({
+        operationKey: key,
+        scenario: "everyday",
+        minutes: 3,
+        messages,
+      }).messages,
+    ).toEqual(messages);
+  });
   it("rejects a fabricated AI Speaking report", () => {
     expect(() =>
       talkingLegacyInputSchema.parse({
