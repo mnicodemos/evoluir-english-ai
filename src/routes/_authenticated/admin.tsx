@@ -157,6 +157,7 @@ function AdminPage() {
               <FolderTabs
                 tabs={[
                   { value: "users", label: t("Users") },
+                  { value: "activity", label: t("Student activity") },
                   { value: "retention", label: t("Retention") },
                 ]}
               >
@@ -213,6 +214,51 @@ function AdminPage() {
                               </td>
                               <td className="py-2 whitespace-nowrap text-muted-foreground">
                                 {memberFor(user.createdAt, lang)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </TabsContent>
+                <TabsContent value="activity" className="mt-4">
+                  {usersQuery.isPending ? (
+                    <div className="py-6 text-sm text-muted-foreground">{t("Loading")}</div>
+                  ) : usersQuery.isError ? (
+                    <p className="py-6 text-sm text-muted-foreground">
+                      {t("Could not load the users right now.")}
+                    </p>
+                  ) : (
+                    <div className="max-h-[60vh] overflow-auto">
+                      <table className="w-full text-left text-sm">
+                        <thead className="sticky top-0 bg-background">
+                          <tr className="border-b border-border text-xs font-semibold uppercase text-muted-foreground">
+                            <th className="py-2 pr-3">{t("Student")}</th>
+                            <th className="py-2 pr-3">{t("Last login")}</th>
+                            <th className="py-2 pr-3">{t("Current level")}</th>
+                            <th className="py-2">{t("Time in last login")}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {usersQuery.data?.users.map((user) => (
+                            <tr key={user.id} className="border-b border-border/60">
+                              <td className="py-2 pr-3">
+                                <span className="block font-medium">{user.name}</span>
+                                <span className="text-xs text-muted-foreground">{user.email}</span>
+                              </td>
+                              <td className="py-2 pr-3 whitespace-nowrap text-muted-foreground">
+                                {user.lastLoginAt
+                                  ? new Date(user.lastLoginAt).toLocaleString(
+                                      lang === "pt" ? "pt-BR" : "en-US",
+                                    )
+                                  : "—"}
+                              </td>
+                              <td className="py-2 pr-3 font-medium">{user.currentLevel ?? "—"}</td>
+                              <td className="py-2 text-muted-foreground">
+                                {user.lastLoginDurationMinutes == null
+                                  ? t("Not tracked yet")
+                                  : `${user.lastLoginDurationMinutes} min`}
                               </td>
                             </tr>
                           ))}
