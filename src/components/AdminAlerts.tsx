@@ -110,7 +110,13 @@ export function AdminAlerts() {
             className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted disabled:opacity-50"
           >
             <Trash2 className="size-3.5" aria-hidden="true" />
-            {clearing ? (pt ? "Apagando..." : "Dismissing...") : pt ? "Apagar alertas" : "Dismiss alerts"}
+            {clearing
+              ? pt
+                ? "Apagando..."
+                : "Dismissing..."
+              : pt
+                ? "Apagar alertas"
+                : "Dismiss alerts"}
           </button>
         </div>
       )}
