@@ -208,11 +208,13 @@ export function ProfileMenu({
   className,
   presentation = "icon",
   toolbar,
+  onAdminNavigate,
 }: {
   className?: string;
   presentation?: "icon" | "dashboard-sidebar" | "mobile-menu";
   /** Desktop sidebar and phone menu: the icon buttons beside the gear in the profile card. */
   toolbar?: ReactNode;
+  onAdminNavigate?: () => void;
 }) {
   const queryClient = useQueryClient();
   const { lang } = useUiLang();
@@ -705,7 +707,14 @@ export function ProfileMenu({
       </section>
 
       <div className="flex flex-row items-center justify-between gap-2">
-        <AdminPanelButton showLabel className="mr-auto" />
+        <AdminPanelButton
+          showLabel
+          className="mr-auto"
+          onNavigate={() => {
+            setOpen(false);
+            if (presentation === "mobile-menu") onAdminNavigate?.();
+          }}
+        />
         <Button onClick={() => save.mutate()} disabled={save.isPending}>
           {save.isPending && <Loader2 className="size-4 animate-spin" />}
           {save.isPending ? translate("Saving...", lang) : translate("Save profile", lang)}
