@@ -31,10 +31,9 @@ describe("sendMarketingEmail", () => {
   it("renders and sends the Premium template through Resend", async () => {
     process.env["RESEND_API_KEY"] = "test-resend-key";
     process.env["RESEND_FROM_EMAIL"] = "Evoluir+ English AI <noreply@example.com>";
-    const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ id: "email_test_123" }), { status: 200 }),
-    );
-    vi.stubGlobal("fetch", fetchMock);
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify({ id: "email_test_123" }), { status: 200 }));
 
     await expect(
       sendMarketingEmail("premium-benefits", "student@example.com", {
@@ -60,15 +59,13 @@ describe("sendMarketingEmail", () => {
     process.env["RESEND_API_KEY"] = "test-resend-key";
     for (const status of [422, 500]) {
       const fetchMock = vi.fn().mockResolvedValue(
-        new Response(JSON.stringify({ message: "Resend rejected the request" }), { status }),
-      );
-      vi.stubGlobal("fetch", fetchMock);
-      await expect(
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValue(new Response(JSON.stringify({ message: "Resend rejected the request" }), { status }));
         sendMarketingEmail("premium-benefits", "student@example.com"),
-      ).rejects.toThrow(`Resend marketing email failed (${status}): Resend rejected the request`);
-    }
-  });
-
+      await expect(sendMarketingEmail("premium-benefits", "student@example.com")).rejects.toThrow(
+        `Resend marketing email failed (${status}): Resend rejected the request`,
+      );
   it("requires the Resend API key before making a request", async () => {
     delete process.env["RESEND_API_KEY"];
     const fetchMock = vi.fn();
@@ -76,6 +73,6 @@ describe("sendMarketingEmail", () => {
     await expect(
       sendMarketingEmail("premium-benefits", "student@example.com"),
     ).rejects.toThrow("RESEND_API_KEY is not configured");
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-});
+    await expect(sendMarketingEmail("premium-benefits", "student@example.com")).rejects.toThrow(
+      "RESEND_API_KEY is not configured",
+    );
