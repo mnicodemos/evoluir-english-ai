@@ -6,6 +6,7 @@ import { Loader2, Mail, RefreshCw, Reply, Send, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { useUiLang } from "@/lib/uiLang";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   completeMicrosoftEmailConnection,
@@ -19,6 +20,8 @@ import {
 } from "@/lib/admin-email.functions";
 
 export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox?: "contact" | "support" }) {
+  const { lang } = useUiLang();
+  const pt = lang === "pt";
   const queryClient = useQueryClient();
   const loadInbox = useServerFn(getAdminEmailInbox);
   const startConnection = useServerFn(startMicrosoftEmailConnection);
@@ -48,7 +51,7 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
     const code = params.get("emailCode");
     const state = params.get("emailState");
     if (status === "failed") {
-      toast.error("A Microsoft não concluiu a autorização. Tente novamente.");
+      toast.error(pt ? "A Microsoft não concluiu a autorização. Tente novamente." : "Microsoft could not complete authorization. Please try again.");
     }
     if (!code || !state) {
       if (status) {
@@ -67,11 +70,11 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
     window.history.replaceState({}, "", clean);
     void completeConnection({ data: { code, state } })
       .then((result) => {
-        toast.success(`Conta Microsoft conectada: ${result.mailboxEmail}`);
+        toast.success(pt ? `Conta Microsoft conectada: ${result.mailboxEmail}` : `Microsoft account connected: ${result.mailboxEmail}`);
         return queryClient.invalidateQueries({ queryKey: ["admin-email-inbox"] });
       })
       .catch((error) => {
-        toast.error(error instanceof Error ? error.message : "Falha ao concluir conexão Microsoft.");
+        toast.error(error instanceof Error ? error.message : pt ? "Falha ao concluir conexão Microsoft." : "Failed to complete Microsoft connection.");
       })
       .finally(() => setBusy(null));
   }, [completeConnection, queryClient]);
@@ -82,7 +85,7 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
       const result = await startConnection();
       window.location.assign(result.authorizationUrl);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Falha ao iniciar conexão Microsoft.");
+      toast.error(error instanceof Error ? error.message : pt ? "Falha ao iniciar conexão Microsoft." : "Failed to start Microsoft connection.");
       setBusy(null);
     }
   };
@@ -91,10 +94,10 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
     setBusy("sync");
     try {
       const result = await syncInbox();
-      toast.success(`${result.synced} mensagem(ns) sincronizada(s).`);
+      toast.success(pt ? `${result.synced} mensagem(ns) sincronizada(s).` : `${result.synced} message(s) synchronized.`);
       await queryClient.invalidateQueries({ queryKey: ["admin-email-inbox"] });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Falha ao sincronizar mensagens.");
+      toast.error(error instanceof Error ? error.message : pt ? "Falha ao sincronizar mensagens." : "Failed to synchronize messages.");
     } finally {
       setBusy(null);
     }
@@ -121,7 +124,7 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
       })
       .catch((error) => {
         visibleUnreadIds.forEach((id: string) => markingReadIds.current.delete(id));
-        toast.error(error instanceof Error ? error.message : "Não foi possível marcar as mensagens como lidas.");
+        toast.error(error instanceof Error ? error.message : pt ? "Não foi possível marcar as mensagens como lidas." : "Could not mark messages as read.");
       });
   }, [markMessagesRead, messages, queryClient, selectedMailbox]);
 
@@ -131,11 +134,11 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
         <div className="flex items-center gap-2">
           <Mail className="size-5 text-primary" />
           <div>
-            <h2 className="font-semibold">Caixa de entrada</h2>
+            <h2 className="font-semibold">{pt ? "Caixa de entrada" : "Inbox"}</h2>
             <p className="text-xs text-muted-foreground">
               {inbox.data?.connected
-                ? `Microsoft conectado: ${inbox.data.mailboxEmail}`
-                : "Conecte a caixa Hotmail que recebe os encaminhamentos do ImprovMX."}
+                ? pt ? `Microsoft conectado: ${inbox.data.mailboxEmail}` : `Microsoft connected: ${inbox.data.mailboxEmail}`
+                : pt ? "Conecte a caixa Hotmail que recebe os encaminhamentos do ImprovMX." : "Connect the Hotmail inbox that receives forwarded messages from ImprovMX."}
             </p>
           </div>
         </div>
@@ -144,7 +147,7 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
             <>
               <Button size="sm" variant="outline" onClick={connect} disabled={busy !== null}>
                 {busy === "connect" ? <Loader2 className="mr-2 size-4 animate-spin" /> : null}
-                Reconectar Hotmail
+                {pt ? "Reconectar Hotmail" : "Reconnect Hotmail"}
               </Button>
               <Button size="sm" variant="outline" onClick={sync} disabled={busy !== null}>
                 {busy === "sync" ? <Loader2 className="mr-2 size-4 animate-spin" /> : <RefreshCw className="mr-2 size-4" />}
@@ -162,28 +165,28 @@ export function AdminEmailInbox({ initialMailbox = "contact" }: { initialMailbox
 
       {inbox.isPending ? (
         <div className="flex items-center gap-2 py-6 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" /> Carregando caixa de entrada…
+          <Loader2 className="size-4 animate-spin" /> {pt ? "Carregando caixa de entrada…" : "Loading inbox…"}
         </div>
       ) : inbox.isError ? (
         <p className="py-4 text-sm text-destructive">
-          Não foi possível carregar a caixa de entrada. Verifique as políticas da migração Admin Email RLS.
+          {pt ? "Não foi possível carregar a caixa de entrada. Verifique as políticas da migração Admin Email RLS." : "Could not load the inbox. Check the Admin Email RLS migration policies."}
         </p>
       ) : !inbox.data?.connected ? (
         <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">
-          A conexão ainda não foi realizada. Ao conectar, a Microsoft solicitará autorização de leitura da caixa.
+          {pt ? "A conexão ainda não foi realizada. Ao conectar, a Microsoft solicitará autorização de leitura da caixa." : "The inbox is not connected yet. Microsoft will request permission to read the mailbox when you connect."}
         </p>
       ) : (
         <Tabs value={selectedMailbox} onValueChange={(value) => setSelectedMailbox(value as "contact" | "support")}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="contact">Contato ({contact.length})</TabsTrigger>
-            <TabsTrigger value="support">Suporte ({support.length})</TabsTrigger>
+            <TabsTrigger value="contact">{pt ? `Contato (${contact.length})` : `Contact (${contact.length})`}</TabsTrigger>
+            <TabsTrigger value="support">{pt ? `Suporte (${support.length})` : `Support (${support.length})`}</TabsTrigger>
           </TabsList>
-          <TabsContent value="contact" className="mt-3 space-y-2"><MessageList messages={contact} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={removeMessage} /></TabsContent>
-          <TabsContent value="support" className="mt-3 space-y-2"><MessageList messages={support} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={removeMessage} /></TabsContent>
+          <TabsContent value="contact" className="mt-3 space-y-2"><MessageList messages={contact} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={removeMessage} pt={pt} /></TabsContent>
+          <TabsContent value="support" className="mt-3 space-y-2"><MessageList messages={support} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={removeMessage} pt={pt} /></TabsContent>
         </Tabs>
       )}
       <p className="text-xs text-muted-foreground">
-        As mensagens excluídas são movidas para Itens Excluídos do Hotmail e podem ser recuperadas por lá. As respostas são enviadas pelo Resend e registradas no histórico.
+        {pt ? "As mensagens excluídas são movidas para Itens Excluídos do Hotmail e podem ser recuperadas por lá. As respostas são enviadas pelo Resend e registradas no histórico." : "Deleted messages are moved to Hotmail Deleted Items and can be recovered there. Replies are sent through Resend and recorded in the history."}
       </p>
     </section>
   );
@@ -218,12 +221,12 @@ function MessageList({
   deleteMessage: MessageDeleter;
 }) {
   if (!messages.length) {
-    return <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Nenhuma mensagem sincronizada nesta caixa.</p>;
+    return <p className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">{pt ? "Nenhuma mensagem sincronizada nesta caixa." : "No messages have been synchronized in this inbox."}</p>;
   }
   return (
     <div className="max-h-[55vh] space-y-3 overflow-y-auto">
       {messages.map((message) => (
-        <ReplyMessage key={message.id} message={message} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={deleteMessage} />
+        <ReplyMessage key={message.id} message={message} sendReply={sendReply} loadReplyHistory={loadReplyHistory} deleteMessage={deleteMessage} pt={pt} />
       ))}
     </div>
   );
@@ -252,17 +255,17 @@ function ReplyMessage({
     retry: false,
   });
   const remove = async () => {
-    if (deleting || !window.confirm("Mover esta mensagem para Itens Excluídos do Hotmail? Ela poderá ser recuperada por lá.")) return;
+    if (deleting || !window.confirm(pt ? "Mover esta mensagem para Itens Excluídos do Hotmail? Ela poderá ser recuperada por lá." : "Move this message to Hotmail Deleted Items? It can be recovered there.")) return;
     setDeleting(true);
     try {
       await deleteMessage({ data: { messageId: message.id } });
-      toast.success("Mensagem movida para Itens Excluídos do Hotmail.");
+      toast.success(pt ? "Mensagem movida para Itens Excluídos do Hotmail." : "Message moved to Hotmail Deleted Items.");
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin-email-inbox"] }),
         queryClient.invalidateQueries({ queryKey: ["admin-email-unread-count"] }),
       ]);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível excluir a mensagem.");
+      toast.error(error instanceof Error ? error.message : pt ? "Não foi possível excluir a mensagem." : "Could not delete the message.");
     } finally {
       setDeleting(false);
     }
@@ -272,11 +275,11 @@ function ReplyMessage({
     setBusy(true);
     try {
       await sendReply({ data: { requestId: crypto.randomUUID(), messageId: message.id, body: body.trim() } });
-      toast.success("Resposta enviada pelo Resend.");
+      toast.success(pt ? "Resposta enviada pelo Resend." : "Reply sent through Resend.");
       setBody("");
       await history.refetch();
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível enviar a resposta.");
+      toast.error(error instanceof Error ? error.message : pt ? "Não foi possível enviar a resposta." : "Could not send the reply.");
     } finally {
       setBusy(false);
     }
@@ -284,15 +287,15 @@ function ReplyMessage({
   return (
     <article className="rounded-lg border border-border/70 p-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
-        <p className="text-sm font-medium">{message.subject || "(Sem assunto)"}</p>
-        <time className="text-xs text-muted-foreground" dateTime={message.received_at}>{new Date(message.received_at).toLocaleString("pt-BR")}</time>
+        <p className="text-sm font-medium">{message.subject || pt ? "(Sem assunto)" : "(No subject)"}</p>
+        <time className="text-xs text-muted-foreground" dateTime={message.received_at}>{new Date(message.received_at).toLocaleString(pt ? "pt-BR" : "en-US")}</time>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">{message.from_address}</p>
       <p className="mt-2 whitespace-pre-wrap break-words text-sm">{message.body_text}</p>
       <div className="mt-3 border-t border-border/60 pt-3">
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" onClick={() => setOpen((value) => !value)}>
-            <Reply className="mr-2 size-4" /> {open ? "Fechar resposta" : "Responder"}
+            <Reply className="mr-2 size-4" /> {open ? (pt ? "Fechar resposta" : "Close reply") : (pt ? "Responder" : "Reply")}
           </Button>
           <Button size="sm" variant="destructive" onClick={remove} disabled={deleting}>
             {deleting ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Trash2 className="mr-2 size-4" />}
@@ -304,13 +307,13 @@ function ReplyMessage({
             {history.data?.map((reply) => (
               <div key={reply.id} className="rounded-md bg-muted/40 p-3 text-sm">
                 <div className="flex justify-between gap-2">
-                  <span className="font-medium">Resposta {reply.status === "sent" ? "enviada" : reply.status}</span>
-                  <span className="text-xs text-muted-foreground">{reply.sent_at ? new Date(reply.sent_at).toLocaleString("pt-BR") : ""}</span>
+                  <span className="font-medium">{pt ? `Resposta ${reply.status === "sent" ? "enviada" : reply.status}` : `Reply ${reply.status === "sent" ? "sent" : reply.status}`}</span>
+                  <span className="text-xs text-muted-foreground">{reply.sent_at ? new Date(reply.sent_at).toLocaleString(pt ? "pt-BR" : "en-US") : ""}</span>
                 </div>
                 <p className="mt-2 whitespace-pre-wrap">{reply.body_text}</p>
               </div>
             ))}
-            <textarea className="min-h-28 w-full rounded-md border border-input bg-background p-3 text-sm" value={body} onChange={(event) => setBody(event.target.value)} maxLength={10000} placeholder="Escreva sua resposta…" />
+            <textarea className="min-h-28 w-full rounded-md border border-input bg-background p-3 text-sm" value={body} onChange={(event) => setBody(event.target.value)} maxLength={10000} placeholder={pt ? "Escreva sua resposta…" : "Write your reply…"} />
             <div className="flex justify-end">
               <Button size="sm" onClick={submit} disabled={!body.trim() || busy}>
                 {busy ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Send className="mr-2 size-4" />}
