@@ -78,6 +78,7 @@ export function serverErrorAlerts(rows: ServerErrorRow[], now: Date): OpsAlert[]
   for (const [area, list] of byArea) {
     const latest = [...list].sort((a, b) => b.created_at.localeCompare(a.created_at))[0]!;
     alerts.push({
+      id: `server:${area}:${latest.created_at}`,
       level: list.length >= ERROR_THRESHOLD ? "error" : "warning",
       area: "server",
       title: `${area}: ${list.length} erro(s) no servidor em 24 h`,
