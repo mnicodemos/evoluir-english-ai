@@ -75,6 +75,13 @@ describe("serverErrorAlerts", () => {
     expect(serverErrorAlerts([row("Servidor", "2026-10-09T10:00:00Z")], now)).toEqual([]);
   });
 
+  it("changes the dismissal identity when a new server error is recorded", () => {
+    const first = serverErrorAlerts([row("Servidor", "2026-10-10T12:00:00Z", "timeout")], now);
+    const second = serverErrorAlerts([row("Servidor", "2026-10-10T12:30:00Z", "timeout")], now);
+    expect(first[0]?.title).toBe(second[0]?.title);
+    expect(first[0]?.id).not.toBe(second[0]?.id);
+  });
+
   it("sums by area, warns below five and flags five or more as an error", () => {
     const rows = [
       ...Array.from({ length: 5 }, (_, i) => row("Voz (TTS)", `2026-10-10T1${i}:00:00Z`, `v${i}`)),
