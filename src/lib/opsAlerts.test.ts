@@ -54,6 +54,19 @@ describe("pushAlerts", () => {
     expect(nobody[0]?.title).toContain("nenhum aparelho recebeu");
   });
 
+  it("assigns a new dismissal identity to each failed scheduled run", () => {
+    const first = pushAlerts(
+      [run({ error: "Push not configured", created_at: "2026-10-07T12:00:00Z" })],
+      now,
+    );
+    const second = pushAlerts(
+      [run({ error: "Push not configured", created_at: "2026-10-07T12:30:00Z" })],
+      now,
+    );
+    expect(first[0]?.title).toBe(second[0]?.title);
+    expect(first[0]?.id).not.toBe(second[0]?.id);
+  });
+
   it("only warns when some devices still received the push", () => {
     const partial = pushAlerts([run({ sent: 1, failed: 1 }), run({ kind: "reminder" })], now);
     expect(partial).toHaveLength(1);
@@ -82,6 +95,19 @@ describe("aiAlerts", () => {
       }),
     ];
     expect(aiAlerts(calls, now)).toEqual([]);
+  });
+
+  it("uses the latest failed call as the alert occurrence identity", () => {
+    const first = aiAlerts(
+      [call({ success: false, status: "error", created_at: "2026-10-07T10:00:00Z" })],
+      now,
+    );
+    const second = aiAlerts(
+      [call({ success: false, status: "error", created_at: "2026-10-07T11:00:00Z" })],
+      now,
+    );
+    expect(first[0]?.title).toBe(second[0]?.title);
+    expect(first[0]?.id).not.toBe(second[0]?.id);
   });
 
   it("warns on a few failures and alarms when many calls fail", () => {

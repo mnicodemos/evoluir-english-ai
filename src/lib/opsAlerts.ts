@@ -21,6 +21,8 @@ export type AiCall = {
 };
 
 export type OpsAlert = {
+  /** Stable identity for this occurrence; a later failure gets a new key. */
+  id?: string;
   level: "error" | "warning";
   area: "push" | "ai" | "product" | "server";
   title: string;
@@ -54,6 +56,7 @@ export function pushAlerts(runs: PushRun[], now: Date): OpsAlert[] {
       .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
     if (!last) {
       alerts.push({
+        id: `push:missing:${job.kinds.join("-")}:${now.toISOString().slice(0, 10)}`,
         level: "warning",
         area: "push",
         title: `${job.label}: nenhuma execução registrada`,
@@ -63,6 +66,7 @@ export function pushAlerts(runs: PushRun[], now: Date): OpsAlert[] {
     }
     if (now.getTime() - new Date(last.created_at).getTime() > MISSED_RUN_MS) {
       alerts.push({
+        id: `push:missed:${last.kind}:${last.created_at}`,
         level: "error",
         area: "push",
         title: `${job.label}: não roda há ${hoursAgo(last.created_at, now)} h`,
@@ -71,6 +75,7 @@ export function pushAlerts(runs: PushRun[], now: Date): OpsAlert[] {
     }
     if (last.error) {
       alerts.push({
+        id: `push:failed:${last.kind}:${last.created_at}`,
         level: "error",
         area: "push",
         title: `${job.label}: a última execução falhou`,
@@ -78,6 +83,7 @@ export function pushAlerts(runs: PushRun[], now: Date): OpsAlert[] {
       });
     } else if (last.failed > 0 && last.sent === 0) {
       alerts.push({
+        id: `push:no-delivery:${last.kind}:${last.created_at}`,
         level: "error",
         area: "push",
         title: `${job.label}: nenhum aparelho recebeu`,
@@ -85,6 +91,7 @@ export function pushAlerts(runs: PushRun[], now: Date): OpsAlert[] {
       });
     } else if (last.failed > 0) {
       alerts.push({
+        id: `push:partial:${last.kind}:${last.created_at}`,
         level: "warning",
         area: "push",
         title: `${job.label}: ${last.failed} envio(s) falharam`,
@@ -115,6 +122,7 @@ export function aiAlerts(calls: AiCall[], now: Date): OpsAlert[] {
     const latest = failed.sort((a, b) => b.created_at.localeCompare(a.created_at))[0]!;
     const reason = latest.error_message || latest.error_code || "erro sem mensagem";
     alerts.push({
+      id: `ai:${operation}:${latest.created_at}`,
       level: failed.length >= 3 && rate >= 0.25 ? "error" : "warning",
       area: "ai",
       title: `IA (${operation}): ${failed.length} de ${total} chamadas falharam em 24 h`,
