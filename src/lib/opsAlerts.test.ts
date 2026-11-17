@@ -55,8 +55,14 @@ describe("pushAlerts", () => {
   });
 
   it("assigns a new dismissal identity to each failed scheduled run", () => {
-    const first = pushAlerts([run({ error: "Push not configured", created_at: "2026-10-07T12:00:00Z" })], now);
-    const second = pushAlerts([run({ error: "Push not configured", created_at: "2026-10-07T12:30:00Z" })], now);
+    const first = pushAlerts(
+      [run({ error: "Push not configured", created_at: "2026-10-07T12:00:00Z" })],
+      now,
+    );
+    const second = pushAlerts(
+      [run({ error: "Push not configured", created_at: "2026-10-07T12:30:00Z" })],
+      now,
+    );
     expect(first[0]?.title).toBe(second[0]?.title);
     expect(first[0]?.id).not.toBe(second[0]?.id);
   });
@@ -92,8 +98,14 @@ describe("aiAlerts", () => {
   });
 
   it("uses the latest failed call as the alert occurrence identity", () => {
-    const first = aiAlerts([call({ success: false, status: "error", created_at: "2026-10-07T10:00:00Z" })], now);
-    const second = aiAlerts([call({ success: false, status: "error", created_at: "2026-10-07T11:00:00Z" })], now);
+    const first = aiAlerts(
+      [call({ success: false, status: "error", created_at: "2026-10-07T10:00:00Z" })],
+      now,
+    );
+    const second = aiAlerts(
+      [call({ success: false, status: "error", created_at: "2026-10-07T11:00:00Z" })],
+      now,
+    );
     expect(first[0]?.title).toBe(second[0]?.title);
     expect(first[0]?.id).not.toBe(second[0]?.id);
   });
