@@ -64,7 +64,11 @@ export async function loadOpsAlerts(
       }),
     );
   }
-  const keyedAlerts = alerts.map((alert) => ({ ...alert, id: `${alert.area}:${alert.title}` }));
+  const keyedAlerts = alerts.map((alert) => ({
+    ...alert,
+    // Keep a dismissal tied to the underlying occurrence, not just its title.
+    id: alert.id ?? `${alert.area}:${alert.title}`,
+  }));
   if (options.includeProduct && keyedAlerts.length > 0) {
     const { data: dismissed, error: dismissalError } = await supabaseAdmin
       .from("admin_alert_dismissals")
