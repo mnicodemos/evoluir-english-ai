@@ -12,6 +12,7 @@ export interface MarketingEmailOptions {
 
 export interface MarketingEmailResult {
   sent: true;
+  messageId: string;
 }
 
 /**
@@ -20,7 +21,7 @@ export interface MarketingEmailResult {
  * workflows that enforce recipient eligibility.
  */
 export async function sendMarketingEmail(
-  templateName: "premium-benefits",
+  templateName: "premium-benefits" | "reactivation",
   to: string,
   options: MarketingEmailOptions = {},
 ): Promise<MarketingEmailResult> {
@@ -72,5 +73,5 @@ export async function sendMarketingEmail(
     throw new Error("Resend accepted the marketing request but returned no email ID");
   }
 
-  return { sent: true };
+  return { sent: true, messageId: String(payload.id) };
 }
