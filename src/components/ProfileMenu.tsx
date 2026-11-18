@@ -711,7 +711,9 @@ export function ProfileMenu({
 
       <section className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background/40 p-3">
         <div className="min-w-0 space-y-1">
-          <h3 className="text-sm font-semibold">{lang === "pt" ? "E-mails de reativação" : "Reactivation emails"}</h3>
+          <h3 className="text-sm font-semibold">
+            {lang === "pt" ? "E-mails de reativação" : "Reactivation emails"}
+          </h3>
           <p className="text-xs leading-relaxed text-muted-foreground">
             {lang === "pt"
               ? "Receba lembretes por e-mail após períodos sem estudar. Você pode cancelar quando quiser."
@@ -720,7 +722,11 @@ export function ProfileMenu({
         </div>
         <Switch
           checked={reactivationEmailPreference.data ?? false}
-          disabled={!profile?.id || reactivationEmailPreference.isLoading || updateReactivationEmailPreference.isPending}
+          disabled={
+            !profile?.id ||
+            reactivationEmailPreference.isLoading ||
+            updateReactivationEmailPreference.isPending
+          }
           onCheckedChange={(enabled) => updateReactivationEmailPreference.mutate(enabled)}
           aria-label={lang === "pt" ? "E-mails de reativação" : "Reactivation emails"}
         />
