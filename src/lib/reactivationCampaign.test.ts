@@ -7,8 +7,9 @@ import {
 } from "./reactivationCampaign";
 
 describe("reactivationCampaign", () => {
-  it("returns only the next due milestone", () => {
-    expect(nextReactivationMilestone(10, [])).toBe(2);
+  it("returns the latest due milestone without sending overdue reminders in a burst", () => {
+    expect(nextReactivationMilestone(2, [])).toBe(2);
+    expect(nextReactivationMilestone(10, [])).toBe(7);
     expect(nextReactivationMilestone(10, [2, 4, 7])).toBeNull();
     expect(nextReactivationMilestone(30, [2, 4, 7, 14])).toBe(30);
   });
