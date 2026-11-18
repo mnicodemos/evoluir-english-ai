@@ -16,6 +16,7 @@ import { focusSetActivity, focusStart, getFocusSnapshot, openFocusWidget } from 
 import type { FocusActivity } from "@/lib/life";
 import { FOCUS_PRESETS } from "@/lib/life";
 import { getFocusInvitationEnabled } from "@/lib/focusInvitationPreference";
+import { FOCUS_CLOUD_SYNC_READY_EVENT, getFocusCloudSyncStatus } from "@/lib/focusCloudSyncStatus";
 
 const claimOffer = createFocusOfferGate();
 const TOAST_ID = "focus-study-invitation";
@@ -49,6 +50,15 @@ export function FocusStudyInvitation() {
         pendingOffer.current = false;
         return;
       }
+      const syncStatus = getFocusCloudSyncStatus(profile.id);
+      if (syncStatus === "pending") {
+        pendingOffer.current = true;
+        return;
+      }
+      if (syncStatus === "failed") {
+        pendingOffer.current = false;
+        return;
+      }
       const current = getFocusSnapshot().state;
       if (!claimOffer(profile.id, current, undefined, pendingActivityKey.current)) return;
       pendingOffer.current = false;
@@ -77,9 +87,19 @@ export function FocusStudyInvitation() {
         cancel: { label: t("Not now"), onClick: () => undefined },
       });
     };
+    const handleSyncReady = (event: Event) => {
+      const detail = (event as CustomEvent<{ userId?: string; status?: string }>).detail;
+      if (detail?.userId !== profile?.id) return;
+      if (detail.status === "ready" && pendingOffer.current) offer();
+      if (detail.status === "failed") pendingOffer.current = false;
+    };
     window.addEventListener(STUDY_STARTED_EVENT, offer);
+    window.addEventListener(FOCUS_CLOUD_SYNC_READY_EVENT, handleSyncReady);
     if (pendingOffer.current) offer();
-    return () => window.removeEventListener(STUDY_STARTED_EVENT, offer);
+    return () => {
+      window.removeEventListener(STUDY_STARTED_EVENT, offer);
+      window.removeEventListener(FOCUS_CLOUD_SYNC_READY_EVENT, handleSyncReady);
+    };
   }, [profile?.id, focusInvitation.data, focusInvitation.isLoading, t]);
 
   useEffect(() => {

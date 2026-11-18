@@ -13,6 +13,7 @@ import {
 } from "@/lib/focusTimer";
 import { loadFocusCloudSnapshot, saveFocusCloudSnapshot } from "@/lib/focusTimer.functions";
 import type { FocusActivity } from "@/lib/life";
+import { setFocusCloudSyncStatus } from "@/lib/focusCloudSyncStatus";
 
 function focusStateSignature(state: Partial<FocusState> | null) {
   if (!state) return null;
@@ -110,6 +111,7 @@ export function useFocusCloudSync() {
 
     loadingUser.current = userId;
     readyForWrites.current = false;
+    setFocusCloudSyncStatus(userId, "pending");
     try {
       const owner = window.localStorage.getItem("evoluir-focus-owner");
       if (owner && owner !== userId) {
@@ -160,9 +162,13 @@ export function useFocusCloudSync() {
         if (shouldResume && restored.phase !== "idle" && restored.endsAt === null) {
           focusResume();
         }
+        setFocusCloudSyncStatus(userId, "ready");
       })
       .catch(() => {
         // Keep the local timer usable while offline; a later mount/reload retries.
+        // Invitations stay suppressed until a successful cloud read avoids offering
+        // a stale preset or starting over an active session from another device.
+        setFocusCloudSyncStatus(userId, "failed");
       })
       .finally(() => {
         readyForWrites.current = true;
