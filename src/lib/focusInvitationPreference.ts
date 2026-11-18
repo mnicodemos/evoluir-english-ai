@@ -89,3 +89,43 @@ export async function setPushNotificationsEnabled(
   if (result.error) throw result.error;
   return enabled;
 }
+
+const REACTIVATION_EMAIL_KEY = "reactivation_email_opt_in";
+
+/** Marketing reactivation is opt-in: existing students remain unsubscribed by default. */
+export async function getReactivationEmailEnabled(userId: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("learning_profile")
+    .select("learning_preferences")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return asPreferences(data?.learning_preferences)[REACTIVATION_EMAIL_KEY] === true;
+}
+
+/** Save explicit consent without overwriting other learning preferences. */
+export async function setReactivationEmailEnabled(
+  userId: string,
+  enabled: boolean,
+): Promise<boolean> {
+  const { data, error } = await supabase
+    .from("learning_profile")
+    .select("learning_preferences")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  const learningPreferences = {
+    ...asPreferences(data?.learning_preferences),
+    [REACTIVATION_EMAIL_KEY]: enabled,
+  };
+  const result = data
+    ? await supabase
+        .from("learning_profile")
+        .update({ learning_preferences: learningPreferences })
+        .eq("user_id", userId)
+    : await supabase
+        .from("learning_profile")
+        .insert({ user_id: userId, learning_preferences: learningPreferences });
+  if (result.error) throw result.error;
+  return enabled;
+}

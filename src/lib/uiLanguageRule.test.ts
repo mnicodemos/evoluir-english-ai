@@ -25,7 +25,7 @@ const SKIP_FILES = [
   /lib\/email-templates\/premium-benefits\.tsx$/,
   /components\/home\//,
   // Transactional email templates are not student-screen UI; copy may be Portuguese-only.
-  /lib\/email-templates\/(premium-benefits|welcome)\.tsx$/,
+  /lib\/email-templates\/(premium-benefits|welcome|reactivation)\.tsx$/,
   /\.test\.tsx$/,
 ];
 /** Brand names, units and symbols read the same in both languages. */

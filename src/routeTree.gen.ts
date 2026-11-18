@@ -56,6 +56,8 @@ import { Route as AuthenticatedLifeDecisionsRouteImport } from './routes/_authen
 import { Route as AuthenticatedLifeGuideRouteImport } from './routes/_authenticated/life/guide'
 import { Route as AuthenticatedLifeHabitsRouteImport } from './routes/_authenticated/life/habits'
 import { Route as AuthenticatedLifeRoutineRouteImport } from './routes/_authenticated/life/routine'
+import { Route as ApiPublicCronReactivationEmailsRouteImport } from './routes/api/public/cron/reactivation-emails'
+import { Route as ApiPublicReactivationUnsubscribeRouteImport } from './routes/api/public/reactivation-unsubscribe'
 import { Route as ApiPublicCronDailyPushRouteImport } from './routes/api/public/cron/daily-push'
 import { Route as ApiPublicCronAdminEmailSyncRouteImport } from './routes/api/public/cron/admin-email-sync'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
@@ -310,6 +312,16 @@ const ApiPublicCronAdminEmailSyncRoute = ApiPublicCronAdminEmailSyncRouteImport.
   path: '/api/public/cron/admin-email-sync',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicCronReactivationEmailsRoute = ApiPublicCronReactivationEmailsRouteImport.update({
+  id: '/api/public/cron/reactivation-emails',
+  path: '/api/public/cron/reactivation-emails',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicReactivationUnsubscribeRoute = ApiPublicReactivationUnsubscribeRouteImport.update({
+  id: '/api/public/reactivation-unsubscribe',
+  path: '/api/public/reactivation-unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicCronDailyPushRoute = ApiPublicCronDailyPushRouteImport.update({
   id: '/api/public/cron/daily-push',
   path: '/api/public/cron/daily-push',
@@ -381,6 +393,8 @@ export interface FileRoutesByFullPath {
   '/life/': typeof AuthenticatedLifeIndexRoute
   '/api/public/cron/admin-email-sync': typeof ApiPublicCronAdminEmailSyncRoute
   '/api/public/cron/admin-email-sync': typeof ApiPublicCronAdminEmailSyncRoute
+  '/api/public/cron/reactivation-emails': typeof ApiPublicCronReactivationEmailsRoute
+  '/api/public/reactivation-unsubscribe': typeof ApiPublicReactivationUnsubscribeRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
@@ -433,6 +447,8 @@ export interface FileRoutesByTo {
   '/life/routine': typeof AuthenticatedLifeRoutineRoute
   '/learning': typeof AuthenticatedLearningIndexRoute
   '/life': typeof AuthenticatedLifeIndexRoute
+  '/api/public/cron/reactivation-emails': typeof ApiPublicCronReactivationEmailsRoute
+  '/api/public/reactivation-unsubscribe': typeof ApiPublicReactivationUnsubscribeRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
@@ -487,6 +503,8 @@ export interface FileRoutesById {
   '/_authenticated/life/routine': typeof AuthenticatedLifeRoutineRoute
   '/_authenticated/learning/': typeof AuthenticatedLearningIndexRoute
   '/_authenticated/life/': typeof AuthenticatedLifeIndexRoute
+  '/api/public/cron/reactivation-emails': typeof ApiPublicCronReactivationEmailsRoute
+  '/api/public/reactivation-unsubscribe': typeof ApiPublicReactivationUnsubscribeRoute
   '/api/public/cron/daily-push': typeof ApiPublicCronDailyPushRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/api/public/whatsapp/webhook': typeof ApiPublicWhatsappWebhookRoute
@@ -541,6 +559,8 @@ export interface FileRouteTypes {
     | '/life/routine'
     | '/learning/'
     | '/life/'
+    | '/api/public/cron/reactivation-emails'
+    | '/api/public/reactivation-unsubscribe'
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/api/public/whatsapp/webhook'
@@ -593,6 +613,8 @@ export interface FileRouteTypes {
     | '/life/routine'
     | '/learning'
     | '/life'
+    | '/api/public/cron/reactivation-emails'
+    | '/api/public/reactivation-unsubscribe'
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/api/public/whatsapp/webhook'
@@ -646,6 +668,8 @@ export interface FileRouteTypes {
     | '/_authenticated/life/routine'
     | '/_authenticated/learning/'
     | '/_authenticated/life/'
+    | '/api/public/cron/reactivation-emails'
+    | '/api/public/reactivation-unsubscribe'
     | '/api/public/cron/daily-push'
     | '/api/public/stripe/webhook'
     | '/api/public/whatsapp/webhook'
@@ -667,6 +691,8 @@ export interface RootRouteChildren {
   ApiTranscribeRoute: typeof ApiTranscribeRoute
   ApiAdminEmailMicrosoftCallbackRoute: typeof ApiAdminEmailMicrosoftCallbackRoute
   ApiPublicCronAdminEmailSyncRoute: typeof ApiPublicCronAdminEmailSyncRoute
+  ApiPublicCronReactivationEmailsRoute: typeof ApiPublicCronReactivationEmailsRoute
+  ApiPublicReactivationUnsubscribeRoute: typeof ApiPublicReactivationUnsubscribeRoute
   ApiPublicCronDailyPushRoute: typeof ApiPublicCronDailyPushRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   ApiPublicWhatsappWebhookRoute: typeof ApiPublicWhatsappWebhookRoute
@@ -1011,6 +1037,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCronAdminEmailSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/cron/reactivation-emails': {
+      id: '/api/public/cron/reactivation-emails'
+      path: '/api/public/cron/reactivation-emails'
+      fullPath: '/api/public/cron/reactivation-emails'
+      preLoaderRoute: typeof ApiPublicCronReactivationEmailsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/reactivation-unsubscribe': {
+      id: '/api/public/reactivation-unsubscribe'
+      path: '/api/public/reactivation-unsubscribe'
+      fullPath: '/api/public/reactivation-unsubscribe'
+      preLoaderRoute: typeof ApiPublicReactivationUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/cron/daily-push': {
       id: '/api/public/cron/daily-push'
       path: '/api/public/cron/daily-push'
@@ -1134,6 +1174,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTranscribeRoute: ApiTranscribeRoute,
   ApiAdminEmailMicrosoftCallbackRoute: ApiAdminEmailMicrosoftCallbackRoute,
   ApiPublicCronAdminEmailSyncRoute: ApiPublicCronAdminEmailSyncRoute,
+  ApiPublicCronReactivationEmailsRoute: ApiPublicCronReactivationEmailsRoute,
+  ApiPublicReactivationUnsubscribeRoute: ApiPublicReactivationUnsubscribeRoute,
   ApiPublicCronDailyPushRoute: ApiPublicCronDailyPushRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   ApiPublicWhatsappWebhookRoute: ApiPublicWhatsappWebhookRoute,
