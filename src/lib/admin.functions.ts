@@ -2435,7 +2435,7 @@ export const listRetentionEmailDeliveries = createServerFn({ method: "GET" })
     }));
     const counts = deliveries.reduce(
       (acc, row) => {
-        acc.total += 1;
+        acc["total"] = (acc["total"] ?? 0) + 1;
         acc[row.status] = (acc[row.status] ?? 0) + 1;
         return acc;
       },
