@@ -3,10 +3,7 @@ const failedUsers = new Set<string>();
 
 export const FOCUS_CLOUD_SYNC_READY_EVENT = "evoluir-focus-cloud-sync-ready";
 
-export function setFocusCloudSyncStatus(
-  userId: string,
-  status: "ready" | "failed" | "pending",
-) {
+export function setFocusCloudSyncStatus(userId: string, status: "ready" | "failed" | "pending") {
   readyUsers.delete(userId);
   failedUsers.delete(userId);
   if (status === "ready") readyUsers.add(userId);
