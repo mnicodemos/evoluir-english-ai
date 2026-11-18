@@ -92,6 +92,7 @@ async function runReactivationCampaign(supabaseAdmin: typeof import("@/integrati
       scheduled_at: new Date().toISOString(),
     });
     if (reserveError) {
+      let retryReserved = false;
       if (reserveError.code === "23505") {
         const { data: existing } = await supabaseAdmin.from("reactivation_email_deliveries")
           .select("status").eq("inactivity_cycle_key", idempotencyKey).maybeSingle();
@@ -99,12 +100,15 @@ async function runReactivationCampaign(supabaseAdmin: typeof import("@/integrati
           const { data: retried } = await supabaseAdmin.from("reactivation_email_deliveries")
             .update({ status: "pending", last_error: null, scheduled_at: new Date().toISOString(), updated_at: new Date().toISOString() })
             .eq("inactivity_cycle_key", idempotencyKey).eq("status", "failed").select("id").maybeSingle();
-          if (!retried) { skipped++; continue; }
-        } else { skipped++; continue; }
+          retryReserved = Boolean(retried);
+        }
       }
-      failed++;
-      console.error("reactivation-email: could not reserve delivery", reserveError.message);
-      continue;
+      if (!retryReserved) {
+        if (reserveError.code === "23505") { skipped++; continue; }
+        failed++;
+        console.error("reactivation-email: could not reserve delivery", reserveError.message);
+        continue;
+      }
     }
     try {
       const result = await sendMarketingEmail("reactivation", email, {
