@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - feat/reactivation-email-automation
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
 permissions:
   contents: write
 jobs:
