@@ -87,7 +87,8 @@ async function runReactivationCampaign(
           !Array.isArray(row.learning_preferences)
             ? (row.learning_preferences as Record<string, unknown>)
             : {};
-        return prefs["reactivation_email_opt_in"] === true;
+        // Enabled by default for all students; an explicit unsubscribe remains respected.
+        return prefs["reactivation_email_opt_in"] !== false;
       })
       .map((row) => row.user_id),
   );
