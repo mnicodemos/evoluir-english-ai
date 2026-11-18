@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { keepAlive } from "@/lib/keepAlive.server";
 import { profileIsPremium } from "@/lib/billing/subscriptionView";
-import { nextReactivationMilestone, reactivationIdempotencyKey, type ReactivationCandidate } from "@/lib/reactivationCampaign";
+import { nextReactivationMilestone, reactivationIdempotencyKey } from "@/lib/reactivationCampaign";
 import { createReactivationUnsubscribeToken } from "@/lib/reactivationUnsubscribe.server";
 import { studyToday } from "@/lib/today";
 
@@ -33,7 +33,6 @@ export const Route = createFileRoute("/api/public/cron/reactivation-emails")({
 
 async function runReactivationCampaign(supabaseAdmin: typeof import("@/integrations/supabase/client.server").supabaseAdmin) {
   const today = studyToday();
-  const oldest = new Date(Date.parse(`${today}T00:00:00-03:00`) - 30 * 86_400_000).toISOString();
   const { data: profiles, error } = await supabaseAdmin
     .from("profiles")
     .select("id,name,email,plan,plan_expires_at,last_activity_date")
@@ -63,12 +62,6 @@ async function runReactivationCampaign(supabaseAdmin: typeof import("@/integrati
   const { sendMarketingEmail } = await import("@/lib/email-templates/send-marketing-email");
   const { data: delivered, error: deliveredError } = await supabaseAdmin.from("reactivation_email_deliveries").select("user_id,milestone_days,inactivity_cycle_key,status").in("user_id", ids);
   if (deliveredError) throw new Error(`Could not load reactivation delivery history: ${deliveredError.message}`);
-  const history = new Map<string, number[]>();
-  for (const row of delivered ?? []) {
-    if (["sent", "delivered", "opened", "clicked", "pending"].includes(row.status)) {
-      history.set(row.user_id, [...(history.get(row.user_id) ?? []), row.milestone_days]);
-    }
-  }
 
   let sent = 0;
   let failed = 0;
@@ -79,9 +72,13 @@ async function runReactivationCampaign(supabaseAdmin: typeof import("@/integrati
     const lastActivityAt = profile.last_activity_date;
     if (!email || !lastActivityAt || !optedIn.has(profile.id) || activePremium.has(profile.id) || profileIsPremium(profile)) { skipped++; continue; }
     const inactivityDays = daysBetween(today, lastActivityAt);
-    const candidate: ReactivationCandidate = { userId: profile.id, lastActivityAt, inactivityDays, isPremium: false };
     if (inactivityDays < 2 || !Number.isFinite(inactivityDays)) { skipped++; continue; }
-    const milestone = nextReactivationMilestone(inactivityDays, history.get(profile.id) ?? []);
+    const cyclePrefix = `reactivation:${profile.id}:${new Date(lastActivityAt).toISOString()}:`;
+    const deliveredMilestones = (delivered ?? [])
+      .filter((row) => row.user_id === profile.id && row.inactivity_cycle_key.startsWith(cyclePrefix)
+        && ["sent", "delivered", "opened", "clicked", "pending"].includes(row.status))
+      .map((row) => row.milestone_days);
+    const milestone = nextReactivationMilestone(inactivityDays, deliveredMilestones);
     if (!milestone) { skipped++; continue; }
     const idempotencyKey = reactivationIdempotencyKey(profile.id, lastActivityAt, milestone);
     const unsubscribeToken = createReactivationUnsubscribeToken(profile.id);
@@ -95,7 +92,16 @@ async function runReactivationCampaign(supabaseAdmin: typeof import("@/integrati
       scheduled_at: new Date().toISOString(),
     });
     if (reserveError) {
-      if (reserveError.code === "23505") { skipped++; continue; }
+      if (reserveError.code === "23505") {
+        const { data: existing } = await supabaseAdmin.from("reactivation_email_deliveries")
+          .select("status").eq("inactivity_cycle_key", idempotencyKey).maybeSingle();
+        if (existing?.status === "failed") {
+          const { data: retried } = await supabaseAdmin.from("reactivation_email_deliveries")
+            .update({ status: "pending", last_error: null, scheduled_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+            .eq("inactivity_cycle_key", idempotencyKey).eq("status", "failed").select("id").maybeSingle();
+          if (!retried) { skipped++; continue; }
+        } else { skipped++; continue; }
+      }
       failed++;
       console.error("reactivation-email: could not reserve delivery", reserveError.message);
       continue;
@@ -112,7 +118,6 @@ async function runReactivationCampaign(supabaseAdmin: typeof import("@/integrati
         updated_at: new Date().toISOString(),
       }).eq("inactivity_cycle_key", idempotencyKey);
       if (updateError) throw updateError;
-      history.set(profile.id, [...(history.get(profile.id) ?? []), milestone]);
       sent++;
     } catch (sendError) {
       failed++;
