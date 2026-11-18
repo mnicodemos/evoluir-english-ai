@@ -148,7 +148,7 @@ export const template = {
   component: ReactivationEmail,
   displayName: "Student reactivation",
   subject: (data: Record<string, unknown>) => {
-    const days = Number(data.milestoneDays ?? 2);
+    const days = Number(data["milestoneDays"] ?? 2);
     const subjects: Record<number, string> = {
       2: "Que tal retomar seu inglês hoje?",
       4: "Seu inglês continua evoluindo, um passo de cada vez",
