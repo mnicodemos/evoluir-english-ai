@@ -50,6 +50,8 @@ import {
   setFocusInvitationEnabled,
   getPushNotificationsEnabled,
   setPushNotificationsEnabled,
+  getReactivationEmailEnabled,
+  setReactivationEmailEnabled,
 } from "@/lib/focusInvitationPreference";
 import {
   createWhatsAppStudyLinkCode,
@@ -291,6 +293,25 @@ export function ProfileMenu({
     },
     onSuccess: (enabled) => {
       queryClient.setQueryData(["push-notifications-enabled", profile?.id], enabled);
+    },
+    onError: () => {
+      showAppNotification({
+        title: translate("Could not update this preference. Please try again.", lang),
+        variant: "error",
+      });
+    },
+  });
+
+  const reactivationEmailPreference = useQuery({
+    queryKey: ["reactivation-email-enabled", profile?.id],
+    enabled: !!profile?.id,
+    queryFn: () => getReactivationEmailEnabled(profile!.id),
+    staleTime: 60_000,
+  });
+  const updateReactivationEmailPreference = useMutation({
+    mutationFn: (enabled: boolean) => setReactivationEmailEnabled(profile!.id, enabled),
+    onSuccess: (enabled) => {
+      queryClient.setQueryData(["reactivation-email-enabled", profile?.id], enabled);
     },
     onError: () => {
       showAppNotification({
@@ -685,6 +706,23 @@ export function ProfileMenu({
           disabled={!profile?.id || pushPreference.isLoading || updatePushPreference.isPending}
           onCheckedChange={(enabled) => updatePushPreference.mutate(enabled)}
           aria-label={translate("Push notifications", lang)}
+        />
+      </section>
+
+      <section className="flex items-center justify-between gap-4 rounded-xl border border-border bg-background/40 p-3">
+        <div className="min-w-0 space-y-1">
+          <h3 className="text-sm font-semibold">{lang === "pt" ? "E-mails de reativação" : "Reactivation emails"}</h3>
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {lang === "pt"
+              ? "Receba lembretes por e-mail após períodos sem estudar. Você pode cancelar quando quiser."
+              : "Receive email reminders after periods without studying. You can unsubscribe at any time."}
+          </p>
+        </div>
+        <Switch
+          checked={reactivationEmailPreference.data ?? false}
+          disabled={!profile?.id || reactivationEmailPreference.isLoading || updateReactivationEmailPreference.isPending}
+          onCheckedChange={(enabled) => updateReactivationEmailPreference.mutate(enabled)}
+          aria-label={lang === "pt" ? "E-mails de reativação" : "Reactivation emails"}
         />
       </section>
 
