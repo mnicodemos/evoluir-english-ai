@@ -16,10 +16,7 @@ import { focusSetActivity, focusStart, getFocusSnapshot, openFocusWidget } from 
 import type { FocusActivity } from "@/lib/life";
 import { FOCUS_PRESETS } from "@/lib/life";
 import { getFocusInvitationEnabled } from "@/lib/focusInvitationPreference";
-import {
-  FOCUS_CLOUD_SYNC_READY_EVENT,
-  getFocusCloudSyncStatus,
-} from "@/lib/focusCloudSyncStatus";
+import { FOCUS_CLOUD_SYNC_READY_EVENT, getFocusCloudSyncStatus } from "@/lib/focusCloudSyncStatus";
 
 const claimOffer = createFocusOfferGate();
 const TOAST_ID = "focus-study-invitation";
