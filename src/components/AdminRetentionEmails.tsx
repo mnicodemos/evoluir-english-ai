@@ -34,15 +34,26 @@ export function AdminRetentionEmails() {
     <section className="card-soft mt-5 space-y-4 p-3 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h3 className="font-semibold">{pt ? "Retenção e lembretes" : "Retention and reminders"}</h3>
+          <h3 className="font-semibold">
+            {pt ? "Retenção e lembretes" : "Retention and reminders"}
+          </h3>
           <p className="text-sm text-muted-foreground">
             {pt
               ? "Acompanhamento dos e-mails por inatividade: 2, 4, 7, 14 e 30 dias."
               : "Email tracking by inactivity: 2, 4, 7, 14, and 30 days."}
           </p>
         </div>
-        <Button size="sm" variant="outline" onClick={() => void query.refetch()} disabled={query.isFetching}>
-          {query.isFetching ? <Loader2 className="size-3 animate-spin" /> : <RefreshCw className="size-3" />}
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => void query.refetch()}
+          disabled={query.isFetching}
+        >
+          {query.isFetching ? (
+            <Loader2 className="size-3 animate-spin" />
+          ) : (
+            <RefreshCw className="size-3" />
+          )}
           {pt ? "Atualizar" : "Refresh"}
         </Button>
       </div>
@@ -54,7 +65,9 @@ export function AdminRetentionEmails() {
         </div>
       ) : query.isError ? (
         <p className="text-sm text-destructive">
-          {pt ? "Não foi possível carregar o histórico de retenção." : "Could not load retention history."}
+          {pt
+            ? "Não foi possível carregar o histórico de retenção."
+            : "Could not load retention history."}
         </p>
       ) : (
         <>
@@ -74,12 +87,17 @@ export function AdminRetentionEmails() {
           <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
             <span>{pt ? "Marcos:" : "Milestones:"}</span>
             {MILESTONES.map((day) => (
-              <span key={day} className="rounded-full border px-2 py-1">{day}{pt ? " dias" : " days"}</span>
+              <span key={day} className="rounded-full border px-2 py-1">
+                {day}
+                {pt ? " dias" : " days"}
+              </span>
             ))}
           </div>
           {query.data.deliveries.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border p-5 text-center">
-              <p className="font-medium">{pt ? "Nenhum envio de retenção registrado" : "No retention emails recorded"}</p>
+              <p className="font-medium">
+                {pt ? "Nenhum envio de retenção registrado" : "No retention emails recorded"}
+              </p>
               <p className="mt-1 text-sm text-muted-foreground">
                 {pt
                   ? "A visão está pronta para monitorar os envios quando a rotina de reativação for ativada. Nenhum e-mail é disparado por esta tela."
@@ -107,11 +125,18 @@ export function AdminRetentionEmails() {
                         <p className="font-medium">{row.student_name}</p>
                         <p className="text-xs text-muted-foreground">{row.recipient_email}</p>
                       </td>
-                      <td className="py-2 pr-2 whitespace-nowrap">{row.milestone_days}{pt ? " dias" : " days"}</td>
+                      <td className="py-2 pr-2 whitespace-nowrap">
+                        {row.milestone_days}
+                        {pt ? " dias" : " days"}
+                      </td>
                       <td className="py-2 pr-2">{labels[row.status] ?? row.status}</td>
-                      <td className="py-2 pr-2 whitespace-nowrap text-xs">{date(row.scheduled_at)}</td>
+                      <td className="py-2 pr-2 whitespace-nowrap text-xs">
+                        {date(row.scheduled_at)}
+                      </td>
                       <td className="py-2 pr-2 whitespace-nowrap text-xs">{date(row.sent_at)}</td>
-                      <td className="py-2 pr-2 whitespace-nowrap text-xs">{date(row.delivered_at)}</td>
+                      <td className="py-2 pr-2 whitespace-nowrap text-xs">
+                        {date(row.delivered_at)}
+                      </td>
                       <td className="py-2 text-xs text-destructive">{row.last_error ?? "—"}</td>
                     </tr>
                   ))}
