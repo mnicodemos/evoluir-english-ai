@@ -18,7 +18,7 @@ export function nextReactivationMilestone(
   const due = REACTIVATION_MILESTONES.filter(
     (milestone) => inactivityDays >= milestone && !delivered.has(milestone),
   );
-  return due.length ? due[0] : null;
+  return due[0] ?? null;
 }
 
 /** Stable across retries, but changes when the student studies again. */
