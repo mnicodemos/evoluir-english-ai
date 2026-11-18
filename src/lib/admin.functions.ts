@@ -2407,7 +2407,6 @@ export const sendAdminStudentEmail = createServerFn({ method: "POST" })
     }
   });
 
-
 /** Read-only delivery history for student retention / inactivity reminders. */
 export const listRetentionEmailDeliveries = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -2416,7 +2415,9 @@ export const listRetentionEmailDeliveries = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("reactivation_email_deliveries")
-      .select("id, user_id, milestone_days, status, recipient_email, scheduled_at, sent_at, delivered_at, opened_at, clicked_at, last_error, created_at")
+      .select(
+        "id, user_id, milestone_days, status, recipient_email, scheduled_at, sent_at, delivered_at, opened_at, clicked_at, last_error, created_at",
+      )
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) throw error;
@@ -2425,7 +2426,9 @@ export const listRetentionEmailDeliveries = createServerFn({ method: "GET" })
       ? await supabaseAdmin.from("profiles").select("id, name").in("id", userIds)
       : { data: [], error: null };
     if (profilesError) throw profilesError;
-    const names = new Map((profiles ?? []).map((profile) => [profile.id, profile.name ?? "Student"]));
+    const names = new Map(
+      (profiles ?? []).map((profile) => [profile.id, profile.name ?? "Student"]),
+    );
     const deliveries = (rows ?? []).map((row) => ({
       ...row,
       student_name: names.get(row.user_id) ?? "Student",
