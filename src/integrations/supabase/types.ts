@@ -653,6 +653,60 @@ export type Database = {
         }
         Relationships: []
       }
+      reactivation_email_deliveries: {
+        Row: {
+          clicked_at: string | null
+          created_at: string
+          delivered_at: string | null
+          id: string
+          inactivity_cycle_key: string
+          last_error: string | null
+          milestone_days: number
+          opened_at: string | null
+          provider_message_id: string | null
+          recipient_email: string
+          scheduled_at: string | null
+          sent_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          clicked_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          inactivity_cycle_key: string
+          last_error?: string | null
+          milestone_days: number
+          opened_at?: string | null
+          provider_message_id?: string | null
+          recipient_email: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          clicked_at?: string | null
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          inactivity_cycle_key?: string
+          last_error?: string | null
+          milestone_days?: number
+          opened_at?: string | null
+          provider_message_id?: string | null
+          recipient_email?: string
+          scheduled_at?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       english_adventure_checkpoints: {
         Row: {
           adventure_id: string
