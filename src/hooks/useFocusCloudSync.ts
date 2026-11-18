@@ -14,6 +14,7 @@ import {
 import { loadFocusCloudSnapshot, saveFocusCloudSnapshot } from "@/lib/focusTimer.functions";
 import type { FocusActivity } from "@/lib/life";
 import { setFocusCloudSyncStatus } from "@/lib/focusCloudSyncStatus";
+import { resetFocusFromPreviousStudyDay } from "@/lib/focusStudyDay";
 
 function focusStateSignature(state: Partial<FocusState> | null) {
   if (!state) return null;
@@ -126,7 +127,6 @@ export function useFocusCloudSync() {
     void loadFocusCloudSnapshot()
       .then((remote) => {
         revision.current = remote.revision;
-        lastSyncedState.current = focusStateSignature(remote.state as FocusState | null);
         for (const row of remote.sessions) {
           addFocusLog({
             key: String(row.key),
@@ -158,10 +158,16 @@ export function useFocusCloudSync() {
         } catch {
           // The cloud-restored timer remains paused if storage is unavailable.
         }
-        const restored = getFocusSnapshot().state;
+        let restored = getFocusSnapshot().state;
         if (shouldResume && restored.phase !== "idle" && restored.endsAt === null) {
           focusResume();
+          restored = getFocusSnapshot().state;
         }
+
+        // An unfinished session from yesterday must not block today's EVO offer.
+        const normalized = resetFocusFromPreviousStudyDay(restored);
+        if (normalized !== restored) focusRestoreState(normalized);
+        lastSyncedState.current = focusStateSignature(normalized);
         setFocusCloudSyncStatus(userId, "ready");
       })
       .catch(() => {
@@ -260,9 +266,10 @@ export function useFocusCloudSync() {
 
         if (localIsClean && remote.state) {
           revision.current = remote.revision;
-          const remoteSignature = focusStateSignature(remote.state as FocusState);
+          const normalizedRemote = resetFocusFromPreviousStudyDay(remote.state as FocusState);
+          const remoteSignature = focusStateSignature(normalizedRemote);
           if (remoteSignature !== focusStateSignature(latestState.current)) {
-            focusRestoreState(remote.state as FocusState);
+            focusRestoreState(normalizedRemote);
           }
           lastSyncedState.current = remoteSignature;
         }
