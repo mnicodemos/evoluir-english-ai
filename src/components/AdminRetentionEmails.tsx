@@ -73,10 +73,10 @@ export function AdminRetentionEmails() {
         <>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[
-              [pt ? "Registros" : "Records", query.data.counts.total ?? 0],
-              [pt ? "Enviados" : "Sent", query.data.counts.sent ?? 0],
-              [pt ? "Entregues" : "Delivered", query.data.counts.delivered ?? 0],
-              [pt ? "Falhas" : "Failed", query.data.counts.failed ?? 0],
+              [pt ? "Registros" : "Records", query.data.counts["total"] ?? 0],
+              [pt ? "Enviados" : "Sent", query.data.counts["sent"] ?? 0],
+              [pt ? "Entregues" : "Delivered", query.data.counts["delivered"] ?? 0],
+              [pt ? "Falhas" : "Failed", query.data.counts["failed"] ?? 0],
             ].map(([label, value]) => (
               <div key={String(label)} className="rounded-lg border border-border/60 p-3">
                 <p className="text-xs text-muted-foreground">{label}</p>
