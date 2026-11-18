@@ -41,7 +41,7 @@ describe("sendMarketingEmail", () => {
         templateData: { lang: "pt", studentName: "Student" },
         idempotencyKey: "premium-test-key",
       }),
-    ).resolves.toEqual({ sent: true });
+    ).resolves.toEqual({ sent: true, messageId: "email_test_123" });
 
     expect(fetchMock).toHaveBeenCalledOnce();
     const [url, request] = fetchMock.mock.calls[0] as [string, RequestInit];
